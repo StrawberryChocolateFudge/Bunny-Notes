@@ -4,6 +4,8 @@ coverage
 coverage.json
 typechain
 
+circuits/input.json
+circuits/witnes.wtns
 #Hardhat files
 cache
 artifacts
