@@ -2,27 +2,35 @@
 pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 interface IVerifier {
-    function verifyProof(bytes memory _proof, uint256[4] memory _input)
-        external
-        returns (bool);
+    function verifyProof(
+        uint256[2] memory a,
+        uint256[2][2] memory b,
+        uint256[2] memory c,
+        uint256[4] memory _input
+    ) external returns (bool);
 }
 
 struct CommitmentStore {
     bool used;
     address creator;
     address recipient;
-    bool utxoNote;
+    bool cashNote;
     uint256 createdDate;
     uint256 spentDate;
 }
 
 abstract contract BunnyNotes is ReentrancyGuard {
+    using SafeMath for uint256;
+
     IVerifier public immutable verifier;
     uint256 public denomination;
 
     address payable public _owner;
+
+    uint256 public fee; // A 1 % fee, 1 hundredth of the denomination!
 
     mapping(bytes32 => bool) public nullifierHashes;
     // We store all the commitments to make sure there are no accidental deposits twice
@@ -46,7 +54,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
         bytes32 nullifierHashes,
         uint256 price,
         uint256 fee,
-        uint256 utxo
+        uint256 change
     );
 
     /**
@@ -59,10 +67,11 @@ abstract contract BunnyNotes is ReentrancyGuard {
         require(_denomination > 0, "Denomination should be greater than 0");
         verifier = _verifier;
         denomination = _denomination;
+        fee = _denomination / 100;
         _owner = payable(msg.sender);
     }
 
-    function deposit(bytes32 _commitment, bool utxoNote)
+    function deposit(bytes32 _commitment, bool cashNote)
         external
         payable
         nonReentrant
@@ -73,8 +82,8 @@ abstract contract BunnyNotes is ReentrancyGuard {
         );
         commitments[_commitment].used = true;
         commitments[_commitment].creator = msg.sender;
-        commitments[_commitment].utxoNote = utxoNote;
-
+        commitments[_commitment].cashNote = cashNote;
+        commitments[_commitment].createdDate = block.timestamp;
         _processDeposit();
 
         emit Deposit(_commitment, msg.sender, block.timestamp);
@@ -87,25 +96,27 @@ abstract contract BunnyNotes is ReentrancyGuard {
     function _processDeposit() internal virtual;
 
     function withdrawGiftCard(
-        bytes calldata _proof,
+        uint256[8] calldata _proof,
         bytes32 _nullifierHash,
         bytes32 _commitment,
         address _recipient,
         uint256 _fee
     ) external nonReentrant {
-        require(_fee <= denomination, "Fee exceeds transfer value");
+        require(_fee == fee, "Invalid Fee");
         require(
             !nullifierHashes[_nullifierHash],
             "The giftcard has already been spent"
         );
         require(
-            commitments[_commitment].utxoNote == false,
+            commitments[_commitment].cashNote == false,
             "You can only withdraw gift cards."
         );
 
         require(
             verifier.verifyProof(
-                _proof,
+                [_proof[0], _proof[1]],
+                [[_proof[2], _proof[3]], [_proof[4], _proof[5]]],
+                [_proof[6], _proof[7]],
                 [
                     uint256(_nullifierHash),
                     uint256(_commitment),
@@ -118,32 +129,39 @@ abstract contract BunnyNotes is ReentrancyGuard {
 
         nullifierHashes[_nullifierHash] = true;
         commitments[_commitment].recipient = msg.sender;
+        commitments[_commitment].spentDate = block.timestamp;
         _processWithdrawGiftCard(payable(_recipient), _fee);
     }
 
     function withdrawCashNote(
-        bytes calldata _proof,
+        uint256[8] calldata _proof,
         bytes32 _nullifierHash,
         bytes32 _commitment,
         address _recipient,
-        uint256 _price,
+        uint256 _change,
         uint256 _fee
     ) external payable {
-        require(_fee <= denomination, "Fee exceeds transfer value");
-        require(_price <= denomination, "Can't spend more than denomination");
-        require(_fee + _price <= denomination, "Fee + Price is to high");
         require(
             !nullifierHashes[_nullifierHash],
             "The note has already been spent"
         );
+
         require(
-            commitments[_commitment].utxoNote == true,
-            "You can only spend utxo notes."
+            commitments[_commitment].cashNote == true,
+            "You can only spend Cash notes."
         );
+
+        require(_fee == fee, "Invalid Fee");
+        require(fee.add(_change) <= denomination, "Invalid Change or Price");
+        uint256 _pricePlusFee = denomination.sub(_change);
+        uint256 _price = _pricePlusFee.sub(_fee);
+        require(_price >= 0, "Invalid price");
 
         require(
             verifier.verifyProof(
-                _proof,
+                [_proof[0], _proof[1]],
+                [[_proof[2], _proof[3]], [_proof[4], _proof[5]]],
+                [_proof[6], _proof[7]],
                 [
                     uint256(_nullifierHash),
                     uint256(_commitment),
@@ -156,11 +174,13 @@ abstract contract BunnyNotes is ReentrancyGuard {
 
         nullifierHashes[_nullifierHash] = true;
         commitments[_commitment].recipient = msg.sender;
+        commitments[_commitment].spentDate = block.timestamp;
         _processWithdrawCashNote(
             payable(_recipient),
             payable(commitments[_commitment].creator),
             _price,
-            _fee
+            _fee,
+            _change
         );
 
         emit WithdrawCashNote(
@@ -169,7 +189,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
             _nullifierHash,
             _price,
             _fee,
-            (denomination - _price) - _fee
+            _change
         );
     }
 
@@ -183,7 +203,8 @@ abstract contract BunnyNotes is ReentrancyGuard {
         address payable _recipient,
         address payable _creator,
         uint256 _price,
-        uint256 _fee
+        uint256 _fee,
+        uint256 _change
     ) internal virtual;
 
     /** @dev wether a giftcard is already spent */

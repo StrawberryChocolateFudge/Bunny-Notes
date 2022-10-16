@@ -20,7 +20,7 @@ contract ERC20Notes is BunnyNotes {
     function _processDeposit() internal override {
         require(
             msg.value == 0,
-            "ETH valie is supposed to be 0 for ERC20 instance"
+            "ETH value is supposed to be 0 for ERC20 instance"
         );
         token.safeTransferFrom(msg.sender, address(this), denomination);
     }
@@ -40,19 +40,17 @@ contract ERC20Notes is BunnyNotes {
         address payable _recipient,
         address payable creator,
         uint256 _price,
-        uint256 _fee
+        uint256 _fee,
+        uint256 _change
     ) internal override {
-        uint256 withoutFee = denomination - _fee;
-        uint256 utxo = withoutFee - _price;
-
         token.safeTransfer(_recipient, _price);
 
         if (_fee > 0) {
             token.safeTransfer(_owner, _fee);
         }
 
-        if (utxo > 0) {
-            token.safeTransfer(creator, utxo);
+        if (_change > 0) {
+            token.safeTransfer(creator, _change);
         }
     }
 }
