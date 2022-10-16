@@ -1,3 +1,23 @@
+# Bunny Notes
+
+This is the full implementation of Bunny Notes, a zero-knowledge proof based Gift Card and Cash Note protocol.
+
+The repository contains the zero-knowledge circuits, the solidity smart contracts and a front-end created with parcel.
+
+It uses the same repository for all for easy testing. 
+The project was built of a Hackathon and was scaffolded with hardhat
+
+To Run the zero-knowledge proof generation test use
+
+   `npx hardhat run scripts/main.ts`
+
+To run the tests run 
+
+   `npx hardhat test`
+
+
+
+
 ## Circom
 
 The verifying contract was generated using 
