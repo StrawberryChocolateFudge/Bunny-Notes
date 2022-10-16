@@ -31,9 +31,9 @@ export type PublicSignals = {
     commitmentHash: bigint,
     recipient: string,
     fee: string
+    change: string
 }
 
-//TODO: CHECK TO MAKE SURE THIS IS CORRECT!!
 export type SolidityProof = [
     BigNumberish,
     BigNumberish,
