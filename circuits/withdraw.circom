@@ -55,4 +55,4 @@ template Withdraw(){
   changeSquare <== change * change;
 }
 
-component main {public [nullifierHash,commitmentHash,recipient,fee]} = Withdraw();
+component main {public [nullifierHash,commitmentHash,recipient,fee,change]} = Withdraw();
