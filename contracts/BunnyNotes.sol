@@ -9,7 +9,7 @@ interface IVerifier {
         uint256[2] memory a,
         uint256[2][2] memory b,
         uint256[2] memory c,
-        uint256[4] memory _input
+        uint256[5] memory _input
     ) external returns (bool);
 }
 
@@ -100,7 +100,8 @@ abstract contract BunnyNotes is ReentrancyGuard {
         bytes32 _nullifierHash,
         bytes32 _commitment,
         address _recipient,
-        uint256 _fee
+        uint256 _fee,
+        uint256 _change
     ) external nonReentrant {
         require(_fee == fee, "Invalid Fee");
         require(
@@ -111,7 +112,6 @@ abstract contract BunnyNotes is ReentrancyGuard {
             commitments[_commitment].cashNote == false,
             "You can only withdraw gift cards."
         );
-
         require(
             verifier.verifyProof(
                 [_proof[0], _proof[1]],
@@ -121,14 +121,15 @@ abstract contract BunnyNotes is ReentrancyGuard {
                     uint256(_nullifierHash),
                     uint256(_commitment),
                     uint256(uint160(_recipient)),
-                    uint256(_fee)
+                    uint256(_fee),
+                    uint256(_change)
                 ]
             ),
             "Invalid Withdraw proof"
         );
 
         nullifierHashes[_nullifierHash] = true;
-        commitments[_commitment].recipient = msg.sender;
+        commitments[_commitment].recipient = _recipient;
         commitments[_commitment].spentDate = block.timestamp;
         _processWithdrawGiftCard(payable(_recipient), _fee);
     }
@@ -138,8 +139,8 @@ abstract contract BunnyNotes is ReentrancyGuard {
         bytes32 _nullifierHash,
         bytes32 _commitment,
         address _recipient,
-        uint256 _change,
-        uint256 _fee
+        uint256 _fee,
+        uint256 _change
     ) external payable {
         require(
             !nullifierHashes[_nullifierHash],
@@ -166,14 +167,15 @@ abstract contract BunnyNotes is ReentrancyGuard {
                     uint256(_nullifierHash),
                     uint256(_commitment),
                     uint256(uint160(_recipient)),
-                    uint256(_fee)
+                    uint256(_fee),
+                    uint256(_change)
                 ]
             ),
             "Invalid Withdraw proof"
         );
 
         nullifierHashes[_nullifierHash] = true;
-        commitments[_commitment].recipient = msg.sender;
+        commitments[_commitment].recipient = _recipient;
         commitments[_commitment].spentDate = block.timestamp;
         _processWithdrawCashNote(
             payable(_recipient),
