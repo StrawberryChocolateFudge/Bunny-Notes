@@ -2,7 +2,7 @@ import { deposit, parseNote } from "../lib/note";
 import { generateProof, verifyProof } from "../lib/generateProof";
 import fs from "fs";
 
-async function main() {
+async function main(): Promise<number> {
     const noteString = await deposit({ currency: "USDT", amount: 10, netId: 0x2b6653dc });
 
     console.log(noteString);
