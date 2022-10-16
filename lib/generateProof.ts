@@ -52,7 +52,8 @@ export function verifyProof(verificationKey: any, { proof, publicSignals }: Full
             publicSignals[0],
             publicSignals[1],
             publicSignals[2],
-            publicSignals[3]
+            publicSignals[3],
+            publicSignals[4]
         ],
         proof
     )
