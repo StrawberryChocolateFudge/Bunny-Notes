@@ -53,7 +53,7 @@ describe("BunnyNotes", function () {
 
   });
 
-  it("It should create a gift card deposit and another address  will withdraw it!", async function () {
+  it("It should create a gift card deposit and another address will withdraw it!", async function () {
 
     const { owner, alice, bob, attaker, USDTM, Verifier, ERC20Notes } = await setUp();
     const noteString = await deposit({ currency: "USDTM", amount: 10, netId: 1337 });
@@ -78,7 +78,21 @@ describe("BunnyNotes", function () {
 
 
     const solidityProof = packToSolidityProof(proof);
-    await ERC20Notes.connect(alice).withdrawGiftCard(solidityProof, toNoteHex(publicSignals[0]), toNoteHex(publicSignals[1]), alice.address, fee);
+
+    // I try to withdraw the gift card as a cash note
+
+    let cantWithdraw = false;
+    try {
+      await ERC20Notes.connect(bob).withdrawCashNote(solidityProof, toNoteHex(publicSignals[0]), toNoteHex(publicSignals[1]), bob.address, publicSignals[3], publicSignals[4])
+
+    } catch (err) {
+      cantWithdraw = true;
+    }
+
+    expect(cantWithdraw).to.be.true;
+
+
+    await ERC20Notes.connect(alice).withdrawGiftCard(solidityProof, toNoteHex(publicSignals[0]), toNoteHex(publicSignals[1]), alice.address, publicSignals[3], publicSignals[4]);
 
     // 1% fee was taken from the withdrawing!
     expect(await USDTM.balanceOf(alice.address)).to.equal(ethers.utils.parseEther("9.9"));
@@ -109,7 +123,7 @@ describe("BunnyNotes", function () {
     let erroOccured = false;
 
     try {
-      await ERC20Notes.connect(alice).withdrawGiftCard(solidityProof, toNoteHex(publicSignals[0]), toNoteHex(publicSignals[1]), alice.address, fee);
+      await ERC20Notes.connect(alice).withdrawGiftCard(solidityProof, toNoteHex(publicSignals[0]), toNoteHex(publicSignals[1]), toNoteHex(publicSignals[2]), publicSignals[3], publicSignals[4]);
     } catch (err) {
       erroOccured = true;
     }
@@ -120,7 +134,7 @@ describe("BunnyNotes", function () {
 
     try {
 
-      await ERC20Notes.connect(alice).withdrawGiftCard(solidityProof, toNoteHex(publicSignals[0]), toNoteHex(publicSignals[1]), alice.address, ethers.utils.parseEther("10000000"));
+      await ERC20Notes.connect(alice).withdrawGiftCard(solidityProof, toNoteHex(publicSignals[0]), toNoteHex(publicSignals[1]), toNoteHex(publicSignals[2]), publicSignals[3], publicSignals[4]);
     } catch (
     err
     ) {
@@ -129,6 +143,170 @@ describe("BunnyNotes", function () {
       erroOccured = true;
     }
     expect(erroOccured).to.be.true;
+
+  })
+
+
+  it("Alice Should create a cash note and then Bob requests payment", async function () {
+    const { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes } = await setUp();
+
+    // Alice createa a Note 
+
+    const noteString = await deposit({ currency: "USDTM", amount: 10, netId: 1337 });
+    const parsedNote = await parseNote(noteString);
+    // The owner makes a deposit
+    expect(parsedNote.deposit.commitment).is.not.undefined;
+
+    expect(await ERC20Notes.isSpent(toNoteHex(parsedNote.deposit.nullifierHash))).to.be.false;
+
+    // Alice mints some USDTM so she has balance
+
+    await USDTM.connect(alice).mint(alice.address, ethers.utils.parseEther("100"));
+
+    expect(await USDTM.balanceOf(alice.address)).to.equal(ethers.utils.parseEther("100"));
+
+    await USDTM.connect(alice).approve(ERC20Notes.address, ethers.utils.parseEther("10"));
+
+    // Now Alice deposits to create a Cash Note
+
+    await ERC20Notes.connect(alice).deposit(toNoteHex(parsedNote.deposit.commitment), true);
+
+    // // I expect that there is not a note saved
+    const depositedNote = await ERC20Notes.commitments(toNoteHex(parsedNote.deposit.commitment));
+
+    expect(depositedNote.used).to.be.true;
+
+    expect(depositedNote.creator).to.equal(alice.address);
+
+    expect(depositedNote.recipient).to.equal("0x0000000000000000000000000000000000000000");
+
+    expect(depositedNote.cashNote).to.be.true;
+
+    //Bob is now requesting payment. This will be actually a front end feature...
+
+    const price = ethers.utils.parseEther("9");
+
+    // Alice decides what note she will pay with and what is the change. Since we have 10 dollar notes, the change is 1.
+
+    const change = ethers.utils.parseEther("1"); // This means BOB is requesting 9 dollars, the change is 1
+
+    // So now alice creates the ZKP after fetching the contract Fee (1%)
+
+    const fee = await ERC20Notes.fee();
+
+    const { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recipient: bob.address, fee: fee.toString(), change: change.toString() });
+
+    // Now alice can give the proof and public signals to BOB or she can do the withdrawing herself
+
+    const solidityProof = packToSolidityProof(proof);
+
+
+    //The attacker will try to withraw a balance to his address with the stolen proof
+
+    let attackerFails = false;
+
+    try {
+      await ERC20Notes.connect(attacker).withdrawCashNote(solidityProof, toNoteHex(publicSignals[0]), toNoteHex(publicSignals[1]), attacker.address, publicSignals[3], publicSignals[4])
+    } catch (err) {
+      attackerFails = true;
+    }
+
+    expect(attackerFails).to.be.true;
+
+
+    await ERC20Notes.connect(bob).withdrawCashNote(solidityProof, toNoteHex(publicSignals[0]), toNoteHex(publicSignals[1]), bob.address, publicSignals[3], publicSignals[4])
+
+    // And bob withdrew the note, with the fee substracted he received the price!
+
+    expect(await USDTM.balanceOf(bob.address)).to.equal(price.sub(ethers.utils.parseEther("0.1")));
+    // Expect the owner to have collected the fee!
+    expect(await USDTM.balanceOf(owner.address)).to.equal(ethers.utils.parseEther("100.1"));
+
+    // Expect Alice to have recieved the change back!
+    expect(await USDTM.balanceOf(alice.address)).to.equal(ethers.utils.parseEther("91"));
+
+
+    // Now  try to cash out the note again
+    let errorOccured;
+    try {
+      await ERC20Notes.connect(bob).withdrawCashNote(solidityProof, toNoteHex(publicSignals[0]), toNoteHex(publicSignals[1]), bob.address, publicSignals[3], publicSignals[4])
+
+    } catch (err) {
+      errorOccured = true;
+    }
+
+    expect(errorOccured).to.be.true;
+
+    expect(await ERC20Notes.isSpent(toNoteHex(parsedNote.deposit.nullifierHash))).to.be.true;
+
+    expect(await ERC20Notes.isSpentArray([toNoteHex(parsedNote.deposit.nullifierHash)])).to.contain(true)
+  })
+
+
+  it("Testing some error conditions that can happen with the price!", async function () {
+    const { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes } = await setUp();
+
+    // Alice createa a Note 
+
+    const noteString = await deposit({ currency: "USDTM", amount: 10, netId: 1337 });
+    const parsedNote = await parseNote(noteString);
+    // The owner makes a deposit
+    expect(parsedNote.deposit.commitment).is.not.undefined;
+
+    // Alice mints some USDTM so she has balance
+
+    await USDTM.connect(alice).mint(alice.address, ethers.utils.parseEther("100"));
+
+    expect(await USDTM.balanceOf(alice.address)).to.equal(ethers.utils.parseEther("100"));
+
+    await USDTM.connect(alice).approve(ERC20Notes.address, ethers.utils.parseEther("10"));
+
+    // Now Alice deposits to create a Cash Note
+
+    await ERC20Notes.connect(alice).deposit(toNoteHex(parsedNote.deposit.commitment), true);
+
+    // // I expect that there is not a note saved
+    await ERC20Notes.commitments(toNoteHex(parsedNote.deposit.commitment));
+
+    // Alice decides what note she will pay with and what is the change. Since we have 10 dollar notes, the change is 1.
+
+    const change = ethers.utils.parseEther("1"); // This means BOB is requesting 9 dollars, the change is 1
+
+    // So now alice creates the ZKP after fetching the contract Fee (1%)
+
+    const fee = await ERC20Notes.fee();
+
+    // Create a proof with too high fee
+    let { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recipient: bob.address, fee: ethers.utils.parseEther("100").toString(), change: change.toString() });
+
+    // Now alice can give the proof and public signals to BOB or she can do the withdrawing herself
+
+    let solidityProof = packToSolidityProof(proof);
+
+    let failed = false;
+    try {
+      await ERC20Notes.connect(bob).withdrawCashNote(solidityProof, toNoteHex(publicSignals[0]), toNoteHex(publicSignals[1]), bob.address, publicSignals[3], publicSignals[4])
+    } catch (err) {
+      failed = true;
+    }
+
+    // Failed cuz the fee was too high!
+
+    expect(failed).to.be.true;
+
+    let { proof: proof2, publicSignals: publicSignals2 } = await generateProof({ deposit: parsedNote.deposit, recipient: bob.address, fee: fee.toString(), change: ethers.utils.parseEther("100").toString() });
+
+    solidityProof = packToSolidityProof(proof2);
+
+    failed = false;
+
+    try {
+      await ERC20Notes.connect(bob).withdrawCashNote(solidityProof, toNoteHex(publicSignals2[0]), toNoteHex(publicSignals2[1]), bob.address, publicSignals2[3], publicSignals2[4])
+    } catch (err) {
+      failed = true;
+    }
+
+    expect(failed).to.be.true
 
   })
 });
