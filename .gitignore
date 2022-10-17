@@ -9,3 +9,5 @@ circuits/witnes.wtns
 #Hardhat files
 cache
 artifacts
+dist
+.parcel-cache
