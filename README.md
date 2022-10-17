@@ -1,3 +1,7 @@
+![Bunny Notes](https://raw.githubusercontent.com/StrawberryChocolateFudge/Bunny-Notes/master/bunnyNotes.jpg)
+
+
+
 # Bunny Notes
 
 This is the full implementation of Bunny Notes, a zero-knowledge proof based Gift Card and Cash Note protocol.
