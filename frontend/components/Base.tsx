@@ -9,6 +9,8 @@ import PurchaseGiftCardTab from './PurchaseGiftCardTab';
 import Header from './Header';
 import PurchaseCashNote from './PurchaseCashNote';
 import VerifyNoteTab from './VerifyNoteTab';
+import CashOutGiftCardTab from './CashOutGiftCardTab';
+import PaymentRequestTab from './PaymentRequestTab';
 
 function Copyright() {
     return (
@@ -177,6 +179,8 @@ export default function Base() {
 
     const [noteString, setMyNoteString] = React.useState("");
 
+    const [paymentRequest, setPaymentRequest] = React.useState({ price: "", payTo: "" })
+
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
@@ -193,11 +197,10 @@ export default function Base() {
                 return <PurchaseCashNote setMyAddress={setMyAddress} myAddress={myAddress} />
             case 2:
                 return <VerifyNoteTab noteString={noteString} setMyNoteString={setMyNoteString} />
-
             case 3:
-                return <p>Cash out</p>
+                return <CashOutGiftCardTab noteString={noteString} setMyNoteString={setMyNoteString}></CashOutGiftCardTab>
             case 4:
-                return <p>Payment request</p>;
+                return <PaymentRequestTab paymentRequest={paymentRequest} setPaymentRequest={setPaymentRequest}></PaymentRequestTab>;
             default:
                 break;
         }
