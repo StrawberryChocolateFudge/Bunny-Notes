@@ -24,9 +24,7 @@ To run the tests run
 
 ## Circom
 
-The verifying contract was generated using 
-
-https://docs.circom.io/getting-started/proving-circuits/#verifying-a-proof
+Run the `compile.sh` from the /circuits directory to recompile the Verifier
 ## Powers of TAU
 
 The ptau file was downloaded from  Hermez Protocol Ceremony from their dropbox [here](https://www.dropbox.com/sh/mn47gnepqu88mzl/AACaJkBU7mmCq8uU8ml0-0fma?dl=0)
