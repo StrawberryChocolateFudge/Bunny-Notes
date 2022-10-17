@@ -48,7 +48,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
             </AppBar>
             <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center" }}>
                   <Button variant="contained" size="large">
-                        <Typography textAlign={"center"} variant="h5" component="h5">Scan Note</Typography>
+                        <Typography textAlign={"center"} variant="h6" component="h6">Scan a Note</Typography>
                   </Button>
 
             </Box>
