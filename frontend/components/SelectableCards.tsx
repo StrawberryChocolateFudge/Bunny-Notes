@@ -13,7 +13,7 @@ export interface SelectableCardsProps {
   imageAlt: string;
   denomination: string;
   currency: string;
-  cardType: "Gift Card" | "Cash Note",
+  cardType: "Gift Card" | "Cash Note" | "Payment Request",
 
 
 }
@@ -31,18 +31,29 @@ export function SelectableCards(props: SelectableCardsProps) {
     console.log(props.currency);
   }
 
+
+  const getContent = () => {
+    if (props.cardType === "Payment Request") {
+      return <Typography gutterBottom variant="subtitle1" component="div">
+        {props.currency}
+      </Typography>
+    } else {
+      return <Typography gutterBottom variant="subtitle1" component="div">
+        {props.denomination} {props.currency} {props.cardType}
+      </Typography>
+    }
+  }
+
   return (
-    <Button onClick={purchaseSelected}>
-      <Card >
+    <Button onClick={purchaseSelected} >
+      <Card sx={{ minWidth: 200 }}>
         <IMG
           width="50"
           src={props.imageLink}
           alt={props.imageAlt}
         />
         <CardContent>
-          <Typography gutterBottom variant="subtitle1" component="div">
-            {props.denomination} {props.currency} {props.cardType}
-          </Typography>
+          {getContent()}
         </CardContent>
       </Card>
     </Button>
