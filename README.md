@@ -11,21 +11,28 @@ The repository contains the zero-knowledge circuits, the solidity smart contract
 It uses the same repository for all for easy testing. 
 The project was built of a Hackathon and was scaffolded with hardhat
 
-To Run the zero-knowledge proof generation test use
 
-   `npx hardhat run scripts/main.ts`
+## Deployment
+
+The applicaiton uses TronBox to upload the smart contract to the tron network
+
+It needs to be globally available!
+
+    npm install -g tronbox
+
+
+
+## Tests
 
 To run the tests run 
 
    `npx hardhat test`
 
 
-
-
 ## Circom
 
 Run the `compile.sh` from the /circuits directory to recompile the Verifier
-## Powers of TAU
+## Powers of Tau
 
 The ptau file was downloaded from  Hermez Protocol Ceremony from their dropbox [here](https://www.dropbox.com/sh/mn47gnepqu88mzl/AACaJkBU7mmCq8uU8ml0-0fma?dl=0)
 
