@@ -9,9 +9,11 @@ import Tooltip from '@mui/material/Tooltip';
 import VerifyIcon from "@mui/icons-material/Note"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography";
-interface CashOutGiftCardTabProps {
+import { BaseTronUser } from './Base';
+interface CashOutGiftCardTabProps extends BaseTronUser {
     noteString: string
     setMyNoteString: (newValue: string) => void;
+
 
 }
 
