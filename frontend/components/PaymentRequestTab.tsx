@@ -13,6 +13,7 @@ import WalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import MoneyIcon from "@mui/icons-material/Money";
 import { getCardPropsData } from "./utils/cardPropsData";
 import CardGrid from "./CardGrid";
+import { BaseTronUser } from "./Base";
 
 
 export type PaymentRequest = {
@@ -20,9 +21,10 @@ export type PaymentRequest = {
     payTo: string
 }
 
-interface PaymentRequestTabProps {
+interface PaymentRequestTabProps extends BaseTronUser {
     paymentRequest: PaymentRequest,
     setPaymentRequest: (value: PaymentRequest) => void;
+
 }
 
 
