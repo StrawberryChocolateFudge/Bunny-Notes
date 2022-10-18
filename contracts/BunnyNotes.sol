@@ -1,5 +1,5 @@
 // SPDX-License-Identifire: MIT
-pragma solidity ^0.8.1;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -16,7 +16,7 @@ interface IVerifier {
 struct CommitmentStore {
     bool used;
     address creator;
-    address recipient;
+    address recepient;
     bool cashNote;
     uint256 createdDate;
     uint256 spentDate;
@@ -110,7 +110,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
         uint256[8] calldata _proof,
         bytes32 _nullifierHash,
         bytes32 _commitment,
-        address _recipient,
+        address _recepient,
         uint256 _change
     ) external nonReentrant {
         require(
@@ -129,7 +129,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
                 [
                     uint256(_nullifierHash),
                     uint256(_commitment),
-                    uint256(uint160(_recipient)),
+                    uint256(uint160(_recepient)),
                     uint256(_change)
                 ]
             ),
@@ -137,16 +137,16 @@ abstract contract BunnyNotes is ReentrancyGuard {
         );
 
         nullifierHashes[_nullifierHash] = true;
-        commitments[_commitment].recipient = _recipient;
+        commitments[_commitment].recepient = _recepient;
         commitments[_commitment].spentDate = block.timestamp;
-        _processWithdrawGiftCard(payable(_recipient));
+        _processWithdrawGiftCard(payable(_recepient));
     }
 
     function withdrawCashNote(
         uint256[8] calldata _proof,
         bytes32 _nullifierHash,
         bytes32 _commitment,
-        address _recipient,
+        address _recepient,
         uint256 _change
     ) external payable {
         require(
@@ -173,7 +173,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
                 [
                     uint256(_nullifierHash),
                     uint256(_commitment),
-                    uint256(uint160(_recipient)),
+                    uint256(uint160(_recepient)),
                     uint256(_change)
                 ]
             ),
@@ -181,10 +181,10 @@ abstract contract BunnyNotes is ReentrancyGuard {
         );
 
         nullifierHashes[_nullifierHash] = true;
-        commitments[_commitment].recipient = _recipient;
+        commitments[_commitment].recepient = _recepient;
         commitments[_commitment].spentDate = block.timestamp;
         _processWithdrawCashNote(
-            payable(_recipient),
+            payable(_recepient),
             payable(commitments[_commitment].creator),
             _price,
             _change
@@ -192,7 +192,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
 
         emit WithdrawCashNote(
             commitments[_commitment].creator,
-            _recipient,
+            _recepient,
             _nullifierHash,
             _price,
             _change
@@ -200,13 +200,13 @@ abstract contract BunnyNotes is ReentrancyGuard {
     }
 
     /** This is defined in a child contract */
-    function _processWithdrawGiftCard(address payable _recipient)
+    function _processWithdrawGiftCard(address payable _recepient)
         internal
         virtual;
 
     /** Process spending the UTXO note, this is defined in a child contract */
     function _processWithdrawCashNote(
-        address payable _recipient,
+        address payable _recepient,
         address payable _creator,
         uint256 _price,
         uint256 _change

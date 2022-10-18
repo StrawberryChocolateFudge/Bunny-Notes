@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.1;
+pragma solidity ^0.8.0;
 
 import "./BunnyNotes.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -43,20 +43,20 @@ contract ERC20Notes is BunnyNotes {
         }
     }
 
-    function _processWithdrawGiftCard(address payable _recipient)
+    function _processWithdrawGiftCard(address payable _recepient)
         internal
         override
     {
-        token.safeTransfer(_recipient, denomination);
+        token.safeTransfer(_recepient, denomination);
     }
 
     function _processWithdrawCashNote(
-        address payable _recipient,
+        address payable _recepient,
         address payable creator,
         uint256 _price,
         uint256 _change
     ) internal override {
-        token.safeTransfer(_recipient, _price);
+        token.safeTransfer(_recepient, _price);
         if (_change > 0) {
             token.safeTransfer(creator, _change);
         }
