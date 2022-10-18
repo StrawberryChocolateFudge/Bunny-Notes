@@ -1,12 +1,14 @@
 import * as React from 'react';
-import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import { SelectableCards, SelectableCardsProps } from './SelectableCards';
 
+export type CardType = "Gift Card" | "Cash Note" | "Payment Request";
+
 interface CardGridProps {
     cardProps: Array<SelectableCardsProps>
+    handleSelect: (denomination: string, currency: string, cardType: CardType) => void
+
 }
 
 
@@ -15,8 +17,7 @@ export default function CardGrid(props: CardGridProps) {
     const renderGrid = () => {
         return props.cardProps.map(data => {
             return <Grid item xs={6} key={`${data.denomination}${data.currency}${data.cardType}`} justifyContent="center" alignItems="stretch" sx={{ textAlign: "center" }}>
-
-                <SelectableCards cardType={data.cardType} currency={data.currency} denomination={data.denomination} imageAlt={data.imageAlt} imageLink={data.imageLink}></SelectableCards>
+                <SelectableCards handleSelect={props.handleSelect} cardType={data.cardType} currency={data.currency} denomination={data.denomination} imageAlt={data.imageAlt} imageLink={data.imageLink}></SelectableCards>
             </Grid>
         })
     }
