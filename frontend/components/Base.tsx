@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -11,8 +10,26 @@ import PurchaseCashNote from './PurchaseCashNote';
 import VerifyNoteTab from './VerifyNoteTab';
 import CashOutGiftCardTab from './CashOutGiftCardTab';
 import PaymentRequestTab from './PaymentRequestTab';
+import CircularProgress from "@mui/material/CircularProgress";
+import Button from "@mui/material/Button";
+import Snackbar from '@mui/material/Snackbar';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
+import getTheme from './theme';
 
-function Copyright() {
+export interface BaseTronUser {
+    myAddress: string,
+    setMyAddress: (newValue: string) => void
+    tronWeb: any,
+    setTronWeb: any,
+    displayError: any
+}
+
+interface CopyrightProps {
+    setPageState: (pageState: PageState) => void
+}
+
+function Copyright(props: CopyrightProps) {
     return (
         <Typography variant="body2" color="text.secondary" align="center">
             {'Copyright © '}
@@ -20,158 +37,23 @@ function Copyright() {
                 bunnynotes.finance {" "}
             </Link>
 
-            {new Date().getFullYear()}.
+            {new Date().getFullYear()}
+            <Button onClick={() => { props.setPageState(PageState.Partner) }}>Partner with us</Button>
         </Typography>
     );
 }
 
-let theme = createTheme({
-    palette: {
-        primary: {
-            light: '#efe9d1',
-            main: '#2d5840',
-            dark: '#006db3',
-        },
-    },
-    typography: {
-        h5: {
-            fontWeight: 500,
-            fontSize: 26,
-            letterSpacing: 0.5,
-        },
-    },
-    shape: {
-        borderRadius: 8,
-    },
-    components: {
-        MuiTab: {
-            defaultProps: {
-                disableRipple: true,
-            },
-        },
-    },
-    mixins: {
-        toolbar: {
-            minHeight: 48,
-        },
-    },
-});
+const theme = getTheme();
 
-theme = {
-    ...theme,
-    components: {
-        MuiDrawer: {
-            styleOverrides: {
-                paper: {
-                    backgroundColor: '#081627',
-                },
-            },
-        },
-        MuiButton: {
-            styleOverrides: {
-                root: {
-                    textTransform: 'none',
-                },
-                contained: {
-                    boxShadow: 'none',
-                    '&:active': {
-                        boxShadow: 'none',
-                    },
-                },
-            },
-        },
-        MuiTabs: {
-            styleOverrides: {
-                root: {
-                    marginLeft: theme.spacing(1),
-                },
-                indicator: {
-                    height: 3,
-                    borderTopLeftRadius: 3,
-                    borderTopRightRadius: 3,
-                    backgroundColor: theme.palette.common.white,
-                },
-            },
-        },
-        MuiTab: {
-            styleOverrides: {
-                root: {
-                    textTransform: 'none',
-                    margin: '0 16px',
-                    minWidth: 0,
-                    padding: 0,
-                    [theme.breakpoints.up('md')]: {
-                        padding: 0,
-                        minWidth: 0,
-                    },
-                },
-            },
-        },
-        MuiIconButton: {
-            styleOverrides: {
-                root: {
-                    padding: theme.spacing(1),
-                },
-            },
-        },
-        MuiTooltip: {
-            styleOverrides: {
-                tooltip: {
-                    borderRadius: 4,
-                },
-            },
-        },
-        MuiDivider: {
-            styleOverrides: {
-                root: {
-                    backgroundColor: 'rgb(255,255,255,0.15)',
-                },
-            },
-        },
-        MuiListItemButton: {
-            styleOverrides: {
-                root: {
-                    '&.Mui-selected': {
-                        color: '#efe9d1',
-                    },
-                },
-            },
-        },
-        MuiListItemText: {
-            styleOverrides: {
-                primary: {
-                    fontSize: 14,
-                    fontWeight: theme.typography.fontWeightMedium,
-                },
-            },
-        },
-        MuiListItemIcon: {
-            styleOverrides: {
-                root: {
-                    color: 'inherit',
-                    minWidth: 'auto',
-                    marginRight: theme.spacing(2),
-                    '& svg': {
-                        fontSize: 20,
-                    },
-                },
-            },
-        },
-        MuiAvatar: {
-            styleOverrides: {
-                root: {
-                    width: 32,
-                    height: 32,
-                },
-            },
-        },
-    },
-};
-
+export enum PageState { Loading, Tabs, Scanning, Partner }
 
 export default function Base() {
-    const [mobileOpen, setMobileOpen] = React.useState(false);
-    const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
+
+    const [pageState, setPageState] = React.useState(PageState.Tabs);
+
+    const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+
+    const [snackbarMessage, setSnackbarMessage] = React.useState("");
 
     const [selectedTab, setSelectedTab] = React.useState(0);
 
@@ -181,31 +63,93 @@ export default function Base() {
 
     const [paymentRequest, setPaymentRequest] = React.useState({ price: "", payTo: "" })
 
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
+    const [tronWeb, setTronWeb] = React.useState(null);
+
+
+    const openSnackbar = (msg: string) => {
+        setSnackbarOpen(true);
+        setSnackbarMessage(msg);
+    }
+
+    const closeSnackbar = (event: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setSnackbarOpen(false);
+    }
+
 
     const onTabToggle = (event: React.SyntheticEvent, newValue: number) => {
         setSelectedTab(newValue);
     };
 
-    const getContent = () => {
+
+    const getLoading = () => {
+        return <Box sx={{ display: 'flex', justifyContent: "center" }}>
+            <CircularProgress />
+        </Box>
+    }
+
+    const genericProps = {
+        displayError: openSnackbar,
+        tronWeb,
+        setTronWeb,
+        setMyAddress,
+        myAddress
+    }
+
+    const noteStringProps = {
+        noteString,
+        setMyNoteString
+    }
+
+    const paymentRequestProps = {
+        paymentRequest,
+        setPaymentRequest
+    }
+
+    const getTabContent = () => {
         switch (selectedTab) {
             case 0:
-                return <PurchaseGiftCardTab setMyAddress={setMyAddress} myAddress={myAddress} />
+                return <PurchaseGiftCardTab {...genericProps} />
             case 1:
-                return <PurchaseCashNote setMyAddress={setMyAddress} myAddress={myAddress} />
+                return <PurchaseCashNote {...genericProps} />
             case 2:
-                return <VerifyNoteTab noteString={noteString} setMyNoteString={setMyNoteString} />
+                return <VerifyNoteTab {...genericProps} {...noteStringProps} />
             case 3:
-                return <CashOutGiftCardTab noteString={noteString} setMyNoteString={setMyNoteString}></CashOutGiftCardTab>
+                return <CashOutGiftCardTab {...genericProps} {...noteStringProps}></CashOutGiftCardTab>
             case 4:
-                return <PaymentRequestTab paymentRequest={paymentRequest} setPaymentRequest={setPaymentRequest}></PaymentRequestTab>;
+                return <PaymentRequestTab {...genericProps} {...paymentRequestProps}></PaymentRequestTab>;
             default:
                 break;
         }
     }
 
+    const getContent = () => {
+        switch (pageState) {
+            case PageState.Loading:
+                return getLoading();
+            case PageState.Tabs:
+                return getTabContent();
+            default:
+
+                break;
+        }
+    }
+
+    const snackBarAction = (
+        <React.Fragment>
+            <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={closeSnackbar}
+            >
+                <CloseIcon fontSize="small" />
+            </IconButton>
+        </React.Fragment>
+    );
 
     return (
         <ThemeProvider theme={theme}>
@@ -213,15 +157,22 @@ export default function Base() {
                 <CssBaseline />
 
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <Header selectedTab={selectedTab} onTabToggle={onTabToggle} onDrawerToggle={handleDrawerToggle} />
+                    <Header pageState={pageState} selectedTab={selectedTab} onTabToggle={onTabToggle} />
                     <Box component="main" sx={{ flex: 1, py: 6, px: 4, bgcolor: '#eaeff1' }}>
                         {getContent()}
                     </Box>
                     <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
-                        <Copyright />
+                        <Copyright setPageState={setPageState} />
                     </Box>
                 </Box>
             </Box>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={closeSnackbar}
+                message={snackbarMessage}
+                action={snackBarAction}
+            />
         </ThemeProvider>
     );
 }
