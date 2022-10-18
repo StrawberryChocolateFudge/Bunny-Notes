@@ -26,3 +26,7 @@ snarkjs zkey export solidityverifier withdraw_0001.zkey Verifier.sol
 
 # copy the Verifier.sol to the contracts directory
 mv Verifier.sol ../contracts/Verifier.sol
+
+cp withdraw_0001.zkey ../dist/withdraw_0001.zkey
+
+cp withdraw_js/withdraw.wasm ../dist/withdraw.wasm
