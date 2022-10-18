@@ -4,14 +4,13 @@ import { groth16 } from "snarkjs"
 import { FullProof } from "./types"
 
 
-export async function generateProof({ deposit, recipient, fee, change, snarkArtifacts }: { deposit: Deposit, recipient: string, fee: string, change: string, snarkArtifacts?: SnarkArtifacts }): Promise<FullProof> {
+export async function generateProof({ deposit, recipient, change, snarkArtifacts }: { deposit: Deposit, recipient: string, change: string, snarkArtifacts?: SnarkArtifacts }): Promise<FullProof> {
     console.log("Generate proof start");
 
     const input = {
         nullifierHash: deposit.nullifierHash,
         commitmentHash: deposit.commitment,
         recipient,
-        fee,
         change,
         // private snark inputs
         nullifier: deposit.nullifier,
@@ -52,8 +51,7 @@ export function verifyProof(verificationKey: any, { proof, publicSignals }: Full
             publicSignals[0],
             publicSignals[1],
             publicSignals[2],
-            publicSignals[3],
-            publicSignals[4]
+            publicSignals[3]
         ],
         proof
     )

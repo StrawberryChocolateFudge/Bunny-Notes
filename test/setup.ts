@@ -4,7 +4,9 @@ export async function setUp(): Promise<any> {
 
     const DENOMINATION = ethers.utils.parseEther("10"); // 10 Dollars!
 
-    const [owner, alice, bob, attacker] = await ethers.getSigners();
+    const FEEDIVIDER = 10 // The fee is calculated like DENOMINATION / FEEDIVIDEr
+
+    const [owner, alice, bob, attacker, relayer] = await ethers.getSigners();
 
     const MockERC20Factory = await ethers.getContractFactory("MOCKERC20");
     const MockERC20 = await MockERC20Factory.deploy();
@@ -21,8 +23,8 @@ export async function setUp(): Promise<any> {
 
     const ERC20NotesFactory = await ethers.getContractFactory("ERC20Notes");
 
-    const ERC20Notes = await ERC20NotesFactory.deploy(VerifierDeploy.address, DENOMINATION, MockERC20.address);
+    const ERC20Notes = await ERC20NotesFactory.deploy(VerifierDeploy.address, DENOMINATION, FEEDIVIDER, MockERC20.address, relayer.address);
 
 
-    return { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes }
+    return { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes, relayer }
 }

@@ -9,7 +9,7 @@ interface IVerifier {
         uint256[2] memory a,
         uint256[2][2] memory b,
         uint256[2] memory c,
-        uint256[5] memory _input
+        uint256[4] memory _input
     ) external returns (bool);
 }
 
@@ -29,6 +29,8 @@ abstract contract BunnyNotes is ReentrancyGuard {
     uint256 public denomination;
 
     address payable public _owner;
+
+    address public relayer;
 
     uint256 public fee; // A 1 % fee, 1 hundredth of the denomination!
 
@@ -53,7 +55,6 @@ abstract contract BunnyNotes is ReentrancyGuard {
         address to,
         bytes32 nullifierHashes,
         uint256 price,
-        uint256 fee,
         uint256 change
     );
 
@@ -61,49 +62,57 @@ abstract contract BunnyNotes is ReentrancyGuard {
         @dev : the constructor
         @param _verifier is the address of SNARK verifier contract
         @param _denomination transfer amount for each deposit
+        @param _feeDivider The amount to divide the denomination to calculate the fee
+        @param _relayer The relayer can make deposits on behalf of other accounts!
+        
     */
 
-    constructor(IVerifier _verifier, uint256 _denomination) {
+    constructor(
+        IVerifier _verifier,
+        uint256 _denomination,
+        uint8 _feeDivider,
+        address _relayer
+    ) {
         require(_denomination > 0, "Denomination should be greater than 0");
         verifier = _verifier;
         denomination = _denomination;
-        fee = _denomination / 100;
+        fee = _denomination / _feeDivider;
         _owner = payable(msg.sender);
+        relayer = _relayer;
     }
 
-    function deposit(bytes32 _commitment, bool cashNote)
-        external
-        payable
-        nonReentrant
-    {
+    function deposit(
+        bytes32 _commitment,
+        bool cashNote,
+        address depositFor
+    ) external payable nonReentrant {
         require(
             !commitments[_commitment].used,
             "The commitment has been submitted"
         );
+
         commitments[_commitment].used = true;
-        commitments[_commitment].creator = msg.sender;
+        commitments[_commitment].creator = depositFor;
         commitments[_commitment].cashNote = cashNote;
         commitments[_commitment].createdDate = block.timestamp;
-        _processDeposit();
+        _processDeposit(depositFor);
 
-        emit Deposit(_commitment, msg.sender, block.timestamp);
+        emit Deposit(_commitment, depositFor, block.timestamp);
     }
 
     /**
      @dev this function is defined in a child contract
     */
 
-    function _processDeposit() internal virtual;
+    function _processDeposit(address depositFor) internal virtual;
 
     function withdrawGiftCard(
         uint256[8] calldata _proof,
         bytes32 _nullifierHash,
         bytes32 _commitment,
         address _recipient,
-        uint256 _fee,
         uint256 _change
     ) external nonReentrant {
-        require(_fee == fee, "Invalid Fee");
         require(
             !nullifierHashes[_nullifierHash],
             "The giftcard has already been spent"
@@ -121,7 +130,6 @@ abstract contract BunnyNotes is ReentrancyGuard {
                     uint256(_nullifierHash),
                     uint256(_commitment),
                     uint256(uint160(_recipient)),
-                    uint256(_fee),
                     uint256(_change)
                 ]
             ),
@@ -131,7 +139,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
         nullifierHashes[_nullifierHash] = true;
         commitments[_commitment].recipient = _recipient;
         commitments[_commitment].spentDate = block.timestamp;
-        _processWithdrawGiftCard(payable(_recipient), _fee);
+        _processWithdrawGiftCard(payable(_recipient));
     }
 
     function withdrawCashNote(
@@ -139,7 +147,6 @@ abstract contract BunnyNotes is ReentrancyGuard {
         bytes32 _nullifierHash,
         bytes32 _commitment,
         address _recipient,
-        uint256 _fee,
         uint256 _change
     ) external payable {
         require(
@@ -152,11 +159,11 @@ abstract contract BunnyNotes is ReentrancyGuard {
             "You can only spend Cash notes."
         );
 
-        require(_fee == fee, "Invalid Fee");
-        require(fee.add(_change) <= denomination, "Invalid Change or Price");
-        uint256 _pricePlusFee = denomination.sub(_change);
-        uint256 _price = _pricePlusFee.sub(_fee);
-        require(_price >= 0, "Invalid price");
+        require(_change <= denomination, "The requested change is too high!");
+
+        uint256 _price = denomination.sub(_change);
+
+        require(_price > 0, "0 Price Payment is not allowed!");
 
         require(
             verifier.verifyProof(
@@ -167,7 +174,6 @@ abstract contract BunnyNotes is ReentrancyGuard {
                     uint256(_nullifierHash),
                     uint256(_commitment),
                     uint256(uint160(_recipient)),
-                    uint256(_fee),
                     uint256(_change)
                 ]
             ),
@@ -181,7 +187,6 @@ abstract contract BunnyNotes is ReentrancyGuard {
             payable(_recipient),
             payable(commitments[_commitment].creator),
             _price,
-            _fee,
             _change
         );
 
@@ -190,13 +195,12 @@ abstract contract BunnyNotes is ReentrancyGuard {
             _recipient,
             _nullifierHash,
             _price,
-            _fee,
             _change
         );
     }
 
     /** This is defined in a child contract */
-    function _processWithdrawGiftCard(address payable _recipient, uint256 _fee)
+    function _processWithdrawGiftCard(address payable _recipient)
         internal
         virtual;
 
@@ -205,7 +209,6 @@ abstract contract BunnyNotes is ReentrancyGuard {
         address payable _recipient,
         address payable _creator,
         uint256 _price,
-        uint256 _fee,
         uint256 _change
     ) internal virtual;
 
