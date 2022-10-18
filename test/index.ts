@@ -49,7 +49,7 @@ describe("BunnyNotes", function () {
     // the creator is the Alice
     expect(depositedNote.creator).to.equal(alice.address);
     // there is no recipeint yet
-    expect(depositedNote.recipient).to.equal("0x0000000000000000000000000000000000000000");
+    expect(depositedNote.recepient).to.equal("0x0000000000000000000000000000000000000000");
     // This is not a cash note
     expect(depositedNote.cashNote).to.be.false;
 
@@ -94,7 +94,7 @@ describe("BunnyNotes", function () {
     // the creator is the ALICE
     expect(depositedNote.creator).to.equal(alice.address);
     // there is no recipeint yet
-    expect(depositedNote.recipient).to.equal("0x0000000000000000000000000000000000000000");
+    expect(depositedNote.recepient).to.equal("0x0000000000000000000000000000000000000000");
     // This is not a cash note
     expect(depositedNote.cashNote).to.be.false;
   });
@@ -116,11 +116,9 @@ describe("BunnyNotes", function () {
 
     // Now Alice will withdraw it!
 
-    const fee = await ERC20Notes.fee();
-
     //Alice generates a proof that she owns the note!
     // Fee is passed in as WEI always!
-    const { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recipient: bob.address, change: ethers.utils.parseEther("0").toString() });
+    const { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recepient: bob.address, change: ethers.utils.parseEther("0").toString() });
 
     // // Now Alice withdraws the USDTM
 
@@ -157,8 +155,8 @@ describe("BunnyNotes", function () {
     // the creator is the Alice
     expect(depositedNote.creator).to.be.equal(alice.address);
 
-    // // the recipient is Bob
-    expect(depositedNote.recipient).to.equal(bob.address);
+    // // the recepient is Bob
+    expect(depositedNote.recepient).to.equal(bob.address);
 
     // this was not a cash note
 
@@ -214,7 +212,7 @@ describe("BunnyNotes", function () {
 
     expect(depositedNote.creator).to.equal(alice.address);
 
-    expect(depositedNote.recipient).to.equal("0x0000000000000000000000000000000000000000");
+    expect(depositedNote.recepient).to.equal("0x0000000000000000000000000000000000000000");
 
     expect(depositedNote.cashNote).to.be.true;
 
@@ -226,7 +224,7 @@ describe("BunnyNotes", function () {
 
     const change = ethers.utils.parseEther("1"); // This means BOB is requesting 9 dollars, the change is 1
 
-    const { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recipient: bob.address, change: change.toString() });
+    const { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recepient: bob.address, change: change.toString() });
 
     // // Now alice can give the proof and public signals to BOB or she can do the withdrawing herself
 
@@ -303,7 +301,7 @@ describe("BunnyNotes", function () {
     const change = ethers.utils.parseEther("100000"); // The change is extremely high
 
     //   // Create a proof with too high fee
-    let { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recipient: bob.address, change: change.toString() });
+    let { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recepient: bob.address, change: change.toString() });
 
     // Now alice can give the proof and public signals to BOB or she can do the withdrawing herself
 
@@ -323,7 +321,7 @@ describe("BunnyNotes", function () {
     // now lets test zero price payments
     const change2 = ethers.utils.parseEther("10") // I ask for all the value back as change!
 
-    let { proof: proof2, publicSignals: pubSig2 } = await generateProof({ deposit: parsedNote.deposit, recipient: bob.address, change: change2.toString() })
+    let { proof: proof2, publicSignals: pubSig2 } = await generateProof({ deposit: parsedNote.deposit, recepient: bob.address, change: change2.toString() })
 
     let solidityProof2 = packToSolidityProof(proof2);
 

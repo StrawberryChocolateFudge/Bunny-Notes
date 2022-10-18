@@ -9,7 +9,7 @@ describe("BunnyNotes ZKP", function () {
 
         console.log(noteString);
         const parsedNote = await parseNote(noteString);
-        const { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recipient: "0x0000000000000000000000000000000000000000", change: "0" })
+        const { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recepient: "0x0000000000000000000000000000000000000000", change: "0" })
 
         const verificationKeyFile = fs.readFileSync("circuits/verification_key.json", "utf-8");
         const verificationKey = JSON.parse(verificationKeyFile);
