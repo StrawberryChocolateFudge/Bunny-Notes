@@ -29,7 +29,7 @@ export type FullProof = {
 export type PublicSignals = {
     nullifierHash: bigint,
     commitmentHash: bigint,
-    recipient: string,
+    recepient: string,
     fee: string
     change: string
 }
