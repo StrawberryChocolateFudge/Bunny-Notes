@@ -9,7 +9,8 @@ import Tooltip from '@mui/material/Tooltip';
 import VerifyIcon from "@mui/icons-material/Note"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography";
-interface VerifyNoteTabProps {
+import { BaseTronUser } from './Base';
+interface VerifyNoteTabProps extends BaseTronUser {
       noteString: string
       setMyNoteString: (newValue: string) => void;
 
