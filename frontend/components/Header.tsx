@@ -8,17 +8,17 @@ import Tabs from '@mui/material/Tabs';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { PageState } from './Base';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
 interface HeaderProps {
-    onDrawerToggle: () => void;
     onTabToggle: (event: React.SyntheticEvent, newValue: number) => void;
-    selectedTab: number
+    selectedTab: number,
+    pageState: PageState
 }
 
 export default function Header(props: HeaderProps) {
-    const { onDrawerToggle } = props;
 
     return (
         <React.Fragment>
@@ -50,7 +50,8 @@ export default function Header(props: HeaderProps) {
                     </Grid>
                 </Toolbar>
             </AppBar>
-            <AppBar component="div" position="static" elevation={0} sx={{ zIndex: 0 }}>
+
+            {props.pageState === PageState.Loading ? <React.Fragment /> : <AppBar component="div" position="static" elevation={0} sx={{ zIndex: 0 }}>
                 <Tabs value={props.selectedTab} onChange={props.onTabToggle} textColor="inherit" variant='scrollable' scrollButtons allowScrollButtonsMobile aria-label="Bunny Notes Options">
                     <Tab label="Purchase Gift Cards" />
                     <Tab label="Purchase Cash Notes" />
@@ -58,7 +59,9 @@ export default function Header(props: HeaderProps) {
                     <Tab label="Cash Out Gift Card" />
                     <Tab label="Request Payment" />
                 </Tabs>
-            </AppBar>
+            </AppBar>}
+
+
         </React.Fragment>
     );
 }
