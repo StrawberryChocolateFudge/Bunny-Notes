@@ -9,15 +9,39 @@ import Tooltip from '@mui/material/Tooltip';
 import WalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import CardGrid, { CardType } from './CardGrid';
 import { getCardPropsData } from './utils/cardPropsData';
-import { generateZKProof, createNote } from '../zkp/generateProof';
-import { onBoardOrGetTronWeb, verifyAddress } from '../tron';
+import { onBoardOrGetTronWeb } from '../tron';
 import { BaseTronUser } from './Base';
+import { handleCardSelectWithTron } from '../tron/componentParts';
+import { downloadNote } from './DownloadNote';
+import { NoteDetails } from '../zkp/generateProof';
+import { createQR } from '../qrcode/create';
 
 interface GiftCardPageProps extends BaseTronUser {
 
 }
 
 export default function PurchaseGiftCardTab(props: GiftCardPageProps) {
+
+    const [renderDownloadPage, setRenderDownloadPage] = React.useState(false);
+
+    const [noteDetails, setNoteDetails] = React.useState<NoteDetails | undefined>(undefined);
+
+    const [qrCodeDataUrl, setQRCodeDataUrl] = React.useState("");
+
+    const [downloadClicked, setDownloadClicked] = React.useState(false);
+
+    React.useEffect(() => {
+        async function getQRCode() {
+            const details = noteDetails;
+            if (details === undefined) {
+                setQRCodeDataUrl("");
+            } else {
+                const dataUrl = await createQR(details[0]);
+                setQRCodeDataUrl(dataUrl);
+            }
+        }
+        getQRCode();
+    }, [noteDetails])
 
     const addressSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         props.setMyAddress(event.target.value);
@@ -39,38 +63,16 @@ export default function PurchaseGiftCardTab(props: GiftCardPageProps) {
     }
 
     const handleSelectGiftCard = async (denomination: string, currency: string, cardType: CardType) => {
-        let tronWeb = null;
-        if (props.tronWeb === null) {
-            tronWeb = await onBoardOrGetTronWeb(props.displayError);
-            if (tronWeb) {
-                props.setTronWeb(tronWeb);
-            }
-        }
-        const addressValid = verifyAddress(props.myAddress);
-        if (!addressValid) {
-            props.displayError("Invalid Address!");
-            return;
-        }
-        if (props.tronWeb === null && tronWeb === null) {
-            // if the address is valid but We can't get the tronWeb I also return
-            props.displayError("Unable to connect to wallet!")
-            return;
-        }
-        // Here if props.tronWeb was null, I use the new tronWeb otherwise use the props.
-        // This is relevant because of that first click that, it runs here before props.setTronWeb runs!
-        if (props.tronWeb === null) {
-            // use the tronWeb object
-        } else {
-            // use the props.tronWeb object
-        }
+        const res = await handleCardSelectWithTron(props, denomination, currency, cardType)
 
-        //TODO: Now I create a note with this denomination
-        // navigate to another page where the note can be downloaded
+        if (res !== false) {
+            setRenderDownloadPage(true);
+            setNoteDetails(res);
+        }
+    }
 
-        console.log(tronWeb);
-        console.log("DENOMINATIOn", denomination);
-        console.log("CURRENCY", currency);
-        console.log("Card Type", cardType);
+    if (renderDownloadPage) {
+        return downloadNote({ cardType: "Gift Card", noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError })
     }
 
     return (
