@@ -15,6 +15,8 @@ const feeLimit = 100_000_000;
 const callValue = 0;
 const shouldPollResponse = true;
 
+
+
 export function tronLinkExists(): boolean {
     return window.tronLink !== undefined;
 }
@@ -43,7 +45,7 @@ export async function onBoardOrGetTronWeb(handleError): any {
     } else {
         let tronWeb = await getTronWeb();
         if (!tronWeb) {
-            handleError("Unable to connect!");
+            handleError("Unable to connect! Make sure to login to the extension!");
             return tronWeb
         } else {
             return tronWeb;
@@ -54,8 +56,6 @@ export async function onBoardOrGetTronWeb(handleError): any {
 export function verifyAddress(addr): boolean {
     return window.tronWeb.isAddress(addr);
 }
-
-
 
 // State change
 
