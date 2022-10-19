@@ -52,20 +52,18 @@
     "@mui/material": "^5.10.9",
     "@mui/styled-engine-sc": "^5.10.6",
     "@openzeppelin/contracts": "^4.7.3",
-    "api": "^4.5.2",
+    "awesome-qr": "^2.1.5-rc.0",
     "circomlib": "^2.0.5",
     "circomlibjs": "0.0.8",
     "ffjavascript": "^0.2.56",
     "hardhat-circom": "^3.3.1",
+    "jspdf": "^2.5.1",
     "qr-scanner": "^1.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.2",
     "snarkjs": "^0.5.0",
     "styled-components": "^5.3.6",
-    "tronweb": "^4.4.0",
-    "wasmsnark": "^0.0.10",
-    "web3": "^1.8.0",
-    "web3modal": "^1.9.9"
+    "tronweb": "^4.4.0"
   }
 }
