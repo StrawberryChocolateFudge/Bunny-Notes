@@ -10,7 +10,11 @@ import WalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import { getCardPropsData } from './utils/cardPropsData';
 import CardGrid, { CardType } from './CardGrid';
 import { BaseTronUser } from './Base';
-import { onBoardOrGetTronWeb, verifyAddress } from '../tron';
+import { handleCardSelectWithTron } from '../tron/componentParts';
+import { NoteDetails } from '../zkp/generateProof';
+import { createQR } from '../qrcode/create';
+import { downloadNote } from './DownloadNote';
+import { onBoardOrGetTronWeb } from '../tron';
 
 
 interface PurchaseCashNoteProps extends BaseTronUser {
@@ -20,43 +24,60 @@ interface PurchaseCashNoteProps extends BaseTronUser {
 
 export default function PurchaseCashNote(props: PurchaseCashNoteProps) {
 
+    const [renderDownloadPage, setRenderDownloadPage] = React.useState(false);
+
+    const [noteDetails, setNoteDetails] = React.useState<NoteDetails | undefined>(undefined);
+
+    const [qrCodeDataUrl, setQRCodeDataUrl] = React.useState("");
+
+    const [downloadClicked, setDownloadClicked] = React.useState(false);
+
+
+    React.useEffect(() => {
+        async function getQRCode() {
+            const details = noteDetails;
+            if (details === undefined) {
+                setQRCodeDataUrl("");
+            } else {
+                const dataUrl = await createQR(details[0]);
+                setQRCodeDataUrl(dataUrl);
+            }
+        }
+        getQRCode();
+    }, [noteDetails])
+
     const addressSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         props.setMyAddress(event.target.value);
     }
 
-    const handleSelectCashNote = async (denomination: string, currency: string, cardType: CardType) => {
-        let tronWeb = null;
+
+    const importAddress = async () => {
         if (props.tronWeb === null) {
-            tronWeb = await onBoardOrGetTronWeb(props.displayError);
+            const tronWeb = await onBoardOrGetTronWeb(props.displayError);
 
             if (tronWeb) {
+                props.setMyAddress(tronWeb.defaultAddress.base58);
                 props.setTronWeb(tronWeb);
             }
-        }
-        const addressValid = verifyAddress(props.myAddress);
-        if (!addressValid) {
-            props.displayError("Invalid Address!");
-            return;
-        }
-        if (props.tronWeb === null && tronWeb === null) {
-            // if the address is valid but We can't get the tronWeb I also return
-            props.displayError("Unable to connect to wallet!")
-            return;
-        }
-        // Here if props.tronWeb was null, I use the new tronWeb otherwise use the props.
-        // This is relevant because of that first click that, it runs here before props.setTronWeb runs!
-        if (props.tronWeb === null) {
-            // use the tronWeb object
-        } else {
-            // use the props.tronWeb object
-        }
-        //TODO: Now I create a note with this denomination
-        // navigate to another page where the note can be downloaded
 
-        console.log(tronWeb);
-        console.log("DENOMINATIOn", denomination);
-        console.log("CURRENCY", currency);
-        console.log("Card Type", cardType);
+        } else {
+            const defaultAddress = props.tronWeb.defaultAddress;
+            props.setMyAddress(defaultAddress.base58);
+        }
+    }
+
+
+    const handleSelectCashNote = async (denomination: string, currency: string, cardType: CardType) => {
+        const res = await handleCardSelectWithTron(props, denomination, currency, cardType)
+
+        if (res !== false) {
+            setRenderDownloadPage(true);
+            setNoteDetails(res);
+        }
+    }
+
+    if (renderDownloadPage) {
+        return downloadNote({ cardType: "Cash Note", noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError })
     }
 
     return (
@@ -87,7 +108,7 @@ export default function PurchaseCashNote(props: PurchaseCashNoteProps) {
                         </Grid>
                         <Grid item>
                             <Tooltip title="Import Address From Wallet Extension">
-                                <Button variant="contained" sx={{ mr: 1 }}>
+                                <Button onClick={importAddress} variant="contained" sx={{ mr: 1 }}>
                                     Import Address
                                 </Button>
                             </Tooltip>
