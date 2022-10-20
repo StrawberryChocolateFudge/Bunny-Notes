@@ -17,7 +17,7 @@ async function main() {
   console.log("Bunny Notes ERC20 has been deployed to", ERC20Notes.address);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+// main().catch((error) => {
+//   console.error(error);
+//   process.exitCode = 1;
+// });
