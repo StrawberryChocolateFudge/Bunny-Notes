@@ -25,9 +25,6 @@ export async function generateProof({ deposit, recepient, change, snarkArtifacts
         }
     }
 
-    //TODO: Download the SNARK artifacts!
-
-    //TODO: get the circuits and the zkey!
     console.time("Proof Time");
 
     const { proof, publicSignals } = await groth16.fullProve(input, snarkArtifacts.wasmFilePath, snarkArtifacts.zkeyFilePath)
