@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
+import { styled } from "@mui/material";
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -10,7 +11,6 @@ import VerifyNoteTab from './VerifyNoteTab';
 import CashOutGiftCardTab from './CashOutGiftCardTab';
 import PaymentRequestTab from './PaymentRequestTab';
 import CircularProgress from "@mui/material/CircularProgress";
-import Button from "@mui/material/Button";
 import Snackbar from '@mui/material/Snackbar';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
@@ -21,6 +21,9 @@ import {
     Routes,
     Route,
 } from "react-router-dom";
+import { TestnetInfo } from './TestnetInfo';
+import { PaymentRequestPage } from './PaymentRequestPage';
+import { NotFoundPage } from './404page';
 
 
 export interface BaseTronUser {
@@ -31,7 +34,6 @@ export interface BaseTronUser {
     displayError: any,
 }
 
-
 function Copyright() {
     return (
         <Typography variant="body2" color="text.secondary" align="center">
@@ -41,13 +43,16 @@ function Copyright() {
             </MuiLink>
 
             {new Date().getFullYear()}
-            <Button >Partner with us</Button>
+            {/* <Button >Partner with us</Button> */}
         </Typography >
     );
 }
 
 const theme = getTheme();
 
+export const Spacer = styled("div")({
+    marginBottom: "10px"
+})
 
 export default function Base() {
     const [snackbarOpen, setSnackbarOpen] = React.useState(false);
@@ -124,16 +129,30 @@ export default function Base() {
         }
     }
 
-
+    const mainRoute = () => <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Header withTabs={true} selectedTab={selectedTab} onTabToggle={onTabToggle} />
+        <Box component="main" sx={{ flex: 1, py: 6, px: 4, bgcolor: '#eaeff1' }}>
+            <TestnetInfo></TestnetInfo>
+            <Spacer></Spacer>
+            {getTabContent()}
+        </Box>
+        <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
+            <Copyright />
+        </Box>
+    </Box>
 
     const getRoutes = () => {
         return (<BrowserRouter>
             <Routes>
-                <Route path="/" element={getTabContent()}>
-                </Route>
+                <Route path="/" element={mainRoute()}></Route>
+                <Route path="/paymentRequest/:payTo/:amount/:currency" element={<PaymentRequestPage {...genericProps}></PaymentRequestPage>}></Route>
+                <Route path="*" element={<NotFoundPage></NotFoundPage>} />
+
             </Routes>
         </BrowserRouter>)
     }
+
+
 
     const snackBarAction = (
         <React.Fragment>
@@ -152,16 +171,7 @@ export default function Base() {
         <ThemeProvider theme={theme}>
             <Box sx={{ display: 'flex', minHeight: '100vh' }}>
                 <CssBaseline />
-
-                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <Header selectedTab={selectedTab} onTabToggle={onTabToggle} />
-                    <Box component="main" sx={{ flex: 1, py: 6, px: 4, bgcolor: '#eaeff1' }}>
-                        {getRoutes()}
-                    </Box>
-                    <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
-                        <Copyright />
-                    </Box>
-                </Box>
+                {getRoutes()}
             </Box>
             <Snackbar
                 open={snackbarOpen}
@@ -172,4 +182,4 @@ export default function Base() {
             />
         </ThemeProvider>
     );
-}
+}   
