@@ -1,12 +1,12 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import { SelectableCards, SelectableCardsProps } from './SelectableCards';
+import { SelectableCards, SelectableCardsParams } from './SelectableCards';
 
 export type CardType = "Gift Card" | "Cash Note" | "Payment Request";
 
 interface CardGridProps {
-    cardProps: Array<SelectableCardsProps>
+    cardProps: Array<SelectableCardsParams>
     handleSelect: (denomination: string, currency: string, cardType: CardType) => void
 
 }
