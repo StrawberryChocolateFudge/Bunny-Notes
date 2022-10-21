@@ -35,7 +35,7 @@ export async function parseNote(noteString: string) {
     const noteRegex = /bunnynote-(?<currency>\w+)-(?<amount>[\d.]+)-(?<netId>\d+)-0x(?<note>[0-9a-fA-F]{124})/g
     const match = noteRegex.exec(noteString);
     if (!match) {
-        throw new Error("The note was invalid format")
+        throw new Error("Invalid Note!")
     }
     //@ts-ignore
     const buf = Buffer.from(match.groups.note, 'hex');
