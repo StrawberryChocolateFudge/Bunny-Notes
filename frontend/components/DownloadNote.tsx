@@ -1,5 +1,6 @@
 import { AppBar, Button, ButtonBase, Grid, Paper, styled, Toolbar, Tooltip, Typography } from "@mui/material";
 import React from "react";
+import { toNoteHex } from "../../lib/note";
 import { downloadPDF } from "../pdf";
 import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
@@ -79,14 +80,12 @@ export function downloadNote(props: DownloadNoteProps) {
             props.displayError("You need to download the Note before you can make a deposit!");
             return;
         }
-        console.log("deposit can proceed!")
     }
     const downloadClick = () => {
-        console.log("download clicked")
+        const commitmentBigint = noteDetails[1].deposit.commitment;
 
         // start the download of the PDF!
-        // exportAsImage(`BunnyNote-${denomination}-${props.cardType}-${noteDetails[1].netId}-${new Date().toISOString()}`)
-        downloadPDF(bearerText, denomination, noteDetails[1].netId.toString(), "Gift Card", props.qrCodeDataUrl, noteString);
+        downloadPDF(bearerText, denomination, toNoteHex(commitmentBigint), props.cardType, props.qrCodeDataUrl, noteString);
 
         props.setDownloadClicked(true);
     }
