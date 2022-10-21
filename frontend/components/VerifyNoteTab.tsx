@@ -8,8 +8,8 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import VerifyIcon from "@mui/icons-material/Note"
 import Box from "@mui/material/Box"
-import Typography from "@mui/material/Typography";
 import { BaseTronUser } from './Base';
+import ScanNoteButton from './QRScannerModal';
 interface VerifyNoteTabProps extends BaseTronUser {
       noteString: string
       setMyNoteString: (newValue: string) => void;
@@ -38,20 +38,18 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                                     <TextField value={props.noteString} onChange={noteStringSetter} fullWidth placeholder="Paste your Note Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                               </Grid>
                               <Grid item>
-                                    <Tooltip title="Verify the pasted Note">
-                                          <Button variant="contained" sx={{ mr: 1 }}>
-                                                Verify
-                                          </Button>
-                                    </Tooltip>
+                                    <ScanNoteButton setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
                               </Grid>
                         </Grid>
                   </Toolbar>
             </AppBar>
             <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center" }}>
-                  <Button variant="contained" size="large">
-                        <Typography textAlign={"center"} variant="h6" component="h6">Scan a Note</Typography>
-                  </Button>
 
+                  <Tooltip title="Verify the Note">
+                        <Button variant="contained" sx={{ mr: 1 }}>
+                              Verify
+                        </Button>
+                  </Tooltip>
             </Box>
       </Paper >
 
