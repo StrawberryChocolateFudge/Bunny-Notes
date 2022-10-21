@@ -1,16 +1,10 @@
 //@ts-nocheck
 
-import { DoNotDisturbOnTotalSilenceRounded } from "@mui/icons-material";
-
-// I am currently not checking this file with typescript
+// I am currently not checking this file with typescript because tronWeb from tronLink is JS
 
 const TRONLINKURL = "https://www.tronlink.org/"
-const USDTADDRESS = "";
-const USDDADDRESS = "";
-const BUNNYNOTES10USDT = "";
-const BUNNYNOTES100USDT = "";
-const BUNNYNOTES10USDD = "";
-const BUNNYNOTES100USDD = "";
+const USDTMCONTRACTADDRESS = "TEfemFon6U3xS8twSVNqbhJxVVzZ7jwVs2";
+const USDTM100ADDRESS = "TWpr6tsT6zCBFKiq18CzKGmPzfSpP1ijyw";
 const feeLimit = 100_000_000;
 const callValue = 0;
 const shouldPollResponse = true;
@@ -69,6 +63,10 @@ export async function ERC20Approve(ERC20Contract: any, spenderContract: string) 
         callValue,
         shouldPollResponse
     })
+}
+
+export async function TESTNETMINTERC20(ERC20Contract: any, mintTo: string, amount: string) {
+    return await ERC20Contract.mint(mintTo, amount).send({ feeLimit, callValue, shouldPollResponse })
 }
 
 export async function bunnyNotesDeposit(contract: any, commitment: string, isCashNote: boolean, depositFor: string) {
