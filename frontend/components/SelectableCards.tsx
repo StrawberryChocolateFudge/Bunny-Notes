@@ -6,13 +6,15 @@ import Button from "@mui/material/Button";
 import { styled } from "@mui/system";
 import { CardType } from './CardGrid';
 
-
-export interface SelectableCardsProps {
+export interface SelectableCardsParams {
   imageLink: string;
   imageAlt: string;
   denomination: string;
   currency: string;
   cardType: CardType,
+}
+
+export interface SelectableCardsProps extends SelectableCardsParams {
   handleSelect: (denomination: string, currency: string, cardType: CardType) => void
 }
 
@@ -22,8 +24,7 @@ const IMG = styled("img")({
 })
 
 export function SelectableCards(props: SelectableCardsProps) {
-
-
+  
   const purchaseSelected = () => {
     props.handleSelect(props.denomination, props.currency, props.cardType)
   }
