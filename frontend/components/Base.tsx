@@ -34,7 +34,7 @@ export interface BaseTronUser {
     displayError: any,
 }
 
-function Copyright() {
+export function Copyright() {
     return (
         <Typography variant="body2" color="text.secondary" align="center">
             {'Copyright © '}
