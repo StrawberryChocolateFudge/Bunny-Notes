@@ -1,8 +1,7 @@
-import { Copyright } from "@mui/icons-material";
-import { AppBar, Box, Button, Grid, Paper, styled, Toolbar, Tooltip, Typography } from "@mui/material";
+import { AppBar, Box, Button, Grid, Paper, styled, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar, Tooltip, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { BaseTronUser, Spacer } from "./Base";
+import { BaseTronUser, Copyright, Spacer } from "./Base";
 import Header from "./Header";
 import { TestnetInfo } from "./TestnetInfo";
 import VerifyIcon from "@mui/icons-material/Note"
@@ -64,16 +63,21 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                     </Toolbar>
                 </AppBar>
                 <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center" }}>
-                    <Column>
-                        <Row>
-                            <Typography variant="h6" component="div">Payment To:</Typography>
-                            <Typography variant="h6" component="div">{payTo}</Typography>
-                        </Row>
-                        <Row>
-                            <Typography variant="h6" component="div">Amount:</Typography>
-                            <Typography variant="h6" component="div">{amount}</Typography>
-                        </Row>
-                    </Column>
+                    <TableContainer component={Paper}>
+                        <Table sx={{ minWidth: 650 }} aria-label="Transaction details">
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell align="right">Payment to:</TableCell>
+                                    <TableCell align="right">{payTo}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell align="right">Amount:</TableCell>
+                                    <TableCell align="right">{amount} {currency}</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <Spacer></Spacer>
                     <Tooltip title="Pay with Cash Note">
                         <Button variant="contained" sx={{ mr: 1 }}>
                             Pay with Cash Note
