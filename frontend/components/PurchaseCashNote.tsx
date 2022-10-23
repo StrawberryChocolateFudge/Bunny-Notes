@@ -32,6 +32,7 @@ export default function PurchaseCashNote(props: PurchaseCashNoteProps) {
 
     const [downloadClicked, setDownloadClicked] = React.useState(false);
 
+    const [showApproval, setShowApproval] = React.useState(true);
 
     React.useEffect(() => {
         async function getQRCode() {
@@ -77,7 +78,7 @@ export default function PurchaseCashNote(props: PurchaseCashNoteProps) {
     }
 
     if (renderDownloadPage) {
-        return downloadNote({ cardType: "Cash Note", noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError })
+        return downloadNote({ showApproval, setShowApproval, cardType: "Cash Note", noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError, tronWeb: props.tronWeb })
     }
 
     return (

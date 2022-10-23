@@ -30,6 +30,9 @@ export default function PurchaseGiftCardTab(props: GiftCardPageProps) {
 
     const [downloadClicked, setDownloadClicked] = React.useState(false);
 
+    const [showApproval, setShowApproval] = React.useState(true);
+
+
     React.useEffect(() => {
         async function getQRCode() {
             const details = noteDetails;
@@ -72,7 +75,7 @@ export default function PurchaseGiftCardTab(props: GiftCardPageProps) {
     }
 
     if (renderDownloadPage) {
-        return downloadNote({ cardType: "Gift Card", noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError })
+        return downloadNote({ showApproval, setShowApproval, cardType: "Gift Card", noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError, tronWeb: props.tronWeb })
     }
 
     return (
