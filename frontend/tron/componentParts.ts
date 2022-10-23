@@ -12,8 +12,11 @@ export async function handleCardSelectWithTron(props: any, denomination: string,
         if (tronWeb) {
             props.setTronWeb(tronWeb);
         }
+    } else {
+        tronWeb = props.tronWeb;
     }
     const addressValid = verifyAddress(props.myAddress);
+
     if (!addressValid) {
         props.displayError("Invalid Address!");
         return false;
