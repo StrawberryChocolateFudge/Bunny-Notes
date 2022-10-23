@@ -1,4 +1,4 @@
-import { AppBar, Box, Button, Grid, Paper, styled, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar, Tooltip, Typography } from "@mui/material";
+import { AppBar, Box, Button, Grid, Paper, styled, Table, TableBody, TableCell, TableContainer, TableRow, Toolbar, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { BaseTronUser, Copyright, Spacer } from "./Base";
@@ -39,7 +39,7 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
     return <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Header withTabs={false} />
         <Box component="main" sx={{ flex: 1, py: 6, px: 4, bgcolor: '#eaeff1' }}>
-            <TestnetInfo></TestnetInfo>
+            <TestnetInfo {...props}></TestnetInfo>
             <Spacer></Spacer>
             <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
                 <AppBar
@@ -64,14 +64,14 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                 </AppBar>
                 <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center" }}>
                     <TableContainer component={Paper}>
-                        <Table sx={{ minWidth: 650 }} aria-label="Transaction details">
+                        <Table aria-label="Transaction details">
                             <TableBody>
                                 <TableRow>
-                                    <TableCell align="right">Payment to:</TableCell>
+                                    <TableCell align="left">Payment to:</TableCell>
                                     <TableCell align="right">{payTo}</TableCell>
                                 </TableRow>
                                 <TableRow>
-                                    <TableCell align="right">Amount:</TableCell>
+                                    <TableCell align="left">Amount:</TableCell>
                                     <TableCell align="right">{amount} {currency}</TableCell>
                                 </TableRow>
                             </TableBody>
