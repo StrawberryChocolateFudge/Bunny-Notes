@@ -26,11 +26,11 @@ import { PaymentRequestPage } from './PaymentRequestPage';
 import { NotFoundPage } from './404page';
 
 
-export interface BaseTronUser {
+export interface Base {
     myAddress: string,
     setMyAddress: (newValue: string) => void
-    tronWeb: any,
-    setTronWeb: any,
+    provider: any,
+    setProvider: any,
     displayError: any,
 }
 
@@ -67,7 +67,7 @@ export default function Base() {
 
     const [paymentRequest, setPaymentRequest] = React.useState({ price: "", payTo: "" })
 
-    const [tronWeb, setTronWeb] = React.useState(null);
+    const [provider, setProvider] = React.useState(null);
 
     const openSnackbar = (msg: string) => {
         setSnackbarOpen(true);
@@ -96,8 +96,8 @@ export default function Base() {
 
     const genericProps = {
         displayError: openSnackbar,
-        tronWeb,
-        setTronWeb,
+        provider,
+        setProvider,
         setMyAddress,
         myAddress
     }
