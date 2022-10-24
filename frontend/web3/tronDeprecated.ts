@@ -116,12 +116,12 @@ export async function getFee(contract: any) {
     return await contract.fee().call();
 }
 
-
 export function getContractAddressFromCurrencyDenomination(denomination: string, currency: string): string {
     if (denomination === "100" && currency === "USDTM") {
         return USDTM100ADDRESS;
     }
 }
+
 
 export async function getAllowance(contract: any, owner: string, spender: string) {
     return await contract.allowance(owner, spender).call();
