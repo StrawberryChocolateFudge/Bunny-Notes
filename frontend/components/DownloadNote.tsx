@@ -2,13 +2,14 @@ import { AppBar, Button, ButtonBase, Grid, Paper, styled, Toolbar, Tooltip, Typo
 import React, { useState } from "react";
 import { toNoteHex } from "../../lib/note";
 import { downloadPDF } from "../pdf";
-import { bunnyNotesDeposit, ERC20Approve, getContract, getFee, USDTM100ADDRESS, USDTMCONTRACTADDRESS } from "../tron";
+// import { bunnyNotesDeposit, ERC20Approve, getContract, getFee, USDTM100ADDRESS, USDTMCONTRACTADDRESS } from "../tron";
 import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
 import { ethers } from "ethers";
+import { bunnyNotesDeposit, ERC20Approve, getContract, getFee, requestAccounts, USDTM100ADDRESS_DOTNAU, USDTMCONTRACTADDRESS_DOTNAU } from "../web3/web3";
 
 interface DownloadNoteProps {
-    tronWeb: any,
+    provider: any,
     cardType: CardType,
     noteDetails: NoteDetails | undefined,
     qrCodeDataUrl: any,
@@ -35,8 +36,6 @@ export function downloadNote(props: DownloadNoteProps) {
     });
 
     const bearerText = `The smart contract will pay the bearer on demand the sum of ${denomination}`
-
-    console.log("Show approval", props.showApproval);
 
     const noteDisplay = () => {
         return <Grid item>
@@ -99,25 +98,25 @@ export function downloadNote(props: DownloadNoteProps) {
 
             // approve the spend, need to approve for the fee
 
-            const contract = await getContract(props.tronWeb, USDTM100ADDRESS);
+            const contract = await getContract(props.provider, USDTM100ADDRESS_DOTNAU, "/ERC20Notes.json");
 
             const fee = await getFee(contract);
             const formattedFee = ethers.utils.formatEther(fee);
 
             const approveAmount = parseFloat(formattedFee) + parseFloat(noteDetails[1].amount);
 
-            const ERC20Contract = await getContract(props.tronWeb, USDTMCONTRACTADDRESS);
+            const ERC20Contract = await getContract(props.provider, USDTMCONTRACTADDRESS_DOTNAU, "/MOCKERC20.json");
 
             const convertedApproveAmount = ethers.utils.parseEther(approveAmount.toString());
             props.setShowApproval(false);
 
-            await ERC20Approve(ERC20Contract, USDTM100ADDRESS, convertedApproveAmount);
+            await ERC20Approve(ERC20Contract, USDTM100ADDRESS_DOTNAU, convertedApproveAmount);
 
         } else {
             // after succesful approval  I can prompt the user to deposit the tokens to add value to the note
 
-            const notesContract = await getContract(props.tronWeb, USDTM100ADDRESS);
-            const address = props.tronWeb.defaultAddress.base58;
+            const notesContract = await getContract(props.provider, USDTM100ADDRESS_DOTNAU, "/ERC20Notes.json");
+            const address = await requestAccounts(props.provider);
 
             const isCashNote = props.cardType === "Cash Note" ? true : false;
 

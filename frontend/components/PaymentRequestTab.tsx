@@ -10,16 +10,17 @@ import WalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import MoneyIcon from "@mui/icons-material/Money";
 import { getCardPropsData } from "./utils/cardPropsData";
 import CardGrid, { CardType } from "./CardGrid";
-import { BaseTronUser } from "./Base";
-import { onBoardOrGetTronWeb } from "../tron";
+import { Base } from "./Base";
 import { useNavigate } from "react-router-dom";
+import { onBoardOrGetProvider, requestAccounts } from "../web3/web3";
+import { ethers } from "ethers";
 
 export type PaymentRequest = {
     price: string,
     payTo: string
 }
 
-interface PaymentRequestTabProps extends BaseTronUser {
+interface PaymentRequestTabProps extends Base {
     paymentRequest: PaymentRequest,
     setPaymentRequest: (value: PaymentRequest) => void;
     displayError: (msg: string) => void;
@@ -39,16 +40,16 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
     }
 
     const importAddress = async () => {
-        if (props.tronWeb === null) {
-            const tronWeb = await onBoardOrGetTronWeb(props.displayError);
-            if (tronWeb) {
-                props.setPaymentRequest({ ...props.paymentRequest, payTo: tronWeb.defaultAddress.base58 })
-                props.setTronWeb(tronWeb);
+        if (props.provider === null) {
+            const provider = await onBoardOrGetProvider(props.displayError);
+            if (provider) {
+                const account = await requestAccounts(provider);
+                props.setPaymentRequest({ ...props.paymentRequest, payTo: account })
+                props.setProvider(provider);
             }
-
         } else {
-            const defaultAddress = props.tronWeb.defaultAddress;
-            props.setPaymentRequest({ ...props.paymentRequest, payTo: defaultAddress.base58 })
+            const account = await requestAccounts(props.provider);
+            props.setPaymentRequest({ ...props.paymentRequest, payTo: account })
         }
     }
 
@@ -60,8 +61,7 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
 
         // For verification I use a temporary tronweb instance, just to call isAddress
         // the props.tronWeb might be null at this point if the user manually copies the address.
-        //@ts-ignore
-        if (TronWeb.isAddress(props.paymentRequest.payTo)) {
+        if (ethers.utils.isAddress(props.paymentRequest.payTo)) {
             navigate(`/paymentRequest/${props.paymentRequest.payTo}/${parseFloat(props.paymentRequest.price).toFixed(2)}/${currency}`)
         } else {
             props.displayError(`Invalid wallet address!`);
