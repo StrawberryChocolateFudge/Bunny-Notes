@@ -1,14 +1,18 @@
 import { AppBar, Box, Button, Grid, Paper, styled, Table, TableBody, TableCell, TableContainer, TableRow, Toolbar, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { BaseTronUser, Copyright, Spacer } from "./Base";
+import { Base, Copyright, Spacer } from "./Base";
 import Header from "./Header";
 import { TestnetInfo } from "./TestnetInfo";
 import VerifyIcon from "@mui/icons-material/Note"
 import TextField from '@mui/material/TextField';
 import ScanNoteButton from './QRScannerModal';
+import { bunnyNotesWithdrawCashNote, getContract, getContractAddressFromCurrencyDenomination, MAXCASHNOTESIZE, onBoardOrGetProvider, requestAccounts } from "../web3/web3";
+import { parseNote, toNoteHex } from "../../lib/note";
+import { ethers } from "ethers";
+import { generateZKProof, packSolidityProof } from "../zkp/generateProof";
 
-interface PaymentRequestPageProps extends BaseTronUser {
+interface PaymentRequestPageProps extends Base {
 }
 
 const Column = styled("div")({
@@ -34,6 +38,72 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
 
     const setData = (d: string) => {
         setNote(d);
+    }
+
+    const paymentAction = async () => {
+        if (props.provider === null) {
+            const provider = await onBoardOrGetProvider(props.displayError);
+            if (provider) {
+                await doPay(provider);
+            }
+
+        } else {
+            await doPay(props.provider);
+        }
+    }
+
+    const doPay = async (provider: any) => {
+        if (payTo === undefined) {
+            props.displayError("Invalid Payment Address")
+            return;
+        }
+
+        if (amount === undefined) {
+
+            props.displayError("Invalid Payment Amount");
+
+            return;
+        }
+
+        // verify the amount in the url is correct
+
+        if (parseFloat(amount) > MAXCASHNOTESIZE) {
+
+            props.displayError(`Invalid Payment Amount. Maximum ${MAXCASHNOTESIZE} is permitted!`)
+
+            return;
+        }
+
+        let parsedNote;
+        try {
+            parsedNote = await parseNote(note);
+        } catch (err) {
+            props.displayError(props.provider);
+            return;
+        }
+
+        // verify the address in the url is correct
+
+        if (!ethers.utils.isAddress(payTo as string)) {
+            props.displayError("Invalid Payment Address")
+            return;
+        }
+
+
+
+        const nullifilerHash = toNoteHex(parsedNote.deposit.nullifierHash);
+        const commitment = toNoteHex(parsedNote.deposit.commitment);
+
+        const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency);
+        const contract = await getContract(provider, contractAddress, "/ERC20Notes.json");
+        const myAddress = await requestAccounts(provider);
+        // Calculate change
+        // The denomination - payment amount;
+        const changeFloat = parseFloat(parsedNote.amount) - parseFloat(amount);
+        const change = changeFloat.toString();
+        const zkp = await generateZKProof(parsedNote.deposit, myAddress, change);
+        const solidityProof = packSolidityProof(zkp.proof);
+        await bunnyNotesWithdrawCashNote(contract, solidityProof, nullifilerHash, commitment, payTo, change);
     }
 
     return <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -79,7 +149,7 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                     </TableContainer>
                     <Spacer></Spacer>
                     <Tooltip title="Pay with Cash Note">
-                        <Button variant="contained" sx={{ mr: 1 }}>
+                        <Button onClick={paymentAction} variant="contained" sx={{ mr: 1 }}>
                             Pay with Cash Note
                         </Button>
                     </Tooltip>
