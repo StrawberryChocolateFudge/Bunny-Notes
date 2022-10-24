@@ -8,12 +8,12 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import VerifyIcon from "@mui/icons-material/Note"
 import Box from "@mui/material/Box"
-import { BaseTronUser, Spacer } from './Base';
+import { Base, Spacer } from './Base';
 import ScanNoteButton from './QRScannerModal';
-import { bunnyNoteIsSpent, bunnyNotesCommitments, getContract, getContractAddressFromCurrencyDenomination, getWindowTronWeb, onBoardOrGetTronWeb } from '../tron';
 import { parseNote, toNoteHex } from '../../lib/note';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-interface VerifyNoteTabProps extends BaseTronUser {
+import { bunnyNoteIsSpent, bunnyNotesCommitments, getContract, getContractAddressFromCurrencyDenomination, onBoardOrGetProvider } from '../web3/web3';
+interface VerifyNoteTabProps extends Base {
       noteString: string
       setMyNoteString: (newValue: string) => void;
 
@@ -35,19 +35,19 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
       }
 
       const onVerify = async () => {
-            if (props.tronWeb === null) {
-                  const tronWeb = await onBoardOrGetTronWeb(props.displayError);
-                  if (tronWeb) {
-                        await fetchCommitment(tronWeb);
+            if (props.provider === null) {
+                  const provider = await onBoardOrGetProvider(props.displayError);
+                  if (provider) {
+                        await fetchCommitment(provider);
                   }
             } else {
-                  await fetchCommitment(props.tronWeb)
+                  await fetchCommitment(props.provider)
             }
 
 
       }
 
-      const fetchCommitment = async (tronWeb: any) => {
+      const fetchCommitment = async (provider: any) => {
             let parsedNote;
 
             try {
@@ -57,10 +57,10 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                   return;
             }
             const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency);
-            const contract = await getContract(tronWeb, contractAddress);
+            const contract = await getContract(props.provider, contractAddress, "/ERC20Notes.json");
             const commitmentBigInt = parsedNote.deposit.commitment;
             const nullifierHash = parsedNote.deposit.nullifierHash
-            // get the commitment data
+            // // get the commitment data
 
             const isSpent = await bunnyNoteIsSpent(contract, toNoteHex(nullifierHash))
 
@@ -71,11 +71,11 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                   return;
             }
 
-            const recepient = !isSpent ? "Not Spent" : tronWeb.address.fromHex(commitments.recepient);
+            const recepient = !isSpent ? "Not Spent" : commitments.recepient;
 
             setCommitmentDetails({
                   noteType: commitments.cashNote,
-                  creator: tronWeb.address.fromHex(commitments.creator),
+                  creator: commitments.creator,
                   recepient: recepient,
                   denomination: `${parsedNote.amount} ${parsedNote.currency}`
             })
