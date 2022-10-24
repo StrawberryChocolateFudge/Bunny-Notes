@@ -30,6 +30,12 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    dotnau: {
+      url: process.env.BTT_DOTNAU_TESTNET_API || "",
+      accounts:
+        process.env.PRIVATE_KEY_DOTNAU !== undefined ? [process.env.PRIVATE_KEY_DOTNAU] : [],
+
+    }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
