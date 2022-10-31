@@ -2,7 +2,7 @@ import { Deposit, FullProof } from "../../lib/types";
 import { generateProof } from "../../lib/generateProof";
 import { deposit, parseNote } from "../../lib/note";
 import packToSolidityProof from "../../lib/packToSolidityProof";
-const urlBASE = "http://localhost:1234"
+const urlBASE = "https://bunnynotes.finance"
 
 const netId = 0x2b6653dc;
 
