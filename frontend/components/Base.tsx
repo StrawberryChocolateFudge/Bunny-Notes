@@ -24,6 +24,7 @@ import {
 import { TestnetInfo } from './TestnetInfo';
 import { PaymentRequestPage } from './PaymentRequestPage';
 import { NotFoundPage } from './404page';
+import HelpPage from './HelpPage';
 
 
 export interface Base {
@@ -147,11 +148,10 @@ export default function Base() {
                 <Route path="/" element={mainRoute()}></Route>
                 <Route path="/paymentRequest/:payTo/:amount/:currency" element={<PaymentRequestPage {...genericProps}></PaymentRequestPage>}></Route>
                 <Route path="*" element={<NotFoundPage></NotFoundPage>} />
-
+                <Route path="/help" element={<HelpPage></HelpPage>}></Route>
             </Routes>
         </BrowserRouter>)
     }
-
 
 
     const snackBarAction = (
