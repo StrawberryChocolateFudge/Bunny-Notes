@@ -7,7 +7,7 @@ import { TestnetInfo } from "./TestnetInfo";
 import VerifyIcon from "@mui/icons-material/Note"
 import TextField from '@mui/material/TextField';
 import ScanNoteButton from './QRScannerModal';
-import { bunnyNotesWithdrawCashNote, getContract, getContractAddressFromCurrencyDenomination, MAXCASHNOTESIZE, onBoardOrGetProvider, requestAccounts } from "../web3/web3";
+import { bunnyNoteIsSpent, bunnyNotesCommitments, bunnyNotesWithdrawCashNote, getContract, getContractAddressFromCurrencyDenomination, MAXCASHNOTESIZE, onBoardOrGetProvider, requestAccounts } from "../web3/web3";
 import { parseNote, toNoteHex } from "../../lib/note";
 import { ethers } from "ethers";
 import { generateZKProof, packSolidityProof } from "../zkp/generateProof";
@@ -89,13 +89,25 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
             return;
         }
 
-
-
         const nullifilerHash = toNoteHex(parsedNote.deposit.nullifierHash);
         const commitment = toNoteHex(parsedNote.deposit.commitment);
 
         const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency);
         const contract = await getContract(provider, contractAddress, "/ERC20Notes.json");
+        // check if the note is valid or if it has been spent already
+        const isSpent = await bunnyNoteIsSpent(contract, nullifilerHash);
+        const commitments = await bunnyNotesCommitments(contract, commitment);
+
+        if (!commitments.used) {
+            props.displayError("Invalid note. Missing Deposit!");
+            return;
+        }
+
+        if (isSpent) {
+            props.displayError("Invalid note. Missing Value!");
+            return;
+        }
+
         const myAddress = await requestAccounts(provider);
         // Calculate change
         // The denomination - payment amount;
