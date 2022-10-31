@@ -104,7 +104,7 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
         }
 
         if (isSpent) {
-            props.displayError("Invalid note. Missing Value!");
+            props.displayError("Invalid.You can't spend a note twice!");
             return;
         }
 
