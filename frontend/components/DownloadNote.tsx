@@ -1,8 +1,7 @@
 import { AppBar, Button, ButtonBase, Grid, Paper, styled, Toolbar, Tooltip, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import { toNoteHex } from "../../lib/note";
 import { downloadPDF } from "../pdf";
-// import { bunnyNotesDeposit, ERC20Approve, getContract, getFee, USDTM100ADDRESS, USDTMCONTRACTADDRESS } from "../tron";
 import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
 import { ethers } from "ethers";
@@ -18,6 +17,7 @@ interface DownloadNoteProps {
     displayError: (msg) => void;
     showApproval: boolean
     setShowApproval: (to: boolean) => void;
+    setRenderDownloadPage: (to: boolean) => void;
 }
 
 
@@ -110,7 +110,9 @@ export function downloadNote(props: DownloadNoteProps) {
             const convertedApproveAmount = ethers.utils.parseEther(approveAmount.toString());
             props.setShowApproval(false);
 
-            await ERC20Approve(ERC20Contract, USDTM100ADDRESS_DOTNAU, convertedApproveAmount);
+            await ERC20Approve(ERC20Contract, USDTM100ADDRESS_DOTNAU, convertedApproveAmount).catch((err) => {
+                props.setShowApproval(true);
+            });
 
         } else {
             // after succesful approval  I can prompt the user to deposit the tokens to add value to the note
@@ -141,6 +143,11 @@ export function downloadNote(props: DownloadNoteProps) {
         >
             <Toolbar>
                 <Grid container spacing={2} alignItems="center" sx={{ paddingTop: "20px" }}>
+                    <Grid item>
+                        <Tooltip title="Go back">
+                            <Button onClick={() => props.setRenderDownloadPage(false)}>Back</Button>
+                        </Tooltip>
+                    </Grid>
                     <Grid item>
                         <Tooltip title="Download the Note">
                             <Button onClick={downloadClick} variant="contained" sx={{ mr: 1 }}>Download</Button>

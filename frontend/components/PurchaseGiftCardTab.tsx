@@ -76,7 +76,7 @@ export default function PurchaseGiftCardTab(props: GiftCardPageProps) {
     }
 
     if (renderDownloadPage) {
-        return downloadNote({ showApproval, setShowApproval, cardType: "Gift Card", noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError, provider: props.provider })
+        return downloadNote({ setRenderDownloadPage, showApproval, setShowApproval, cardType: "Gift Card", noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError, provider: props.provider })
     }
 
     return (

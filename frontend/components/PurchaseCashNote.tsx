@@ -79,7 +79,7 @@ export default function PurchaseCashNote(props: PurchaseCashNoteProps) {
     }
 
     if (renderDownloadPage) {
-        return downloadNote({ showApproval, setShowApproval, cardType: "Cash Note", noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError, provider: props.provider })
+        return downloadNote({ setRenderDownloadPage, showApproval, setShowApproval, cardType: "Cash Note", noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError, provider: props.provider })
     }
 
     return (
