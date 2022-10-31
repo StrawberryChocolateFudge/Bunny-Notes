@@ -12,7 +12,7 @@ import { Base, Spacer } from './Base';
 import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/note';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import { bunnyNoteIsSpent, bunnyNotesCommitments, getContract, getContractAddressFromCurrencyDenomination, onBoardOrGetProvider } from '../web3/web3';
+import { bunnyNoteIsSpent, bunnyNotesCommitments, getContract, getContractAddressFromCurrencyDenomination, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
 interface VerifyNoteTabProps extends Base {
       noteString: string
       setMyNoteString: (newValue: string) => void;
@@ -20,6 +20,7 @@ interface VerifyNoteTabProps extends Base {
 }
 
 export type Commitment = {
+      validText: string
       noteType: boolean
       creator: string
       recepient: string
@@ -37,6 +38,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
       const onVerify = async () => {
             if (props.provider === null) {
                   const provider = await onBoardOrGetProvider(props.displayError);
+                  await requestAccounts(provider);
                   if (provider) {
                         await fetchCommitment(provider);
                   }
@@ -57,7 +59,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                   return;
             }
             const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency);
-            const contract = await getContract(props.provider, contractAddress, "/ERC20Notes.json");
+            const contract = await getContract(provider, contractAddress, "/ERC20Notes.json");
             const commitmentBigInt = parsedNote.deposit.commitment;
             const nullifierHash = parsedNote.deposit.nullifierHash
             // // get the commitment data
@@ -72,8 +74,8 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
             }
 
             const recepient = !isSpent ? "Not Spent" : commitments.recepient;
-
             setCommitmentDetails({
+                  validText: !isSpent ? "Valid!" : "The Note has been spent!",
                   noteType: commitments.cashNote,
                   creator: commitments.creator,
                   recepient: recepient,
@@ -110,7 +112,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                               Verify
                         </Button>
                   </Tooltip> : <React.Fragment>
-                        <Typography sx={{ textAlign: "center" }}>Valid!</Typography>
+                        <Typography sx={{ textAlign: "center" }}>{commitmentDetails.validText}</Typography>
                         <TableContainer component={Paper}>
                               <Table sx={{ minWidth: 650 }} aria-label="Note details">
                                     <TableBody>
