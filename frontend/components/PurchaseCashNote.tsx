@@ -9,15 +9,15 @@ import Tooltip from '@mui/material/Tooltip';
 import WalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import { getCardPropsData } from './utils/cardPropsData';
 import CardGrid, { CardType } from './CardGrid';
-import { BaseTronUser } from './Base';
-import { handleCardSelectWithTron } from '../tron/componentParts';
+import { Base } from './Base';
 import { NoteDetails } from '../zkp/generateProof';
 import { createQR } from '../qrcode/create';
 import { downloadNote } from './DownloadNote';
-import { onBoardOrGetTronWeb } from '../tron';
+import { onBoardOrGetProvider, requestAccounts } from '../web3/web3';
+import { handleCardSelectWithProvider } from '../web3/componentParts';
 
 
-interface PurchaseCashNoteProps extends BaseTronUser {
+interface PurchaseCashNoteProps extends Base {
 
 }
 
@@ -53,23 +53,24 @@ export default function PurchaseCashNote(props: PurchaseCashNoteProps) {
 
 
     const importAddress = async () => {
-        if (props.tronWeb === null) {
-            const tronWeb = await onBoardOrGetTronWeb(props.displayError);
+        if (props.provider === null) {
+            const provider = await onBoardOrGetProvider(props.displayError);
 
-            if (tronWeb) {
-                props.setMyAddress(tronWeb.defaultAddress.base58);
-                props.setTronWeb(tronWeb);
+            if (provider) {
+                const account = await requestAccounts(provider);
+                props.setMyAddress(account);
+                props.setProvider(provider);
             }
 
         } else {
-            const defaultAddress = props.tronWeb.defaultAddress;
-            props.setMyAddress(defaultAddress.base58);
+            const account = await requestAccounts(props.provider);
+            props.setMyAddress(account);
         }
     }
 
 
     const handleSelectCashNote = async (denomination: string, currency: string, cardType: CardType) => {
-        const res = await handleCardSelectWithTron(props, denomination, currency, cardType)
+        const res = await handleCardSelectWithProvider(props, denomination, currency, cardType)
 
         if (res !== false) {
             setRenderDownloadPage(true);
@@ -78,7 +79,7 @@ export default function PurchaseCashNote(props: PurchaseCashNoteProps) {
     }
 
     if (renderDownloadPage) {
-        return downloadNote({ showApproval, setShowApproval, cardType: "Cash Note", noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError, tronWeb: props.tronWeb })
+        return downloadNote({ setRenderDownloadPage, showApproval, setShowApproval, cardType: "Cash Note", noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError, provider: props.provider })
     }
 
     return (
@@ -99,7 +100,7 @@ export default function PurchaseCashNote(props: PurchaseCashNoteProps) {
                                 value={props.myAddress}
                                 onChange={addressSetter}
                                 fullWidth
-                                placeholder="Enter Your Tron Wallet Address"
+                                placeholder="Enter Your Wallet Address"
                                 InputProps={{
                                     disableUnderline: true,
                                     sx: { fontSize: 'default' },

@@ -8,12 +8,12 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import VerifyIcon from "@mui/icons-material/Note"
 import Box from "@mui/material/Box"
-import { BaseTronUser } from './Base';
+import { Base } from './Base';
 import ScanNoteButton from './QRScannerModal';
-import { bunnyNotesWithdrawGiftCard, getContract, getContractAddressFromCurrencyDenomination, onBoardOrGetTronWeb } from '../tron';
 import { parseNote, toNoteHex } from '../../lib/note';
 import { generateZKProof, packSolidityProof } from '../zkp/generateProof';
-interface CashOutGiftCardTabProps extends BaseTronUser {
+import { bunnyNotesWithdrawGiftCard, getContract, getContractAddressFromCurrencyDenomination, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
+interface CashOutGiftCardTabProps extends Base {
     noteString: string
     setMyNoteString: (newValue: string) => void;
 }
@@ -25,17 +25,17 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
     }
 
     const cashOutAction = async () => {
-        if (props.tronWeb === null) {
-            const tronWeb = await onBoardOrGetTronWeb(props.displayError);
-            if (tronWeb) {
-                await doCashOut(tronWeb);
+        if (props.provider === null) {
+            const provider = await onBoardOrGetProvider(props.displayError);
+            if (provider) {
+                await doCashOut(provider);
             }
         } else {
-            await doCashOut(props.tronWeb);
+            await doCashOut(props.provider);
         }
     }
 
-    const doCashOut = async (tronWeb: any) => {
+    const doCashOut = async (provider: any) => {
         let parsedNote;
 
         try {
@@ -49,18 +49,12 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
         const commitment = toNoteHex(parsedNote.deposit.commitment);
 
         const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency);
-        const contract = await getContract(tronWeb, contractAddress);
-        const myAddress = "0x" + tronWeb.defaultAddress.hex.slice(2);
+        const contract = await getContract(provider, contractAddress, "/ERC20Notes.json");
+        const myAddress = await requestAccounts(provider);
         const change = "0";
         const zkp = await generateZKProof(parsedNote.deposit, myAddress, change);
-
-        console.log(zkp);
-        console.log("BEFORE PACKING")
         const solidityProof = packSolidityProof(zkp.proof);
-        console.log("AFTER PACKING")
-        console.log(solidityProof);
-
-        await bunnyNotesWithdrawGiftCard(contract, solidityProof, nullifierHash, commitment, tronWeb.defaultAddress.base58, change);
+        await bunnyNotesWithdrawGiftCard(contract, solidityProof, nullifierHash, commitment, myAddress, change);
     }
 
     return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>

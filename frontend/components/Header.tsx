@@ -42,7 +42,7 @@ export default function Header(props: HeaderProps) {
                         </Grid>
                         <Grid item>
                             <Tooltip title="Help">
-                                <IconButton color="inherit">
+                                <IconButton color="inherit" href="/help">
                                     <HelpIcon />
                                 </IconButton>
                             </Tooltip>

@@ -24,7 +24,7 @@ const IMG = styled("img")({
 })
 
 export function SelectableCards(props: SelectableCardsProps) {
-  
+
   const purchaseSelected = () => {
     props.handleSelect(props.denomination, props.currency, props.cardType)
   }
@@ -43,8 +43,8 @@ export function SelectableCards(props: SelectableCardsProps) {
   }
 
   return (
-    <Button onClick={purchaseSelected} >
-      <Card sx={{ minWidth: 200 }}>
+    <Button sx={{maxHeight: 150}} onClick={purchaseSelected} >
+      <Card sx={{ minWidth: 200,maxHeight: 150 }}>
         <IMG
           width="50"
           src={props.imageLink}

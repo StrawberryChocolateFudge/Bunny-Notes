@@ -1,8 +1,18 @@
-#cp circuits/withdraw_0001.zkey dist/withdraw_0001.zkey
+cp circuits/withdraw_0001.zkey dist/withdraw_0001.zkey
 
-#cp circuits/withdraw_js/withdraw.wasm dist/withdraw.wasm
+cp circuits/withdraw_js/withdraw.wasm dist/withdraw.wasm
 
-#cp Bunny.svg dist/Bunny.svg
+cp artifacts/contracts/ERC20Notes.sol/ERC20Notes.json dist/ERC20Notes.json
+cp artifacts/contracts/Mock/MockERC20.sol/MOCKERC20.json dist/MOCKERC20.json
 
-# copy the TronWeb dependency to use in the browser
-cp node_modules/tronweb/dist/TronWeb.js dist/tronweb.js
+cp Bunny.svg dist/Bunny.svg
+cp testnet-banner.png dist/testnet-banner.png
+
+cp depositPage.png dist/depositPage.png
+cp testNote.pdf dist/testNote.pdf
+
+cp verifyPage.png dist/verifyPage.png
+cp cashOut.png dist/cashOut.png
+cp paymentRequestPage.png dist/paymentRequestPage.png
+cp payWithCashNote.png dist/payWithCashNote.png
+cp Bunny-Note.jpg dist/Bunny-Note.jpg
