@@ -2,7 +2,7 @@ import { Button, Paper, Typography } from "@mui/material";
 import React from "react";
 import { Base, Spacer } from "./Base";
 import { ethers } from "ethers";
-import { getContract, onBoardOrGetProvider, requestAccounts, switchToDonauTestnet, TESTNETMINTERC20, USDTMCONTRACTADDRESS_DOTNAU, watchAsset } from "../web3/web3";
+import { getContract, onBoardOrGetProvider, onboardOrSwitchNetwork, requestAccounts, switchToDonauTestnet, TESTNETMINTERC20, USDTMCONTRACTADDRESS_DOTNAU, watchAsset } from "../web3/web3";
 interface TestnetInfoProps extends Base {
 }
 
@@ -42,7 +42,7 @@ export function TestnetInfo(props: TestnetInfoProps) {
     }
 
     const switchNetwork = async () => {
-        await switchToDonauTestnet()
+        await onboardOrSwitchNetwork(props.displayError)
         // I set the provider null so we need to reconnect to avoid error after changing network!
         props.setProvider(null);
     }
