@@ -2,7 +2,8 @@
   "name": "bunny-notes",
   "scripts": {
     "dev": "parcel frontend/index.html",
-    "build": "parcel build frontned/index.html"
+    "build": "parcel build frontend/index.html && npm run copy",
+    "copy": "sh copyToDist.sh"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.2.0",
