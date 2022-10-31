@@ -9,7 +9,7 @@ export const USDTM100ADDRESS_DOTNAU = "0xF273919f7e9239D5C8C70f49368fF80c0a91064
 
 export function web3Injected(): boolean {
     //@ts-ignore
-    if (window.ethereum) {
+    if (window.ethereum !== undefined) {
         return true;
     } else {
         return false;
