@@ -7,12 +7,12 @@ export default function HelpPage() {
     const Title = (txt) => <Typography sx={{ margin: "0 auto" }} component={"h3"} variant="h3">{txt}</Typography>
     const Body = (txt) => <Typography component={"div"} variant="body1">{txt}</Typography>
     const STitle = (txt) => <Typography sx={{ margin: "0 auto" }} component="h6" variant="h6">{txt}</Typography>
-    const Img = (src) => <img style={{ margin: "0 auto" }} width="80%" src={src} />
+    const Img = (src, width) => <img style={{ margin: "0 auto" }} width={width} src={src} />
 
     return <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <Header withTabs={false}></Header>
         <Box component="main" sx={{ flex: 1, py: 6, px: 4, bgcolor: '#eaeff1', display: "flex", flexDirection: "column" }}>
-            {Img("/Bunny-Note.jpg")}
+            {Img("/Bunny-Note.jpg", "200px")}
             <hr />
             {Title("Help")}
 
@@ -23,11 +23,11 @@ export default function HelpPage() {
             {STitle('We are on Testnet')}
 
             {Body("A Hot Wallet is needed to try out the DApp. You need to use Metamask or similar The Bunny Notes Smart contracts are deployed on Donau testnet and use the BitTorrent Chain!")}
-            {Img("/testnet-banner.png")}
+            {Img("/testnet-banner.png", "600px")}
             <hr />
             {STitle("Purchase Gift Cards or Cash Notes")}
             {Body("You can select a token from the list and purchase it. All you need is to provide your crypto address. Click \"Import Address\" to connect metamask and fill it out automatically. Select USDTM from the list to proceed with your purchase. Because we are on testnet, only that token works. Make sure you mint some first so you can make the deposit!")}
-            {Img("/depositPage.png")}
+            {Img("/depositPage.png", "600px")}
             {Body("Congratulations! After a successful deposit, your Note now has value! You can give it to somebody to cash it out or if you created a cash note, you can spend it!")}
             <hr />
             {STitle("Gift Cards VS Cash Notes")}
@@ -40,19 +40,19 @@ export default function HelpPage() {
             <hr />
             {STitle("Verify a Note")}
             {Body("You should verify a note if you find one to check if it's valid. Use the QR code scanner or copy the text from the bottom of the pdf image to the input field and click verify!")}
-            {Img("/verifyPage.png")}
+            {Img("/verifyPage.png", "600px")}
             <hr />
             {STitle("Cash Out a Gift Card")}
             {Body("Gift cards can be converted back to tokens. When cashing out the user needs to scan the QR code or paste the note and they are ready to withdraw the tokens!")}
-            {Img("/cashOut.png")}
+            {Img("/cashOut.png", "600px")}
             <hr />
             {STitle("Request Payment")}
             {Body("Payment Requests are very versatile. Using this page will create a link to the application that you can share online or you can show it to your customer in person, and he can pay with the note instantly using the QR Code Scanner!")}
-            {Img("/paymentRequestPage.png")}
+            {Img("/paymentRequestPage.png", "600px")}
             <hr />
             {STitle("Payment Link Page")}
             {Body("The payment link page can be used to pay in person or online. In the current version one of the parties must use a crypto wallet however it can be either of the parties. A seller can just scan the QR code of the Note and the buyer can be sure the seller has no access to his wallet when making payments or in another scenario the seller can send the link to the buyer and the buyer will submit the transaction to the network. Either way, it works.")}
-            {Img("/payWithCashNote.png")}
+            {Img("/payWithCashNote.png", "600px")}
         </Box>
     </Box>
 }
