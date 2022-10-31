@@ -78,7 +78,7 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
         try {
             parsedNote = await parseNote(note);
         } catch (err) {
-            props.displayError(props.provider);
+            props.displayError("Invalid Note");
             return;
         }
 
