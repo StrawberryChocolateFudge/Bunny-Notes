@@ -16,12 +16,16 @@ export function web3Injected(): boolean {
     }
 }
 
+export function doOnBoarding() {
+    const onboarding = new MetaMaskOnboarding();
+    onboarding.startOnboarding();
+}
+
 
 export function onBoardOrGetProvider(handleError): any {
     if (!web3Injected()) {
         handleError("You need to install metamask!");
-        const onboarding = new MetaMaskOnboarding();
-        onboarding.startOnboarding();
+        doOnBoarding();
         return false;
     } else {
         //@ts-ignore
@@ -55,6 +59,14 @@ export async function watchAsset(erc20Params: any, onError: any) {
             }
         })
         .catch(console.error);
+}
+
+export async function onboardOrSwitchNetwork(handleError) {
+    if (!web3Injected()) {
+        handleError("You need to install metamask!");
+        await doOnBoarding();
+    }
+    await switchToDonauTestnet()
 }
 
 export async function switchToDonauTestnet() {
