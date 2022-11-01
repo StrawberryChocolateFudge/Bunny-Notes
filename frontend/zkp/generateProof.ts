@@ -4,7 +4,7 @@ import { deposit, parseNote } from "../../lib/note";
 import packToSolidityProof from "../../lib/packToSolidityProof";
 const urlBASE = "https://bunnynotes.finance"
 
-const netId = 0x2b6653dc;
+const netId = 0x405;
 
 
 export const snarkArtifacts = { wasmFilePath: urlBASE + "/withdraw.wasm", zkeyFilePath: urlBASE + "/withdraw_0001.zkey" };
