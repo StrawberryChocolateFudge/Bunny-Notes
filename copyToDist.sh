@@ -7,16 +7,3 @@ cp abis/MOCKERC20.json dist/MOCKERC20.json
 
 
 cp -R imgs dist/imgs
-
-
-#cp Bunny.svg dist/Bunny.svg
-#cp testnet-banner.png dist/testnet-banner.png
-
-#cp depositPage.png dist/depositPage.png
-#cp testNote.pdf dist/testNote.pdf
-
-#cp verifyPage.png dist/verifyPage.png
-#cp cashOut.png dist/cashOut.png
-#cp paymentRequestPage.png dist/paymentRequestPage.png
-#cp payWithCashNote.png dist/payWithCashNote.png
-#cp Bunny-Note.jpg dist/Bunny-Note.jpg
