@@ -9,12 +9,13 @@ import Tooltip from '@mui/material/Tooltip';
 import WalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import { getCardPropsData } from './utils/cardPropsData';
 import CardGrid, { CardType } from './CardGrid';
-import { Base } from './Base';
+import { Base, Spacer } from './Base';
 import { NoteDetails } from '../zkp/generateProof';
 import { createQR } from '../qrcode/create';
 import { downloadNote } from './DownloadNote';
 import { onBoardOrGetProvider, requestAccounts } from '../web3/web3';
 import { handleCardSelectWithProvider } from '../web3/componentParts';
+import { Center } from './PurchaseGiftCardTab';
 
 
 interface PurchaseCashNoteProps extends Base {
@@ -118,6 +119,10 @@ export default function PurchaseCashNote(props: PurchaseCashNoteProps) {
                     </Grid>
                 </Toolbar>
             </AppBar>
+            <Center>
+                <Spacer></Spacer>
+                <Button target="_blank" variant="outlined" href="https://bt.io/wallet/?language=EN">My Assets</Button>
+            </Center>
             <CardGrid handleSelect={handleSelectCashNote} cardProps={getCardPropsData("Cash Note")} ></CardGrid>
         </Paper>
     );

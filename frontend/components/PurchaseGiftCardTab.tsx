@@ -9,16 +9,21 @@ import Tooltip from '@mui/material/Tooltip';
 import WalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import CardGrid, { CardType } from './CardGrid';
 import { getCardPropsData } from './utils/cardPropsData';
-import { Base } from './Base';
+import { Base, Spacer } from './Base';
 import { downloadNote } from './DownloadNote';
 import { NoteDetails } from '../zkp/generateProof';
 import { createQR } from '../qrcode/create';
 import { onBoardOrGetProvider, requestAccounts } from '../web3/web3';
 import { handleCardSelectWithProvider } from '../web3/componentParts';
+import { styled } from '@mui/material';
 
 interface GiftCardPageProps extends Base {
 
 }
+
+export const Center = styled("div")({
+    textAlign: "center"
+})
 
 export default function PurchaseGiftCardTab(props: GiftCardPageProps) {
 
@@ -115,6 +120,10 @@ export default function PurchaseGiftCardTab(props: GiftCardPageProps) {
                     </Grid>
                 </Toolbar>
             </AppBar>
+            <Center>
+                <Spacer></Spacer>
+                <Button target="_blank" variant="outlined" href="https://bt.io/wallet/?language=EN">My Assets</Button>
+            </Center>
             <CardGrid handleSelect={handleSelectGiftCard} cardProps={getCardPropsData("Gift Card")} ></CardGrid>
         </Paper>
     );
