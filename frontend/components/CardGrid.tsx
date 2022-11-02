@@ -17,7 +17,7 @@ export default function CardGrid(props: CardGridProps) {
     const renderGrid = () => {
         return props.cardProps.map(data => {
             return <Grid item xs={6} key={`${data.denomination}${data.currency}${data.cardType}`} justifyContent="center" alignItems="stretch" sx={{ textAlign: "center" }}>
-                <SelectableCards handleSelect={props.handleSelect} cardType={data.cardType} currency={data.currency} denomination={data.denomination} imageAlt={data.imageAlt} imageLink={data.imageLink}></SelectableCards>
+                <SelectableCards networkAlt={data.networkAlt} networkLogo={data.networkLogo} handleSelect={props.handleSelect} cardType={data.cardType} currency={data.currency} denomination={data.denomination} imageAlt={data.imageAlt} imageLink={data.imageLink}></SelectableCards>
             </Grid>
         })
     }

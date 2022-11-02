@@ -5,8 +5,11 @@ import Typography from '@mui/material/Typography';
 import Button from "@mui/material/Button";
 import { styled } from "@mui/system";
 import { CardType } from './CardGrid';
+import { Avatar, CardHeader } from '@mui/material';
 
 export interface SelectableCardsParams {
+  networkLogo: string;
+  networkAlt: string;
   imageLink: string;
   imageAlt: string;
   denomination: string;
@@ -19,8 +22,15 @@ export interface SelectableCardsProps extends SelectableCardsParams {
 }
 
 
-const IMG = styled("img")({
+const IMGWithMargin = styled("img")({
   marginTop: "20px"
+})
+
+const OverlayImgs = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center"
+
 })
 
 export function SelectableCards(props: SelectableCardsProps) {
@@ -29,6 +39,10 @@ export function SelectableCards(props: SelectableCardsProps) {
     props.handleSelect(props.denomination, props.currency, props.cardType)
   }
 
+  const OverlayedImage = () => <OverlayImgs>
+    <img width={"50"} style={{ margin: "0 auto", marginTop: "10px" }} src={props.imageLink} alt={props.imageAlt} />
+    <img width="20" style={{ right: "80px", bottom: "85px", position: "absolute" }} src={props.networkLogo} />
+  </OverlayImgs>
 
   const getContent = () => {
     if (props.cardType === "Payment Request") {
@@ -41,15 +55,10 @@ export function SelectableCards(props: SelectableCardsProps) {
       </Typography>
     }
   }
-
   return (
-    <Button sx={{maxHeight: 150}} onClick={purchaseSelected} >
-      <Card sx={{ minWidth: 200,maxHeight: 150 }}>
-        <IMG
-          width="50"
-          src={props.imageLink}
-          alt={props.imageAlt}
-        />
+    <Button sx={{ height: 150 }} onClick={purchaseSelected} >
+      <Card sx={{ width: 200, height: 150 }}>
+        <OverlayedImage></OverlayedImage>
         <CardContent>
           {getContent()}
         </CardContent>
