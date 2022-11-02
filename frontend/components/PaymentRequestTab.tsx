@@ -62,7 +62,7 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
         // For verification I use a temporary tronweb instance, just to call isAddress
         // the props.tronWeb might be null at this point if the user manually copies the address.
         if (ethers.utils.isAddress(props.paymentRequest.payTo)) {
-            navigate(`/paymentRequest/${props.paymentRequest.payTo}/${parseFloat(props.paymentRequest.price).toFixed(2)}/${currency}`)
+            navigate(`/paymentRequest/${props.paymentRequest.payTo}/${parseFloat(props.paymentRequest.price)}/${currency}`)
         } else {
             props.displayError(`Invalid wallet address!`);
             return;
