@@ -2,9 +2,9 @@ import { Deposit, FullProof } from "../../lib/types";
 import { generateProof } from "../../lib/generateProof";
 import { deposit, parseNote } from "../../lib/note";
 import packToSolidityProof from "../../lib/packToSolidityProof";
+import { netId } from "../web3/web3";
 const urlBASE = "https://bunnynotes.finance"
 
-const netId = 0x405;
 
 
 export const snarkArtifacts = { wasmFilePath: urlBASE + "/withdraw.wasm", zkeyFilePath: urlBASE + "/withdraw_0001.zkey" };
