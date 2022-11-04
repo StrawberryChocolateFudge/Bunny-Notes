@@ -89,11 +89,7 @@ export default function Base() {
     };
 
 
-    const getLoading = () => {
-        return <Box sx={{ display: 'flex', justifyContent: "center" }}>
-            <CircularProgress />
-        </Box>
-    }
+   
 
     const genericProps = {
         displayError: openSnackbar,
