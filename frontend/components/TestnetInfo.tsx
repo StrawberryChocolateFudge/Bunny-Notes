@@ -2,7 +2,7 @@ import { Button, Paper, Typography } from "@mui/material";
 import React from "react";
 import { Base, Spacer } from "./Base";
 import { ethers } from "ethers";
-import { getContract, onBoardOrGetProvider, onboardOrSwitchNetwork, requestAccounts, switchToDonauTestnet, TESTNETMINTERC20, USDTMCONTRACTADDRESS_DOTNAU, watchAsset } from "../web3/web3";
+import { getChainId, getContract, netId, onBoardOrGetProvider, onboardOrSwitchNetwork, requestAccounts, switchToDonauTestnet, TESTNETMINTERC20, USDTMCONTRACTADDRESS_DONAU, watchAsset } from "../web3/web3";
 interface TestnetInfoProps extends Base {
 }
 
@@ -10,13 +10,23 @@ interface TestnetInfoProps extends Base {
 export function TestnetInfo(props: TestnetInfoProps) {
 
     async function doMint(provider: any) {
-        const contract = await getContract(provider, USDTMCONTRACTADDRESS_DOTNAU, "/MOCKERC20.json");
+        // Check if we are on the correct network!
+        const chainId = await getChainId(provider);
+
+        if (chainId !== netId) {
+
+            props.displayError("You are on the wrong network!")
+            return;
+        }
+
+
+        const contract = await getContract(provider, USDTMCONTRACTADDRESS_DONAU, "/MOCKERC20.json");
         const account = await requestAccounts(provider);
         const amount = ethers.utils.parseEther("1000");
         await TESTNETMINTERC20(contract, account, amount).then(async () => {
             await watchAsset(
                 {
-                    address: USDTMCONTRACTADDRESS_DOTNAU,
+                    address: USDTMCONTRACTADDRESS_DONAU,
                     symbol: "USDTM",
                     decimals: 18
                 },
@@ -43,8 +53,6 @@ export function TestnetInfo(props: TestnetInfoProps) {
 
     const switchNetwork = async () => {
         await onboardOrSwitchNetwork(props.displayError)
-        // I set the provider null so we need to reconnect to avoid error after changing network!
-        props.setProvider(null);
     }
 
 
