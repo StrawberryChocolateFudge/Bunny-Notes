@@ -3,14 +3,14 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Base, Copyright, Spacer } from "./Base";
 import Header from "./Header";
-import { TestnetInfo } from "./TestnetInfo";
 import VerifyIcon from "@mui/icons-material/Note"
 import TextField from '@mui/material/TextField';
 import ScanNoteButton from './QRScannerModal';
-import { bunnyNoteIsSpent, bunnyNotesCommitments, bunnyNotesWithdrawCashNote, getContract, getContractAddressFromCurrencyDenomination, MAXCASHNOTESIZE, onBoardOrGetProvider, requestAccounts } from "../web3/web3";
+import { bunnyNoteIsSpent, bunnyNotesCommitments, bunnyNotesWithdrawCashNote, getContract, getContractAddressFromCurrencyDenomination, getJsonRpcProvider, getRpcContract, MAXCASHNOTESIZE, onBoardOrGetProvider, relayCashNotePayment, requestAccounts } from "../web3/web3";
 import { parseNote, toNoteHex } from "../../lib/note";
 import { ethers } from "ethers";
 import { generateZKProof, packSolidityProof } from "../zkp/generateProof";
+import { getLoading } from "./LoadingIndicator";
 
 interface PaymentRequestPageProps extends Base {
 }
@@ -31,6 +31,8 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
     const { payTo, amount, currency } = useParams();
 
     const [note, setNote] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [paymentDone, setPaymentDone] = useState(false);
 
     const noteSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         setNote(event.target.value);
@@ -41,15 +43,8 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
     }
 
     const paymentAction = async () => {
-        if (props.provider === null) {
-            const provider = await onBoardOrGetProvider(props.displayError);
-            if (provider) {
-                await doPay(provider);
-            }
-
-        } else {
-            await doPay(props.provider);
-        }
+        const provider = getJsonRpcProvider();
+        await doPay(provider);
     }
 
     const doPay = async (provider: any) => {
@@ -82,46 +77,67 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
             return;
         }
 
+        if (parsedNote.currency !== currency) {
+            props.displayError("Invalid payment currency!");
+        }
+
         // verify the address in the url is correct
 
         if (!ethers.utils.isAddress(payTo as string)) {
             props.displayError("Invalid Payment Address")
             return;
         }
-
-        const nullifilerHash = toNoteHex(parsedNote.deposit.nullifierHash);
+        setLoading(true);
+        const nullifierHash = toNoteHex(parsedNote.deposit.nullifierHash);
         const commitment = toNoteHex(parsedNote.deposit.commitment);
 
         const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency);
-        const contract = await getContract(provider, contractAddress, "/ERC20Notes.json");
+        const contract = await getRpcContract(provider, contractAddress, "/ERC20Notes.json");
         // check if the note is valid or if it has been spent already
-        const isSpent = await bunnyNoteIsSpent(contract, nullifilerHash);
+        const isSpent = await bunnyNoteIsSpent(contract, nullifierHash);
         const commitments = await bunnyNotesCommitments(contract, commitment);
 
         if (!commitments.used) {
             props.displayError("Invalid note. Missing Deposit!");
+            setLoading(false);
             return;
         }
 
         if (isSpent) {
             props.displayError("Invalid.You can't spend a note twice!");
+            setLoading(false);
             return;
         }
 
-        const myAddress = await requestAccounts(provider);
         // Calculate change
         // The denomination - payment amount;
         const changeFloat = parseFloat(parsedNote.amount) - parseFloat(amount);
         const change = changeFloat.toString();
-        const zkp = await generateZKProof(parsedNote.deposit, myAddress, change);
+        const zkp = await generateZKProof(parsedNote.deposit, payTo, change);
         const solidityProof = packSolidityProof(zkp.proof);
-        await bunnyNotesWithdrawCashNote(contract, solidityProof, nullifilerHash, commitment, payTo, change);
+
+        //PAYMENTS WILL BE ARE RELAYED!!
+        try {
+            const res = await relayCashNotePayment({ solidityProof, nullifierHash, commitment, recepient: payTo, change, currency: parsedNote.currency, denomination: parsedNote.amount, type: "Cash Note" });
+
+            if (res.status === 200) {
+                setPaymentDone(true);
+            } else {
+                const json = await res.json();
+                props.displayError(json.msg);
+            }
+
+        } catch (err) {
+            props.displayError("Network Error!")
+        } finally {
+            setLoading(false);
+        }
+
     }
 
     return <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Header withTabs={false} />
         <Box component="main" sx={{ flex: 1, py: 6, px: 4, bgcolor: '#eaeff1' }}>
-            <TestnetInfo {...props}></TestnetInfo>
             <Spacer></Spacer>
             <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
                 <AppBar
@@ -160,11 +176,12 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                         </Table>
                     </TableContainer>
                     <Spacer></Spacer>
-                    <Tooltip title="Pay with Cash Note">
+
+                    {loading ? getLoading() : (paymentDone ? <p>Done</p> : <Tooltip title="Pay with Cash Note">
                         <Button onClick={paymentAction} variant="contained" sx={{ mr: 1 }}>
                             Pay with Cash Note
                         </Button>
-                    </Tooltip>
+                    </Tooltip>)}
                 </Box>
             </Paper >
         </Box>
