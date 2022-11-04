@@ -11,8 +11,9 @@ import Box from "@mui/material/Box"
 import { Base, Spacer } from './Base';
 import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/note';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import { bunnyNoteIsSpent, bunnyNotesCommitments, getContract, getContractAddressFromCurrencyDenomination, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
+import { Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
+import { bunnyNoteIsSpent, bunnyNotesCommitments, getContractAddressFromCurrencyDenomination, getJsonRpcProvider, getRpcContract } from '../web3/web3';
+import { getLoading } from './LoadingIndicator';
 interface VerifyNoteTabProps extends Base {
       noteString: string
       setMyNoteString: (newValue: string) => void;
@@ -30,24 +31,17 @@ export type Commitment = {
 export default function VerifyNoteTab(props: VerifyNoteTabProps) {
 
       const [commitmentDetails, setCommitmentDetails] = React.useState<null | Commitment>(null)
-
+      const [loading, setLoading] = React.useState(false);
       const noteStringSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
             props.setMyNoteString(event.target.value);
       }
 
       const onVerify = async () => {
-            if (props.provider === null) {
-                  const provider = await onBoardOrGetProvider(props.displayError);
-                  await requestAccounts(provider);
-                  if (provider) {
-                        await fetchCommitment(provider);
-                  }
-            } else {
-                  await fetchCommitment(props.provider)
-            }
-
-
+            const provider = getJsonRpcProvider();
+            await fetchCommitment(provider)
       }
+
+
 
       const fetchCommitment = async (provider: any) => {
             let parsedNote;
@@ -58,8 +52,9 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                   props.displayError(err.message);
                   return;
             }
+            setLoading(true);
             const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency);
-            const contract = await getContract(provider, contractAddress, "/ERC20Notes.json");
+            const contract = await getRpcContract(provider, contractAddress, "/ERC20Notes.json");
             const commitmentBigInt = parsedNote.deposit.commitment;
             const nullifierHash = parsedNote.deposit.nullifierHash
             // // get the commitment data
@@ -70,6 +65,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
 
             if (!commitments.used) {
                   props.displayError("Invalid note. Missing Deposit!");
+                  setLoading(false);
                   return;
             }
 
@@ -81,6 +77,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                   recepient: recepient,
                   denomination: `${parsedNote.amount} ${parsedNote.currency}`
             })
+            setLoading(false);
       }
 
       return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
@@ -107,11 +104,11 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
             <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center" }}>
                   <Spacer></Spacer>
 
-                  {commitmentDetails === null ? <Tooltip title="Verify the Note">
+                  {commitmentDetails === null ? (loading ? getLoading() : <Tooltip title="Verify the Note">
                         <Button onClick={onVerify} variant="contained" sx={{ mr: 1 }}>
                               Verify
                         </Button>
-                  </Tooltip> : <React.Fragment>
+                  </Tooltip>) : <React.Fragment>
                         <Typography sx={{ textAlign: "center" }}>{commitmentDetails.validText}</Typography>
                         <TableContainer component={Paper}>
                               <Table sx={{ minWidth: 650 }} aria-label="Note details">
