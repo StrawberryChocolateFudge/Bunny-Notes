@@ -12,7 +12,7 @@ import { Base } from './Base';
 import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/note';
 import { generateZKProof, packSolidityProof } from '../zkp/generateProof';
-import { bunnyNotesWithdrawGiftCard, getContract, getContractAddressFromCurrencyDenomination, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
+import { bunnyNotesWithdrawGiftCard, getChainId, getContract, getContractAddressFromCurrencyDenomination, netId, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
 interface CashOutGiftCardTabProps extends Base {
     noteString: string
     setMyNoteString: (newValue: string) => void;
@@ -44,6 +44,15 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
             props.displayError(err.message);
             return;
         }
+
+        // Check if we are on the correct network!
+        const chainId = await getChainId(props.provider);
+
+        if (chainId !== netId) {
+            props.displayError("You are on the wrong network!")
+            return;
+        }
+
 
         const nullifierHash = toNoteHex(parsedNote.deposit.nullifierHash);
         const commitment = toNoteHex(parsedNote.deposit.commitment);
