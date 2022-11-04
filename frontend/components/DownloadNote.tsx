@@ -5,7 +5,7 @@ import { downloadPDF } from "../pdf";
 import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
 import { ethers } from "ethers";
-import { bunnyNotesDeposit, ERC20Approve, getContract, getFee, requestAccounts, USDTM100ADDRESS_DOTNAU, USDTMCONTRACTADDRESS_DOTNAU } from "../web3/web3";
+import { bunnyNotesCommitments, bunnyNotesDeposit, ERC20Approve, getChainId, getContract, getFee, netId, requestAccounts, USDTM100ADDRESS_DONAU, USDTMCONTRACTADDRESS_DONAU } from "../web3/web3";
 
 interface DownloadNoteProps {
     provider: any,
@@ -94,35 +94,56 @@ export function downloadNote(props: DownloadNoteProps) {
             return;
         }
 
+        // Check if we are on the correct network!
+        const chainId = await getChainId(props.provider);
+
+        if (chainId !== netId) {
+
+            props.displayError("You are on the wrong network!")
+            return;
+        }
+
         if (props.showApproval) {
 
             // approve the spend, need to approve for the fee
 
-            const contract = await getContract(props.provider, USDTM100ADDRESS_DOTNAU, "/ERC20Notes.json");
+            const contract = await getContract(props.provider, USDTM100ADDRESS_DONAU, "/ERC20Notes.json");
 
             const fee = await getFee(contract);
             const formattedFee = ethers.utils.formatEther(fee);
 
             const approveAmount = parseFloat(formattedFee) + parseFloat(noteDetails[1].amount);
 
-            const ERC20Contract = await getContract(props.provider, USDTMCONTRACTADDRESS_DOTNAU, "/MOCKERC20.json");
+            const ERC20Contract = await getContract(props.provider, USDTMCONTRACTADDRESS_DONAU, "/MOCKERC20.json");
 
             const convertedApproveAmount = ethers.utils.parseEther(approveAmount.toString());
             props.setShowApproval(false);
 
-            await ERC20Approve(ERC20Contract, USDTM100ADDRESS_DOTNAU, convertedApproveAmount).catch((err) => {
+            await ERC20Approve(ERC20Contract, USDTM100ADDRESS_DONAU, convertedApproveAmount).catch((err) => {
                 props.setShowApproval(true);
             });
 
         } else {
             // after succesful approval  I can prompt the user to deposit the tokens to add value to the note
 
-            const notesContract = await getContract(props.provider, USDTM100ADDRESS_DOTNAU, "/ERC20Notes.json");
+            const notesContract = await getContract(props.provider, USDTM100ADDRESS_DONAU, "/ERC20Notes.json");
+
+
             const address = await requestAccounts(props.provider);
 
             const isCashNote = props.cardType === "Cash Note" ? true : false;
 
             const deposit = noteDetails[1].deposit;
+
+
+            // CHECK if the commitment exists already to stop the deposit!
+
+            const commitments = await bunnyNotesCommitments(notesContract, toNoteHex(deposit.commitment));
+
+            if (commitments.used) {
+                props.displayError("Invalid commitment. Deposit already exists!");
+                return;
+            }
 
             await bunnyNotesDeposit(notesContract, toNoteHex(deposit.commitment), isCashNote, address);
         }
@@ -163,7 +184,7 @@ export function downloadNote(props: DownloadNoteProps) {
                             <Typography variant="subtitle1" component="div">
                                 If you loose the note we cannot recover the deposit for you!
                             </Typography>
-                            {props.showApproval ? <Tooltip title={"Approve spending " + denomination + " (plus 1% fee)"}>
+                            {props.showApproval ? <Tooltip title={"Approve spending " + denomination + " (plus 10% fee)"}>
                                 <Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend</Button></Tooltip> : <Tooltip title={"Deposit " + denomination + " (plus 1% fee)"}>
                                 <Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Deposit</Button></Tooltip>}
                         </Grid>
