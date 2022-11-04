@@ -2,10 +2,12 @@ import MetaMaskOnboarding from "@metamask/onboarding";
 import { ethers } from "ethers";
 
 export const MAXCASHNOTESIZE = 100;
+export const netId = 0x405;
 
-export const USDTMCONTRACTADDRESS_DOTNAU = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7";
-export const USDTM100ADDRESS_DOTNAU = "0xF273919f7e9239D5C8C70f49368fF80c0a91064A";
-
+export const USDTMCONTRACTADDRESS_DONAU = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7";
+export const USDTM100ADDRESS_DONAU = "0xa756b2b52Ba893a6109561bC86138Cbb897Fb2e0";
+export const RELAYERURL = "https://relayer.bunnynotes.finance"
+export const RPCURL = "https://pre-rpc.bt.io/";
 
 export function web3Injected(): boolean {
     //@ts-ignore
@@ -14,6 +16,11 @@ export function web3Injected(): boolean {
     } else {
         return false;
     }
+}
+
+export async function getChainId(provider): Promise<number> {
+    const { chainId } = await provider.getNetwork();
+    return chainId
 }
 
 export function doOnBoarding() {
@@ -29,8 +36,20 @@ export function onBoardOrGetProvider(handleError): any {
         return false;
     } else {
         //@ts-ignore
-        return new ethers.providers.Web3Provider(window.ethereum);
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        //@ts-ignore
+        window.ethereum.on('chainChanged', (chainId) => {
+            // Handle the new chain.
+            // Correctly handling chain changes can be complicated.
+            // We recommend reloading the page unless you have good reason not to.
+            window.location.reload();
+        });
+        return provider;
     }
+}
+
+export function getJsonRpcProvider(): any {
+    return new ethers.providers.JsonRpcProvider(RPCURL)
 }
 
 export async function requestAccounts(provider: any) {
@@ -131,6 +150,11 @@ export async function getContract(provider: any, at: string, abiPath: string): P
     return new ethers.Contract(at, artifact.abi, signer);
 }
 
+export async function getRpcContract(provider: any, at: string, abiPath: string): Promise<any> {
+    const artifact = await fetchAbi(abiPath);
+    return new ethers.Contract(at, artifact.abi, provider);
+}
+
 export async function TESTNETMINTERC20(ERC20Contract: any, mintTo: string, amount: any) {
     return await ERC20Contract.mint(mintTo, amount);
 }
@@ -171,10 +195,22 @@ export async function getFee(contract: any) {
 
 export function getContractAddressFromCurrencyDenomination(denomination: string, currency: string): string {
     if (denomination === "100" && currency === "USDTM") {
-        return USDTM100ADDRESS_DOTNAU;
+        return USDTM100ADDRESS_DONAU;
     } else return ""
 }
 
 export async function getAllowance(contract: any, owner: string, spender: string) {
     return await contract.allowance(owner, spender).call();
+}
+
+
+export async function relayCashNotePayment(details) {
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(details)
+    };
+
+    const res = await fetch(RELAYERURL, requestOptions);
+    return res;
 }
