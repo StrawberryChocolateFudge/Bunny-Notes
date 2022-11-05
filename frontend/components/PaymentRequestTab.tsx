@@ -82,7 +82,7 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
                         <WalletIcon color="inherit" sx={{ display: 'block' }} />
                     </Grid>
                     <Grid item xs>
-                        <TextField type="text" value={props.paymentRequest.payTo} onChange={setPayToAddress} fullWidth placeholder="Paste your Address Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
+                        <TextField autoComplete="off" type="text" value={props.paymentRequest.payTo} onChange={setPayToAddress} fullWidth placeholder="Paste your Address Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                     </Grid>
                     <Grid item>
                         <Tooltip title="Import Address From Wallet Extension">
@@ -106,7 +106,7 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
                         <MoneyIcon color="inherit" sx={{ display: 'block' }} />
                     </Grid>
                     <Grid item xs>
-                        <TextField type={"number"} value={props.paymentRequest.price} onChange={setPrice} fullWidth placeholder="Set the Price" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard"></TextField>
+                        <TextField autoComplete="off" type={"number"} value={props.paymentRequest.price} onChange={setPrice} fullWidth placeholder="Set the Price" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard"></TextField>
                     </Grid>
                 </Grid>
             </Toolbar>

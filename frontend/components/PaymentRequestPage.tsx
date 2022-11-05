@@ -152,7 +152,7 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                                 <VerifyIcon color="inherit" sx={{ display: 'block' }} />
                             </Grid>
                             <Grid item xs>
-                                <TextField value={note} onChange={noteSetter} fullWidth placeholder="Paste your Note Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
+                                <TextField autoComplete="off" value={note} onChange={noteSetter} fullWidth placeholder="Paste your Note Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                             </Grid>
                             <Grid item>
                                 <ScanNoteButton setData={setData} handleError={props.displayError}></ScanNoteButton>

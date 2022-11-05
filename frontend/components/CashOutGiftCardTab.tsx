@@ -79,7 +79,7 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
                         <VerifyIcon color="inherit" sx={{ display: 'block' }} />
                     </Grid>
                     <Grid item xs>
-                        <TextField value={props.noteString} onChange={noteStringSetter} fullWidth placeholder="Paste your Note Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
+                        <TextField autoComplete='off' value={props.noteString} onChange={noteStringSetter} fullWidth placeholder="Paste your Note Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                     </Grid>
                     <Grid item>
                         <ScanNoteButton setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
