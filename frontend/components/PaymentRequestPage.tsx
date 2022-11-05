@@ -103,6 +103,12 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
             return;
         }
 
+        if (!commitments.cashNote) {
+            props.displayError("You can only spend Cash Notes!");
+            setLoading(false);
+            return;
+        }
+
         if (isSpent) {
             props.displayError("Invalid.You can't spend a note twice!");
             setLoading(false);
@@ -112,13 +118,13 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
         // Calculate change
         // The denomination - payment amount;
         const changeFloat = parseFloat(parsedNote.amount) - parseFloat(amount);
-        const change = changeFloat.toString();
-        const zkp = await generateZKProof(parsedNote.deposit, payTo, change);
+        const change = ethers.utils.parseEther(changeFloat.toString());
+        const zkp = await generateZKProof(parsedNote.deposit, payTo, change.toString());
         const solidityProof = packSolidityProof(zkp.proof);
 
         //PAYMENTS WILL BE ARE RELAYED!!
         try {
-            const res = await relayCashNotePayment({ solidityProof, nullifierHash, commitment, recepient: payTo, change, currency: parsedNote.currency, denomination: parsedNote.amount, type: "Cash Note" });
+            const res = await relayCashNotePayment({ solidityProof, nullifierHash, commitment, recepient: payTo, change: change.toString(), currency: parsedNote.currency, denomination: parsedNote.amount, type: "Cash Note" });
 
             if (res.status === 200) {
                 setPaymentDone(true);
