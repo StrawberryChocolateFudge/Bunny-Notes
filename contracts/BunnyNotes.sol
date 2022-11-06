@@ -32,10 +32,10 @@ abstract contract BunnyNotes is ReentrancyGuard {
 
     address public relayer;
 
-    uint256 public fee; // A 1 % fee, 1 hundredth of the denomination!
+    uint256 public fee; 
 
     mapping(bytes32 => bool) public nullifierHashes;
-    // We store all the commitments to make sure there are no accidental deposits twice
+    // We store all the commitments to make sure there are no accidental deposits twice and this allows us to query for transaction details later
     mapping(bytes32 => CommitmentStore) public commitments;
 
     event Deposit(

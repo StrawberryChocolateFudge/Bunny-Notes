@@ -122,7 +122,7 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
         const zkp = await generateZKProof(parsedNote.deposit, payTo, change.toString());
         const solidityProof = packSolidityProof(zkp.proof);
 
-        //PAYMENTS WILL BE ARE RELAYED!!
+        //PAYMENTS ARE RELAYED!!
         try {
             const res = await relayCashNotePayment({ solidityProof, nullifierHash, commitment, recepient: payTo, change: change.toString(), currency: parsedNote.currency, denomination: parsedNote.amount, type: "Cash Note" });
 
