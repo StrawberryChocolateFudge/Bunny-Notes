@@ -185,7 +185,7 @@ export function downloadNote(props: DownloadNoteProps) {
                                 If you loose the note we cannot recover the deposit for you!
                             </Typography>
                             {props.showApproval ? <Tooltip title={"Approve spending " + denomination + " (plus 10% fee)"}>
-                                <Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend</Button></Tooltip> : <Tooltip title={"Deposit " + denomination + " (plus 1% fee)"}>
+                                <Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend</Button></Tooltip> : <Tooltip title={"Deposit " + denomination + " (plus 10% fee)"}>
                                 <Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Deposit</Button></Tooltip>}
                         </Grid>
                     </Grid>
