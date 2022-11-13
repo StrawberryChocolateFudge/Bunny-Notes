@@ -9,7 +9,7 @@ import ScanNoteButton from './QRScannerModal';
 import { bunnyNoteIsSpent, bunnyNotesCommitments, bunnyNotesWithdrawCashNote, getContract, getContractAddressFromCurrencyDenomination, getJsonRpcProvider, getRpcContract, MAXCASHNOTESIZE, onBoardOrGetProvider, relayCashNotePayment, requestAccounts } from "../web3/web3";
 import { parseNote, toNoteHex } from "../../lib/note";
 import { ethers } from "ethers";
-import { generateZKProof, packSolidityProof } from "../zkp/generateProof";
+import { generateZKProof } from "../zkp/generateProof";
 import { getLoading } from "./LoadingIndicator";
 
 interface PaymentRequestPageProps extends Base {
@@ -120,11 +120,11 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
         const changeFloat = parseFloat(parsedNote.amount) - parseFloat(amount);
         const change = ethers.utils.parseEther(changeFloat.toString());
         const zkp = await generateZKProof(parsedNote.deposit, payTo, change.toString());
-        const solidityProof = packSolidityProof(zkp.proof);
 
         //PAYMENTS ARE RELAYED!!
         try {
-            const res = await relayCashNotePayment({ solidityProof, nullifierHash, commitment, recepient: payTo, change: change.toString(), currency: parsedNote.currency, denomination: parsedNote.amount, type: "Cash Note" });
+            // Need to send the proof and the publicSignals, why? the relayer will verify the ZKP off-chain before submitting it to the network!
+            const res = await relayCashNotePayment({ proof: zkp.proof, publicSignals: zkp.publicSignals, recepient: payTo, currency: parsedNote.currency, denomination: parsedNote.amount, type: "Cash Note" });
 
             if (res.status === 200) {
                 setPaymentDone(true);
@@ -132,7 +132,6 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                 const json = await res.json();
                 props.displayError(json.msg);
             }
-
         } catch (err) {
             props.displayError("Network Error!")
         } finally {

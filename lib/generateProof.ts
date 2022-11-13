@@ -10,7 +10,7 @@ export async function generateProof({ deposit, recepient, change, snarkArtifacts
     const input = {
         nullifierHash: deposit.nullifierHash,
         commitmentHash: deposit.commitment,
-        recepient: recepient,
+        recepient,
         change,
         // private snark inputs
         nullifier: deposit.nullifier,
