@@ -12,6 +12,11 @@ It uses the same repository for all for easy testing.
 The project was built for a Hackathon and was scaffolded with hardhat
 
 
+## The Bunny Wallet
+
+Bunny wallet is a smart contract wallet that has relayed zkp based transactions built in, it uses uniswap v3 to provide gasless relayed transactions
+
+
 
 ## Tests
 
