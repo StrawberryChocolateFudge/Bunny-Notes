@@ -1,4 +1,4 @@
-// SPDX-License-Identifire: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -17,7 +17,6 @@ struct CommitmentStore {
     bool used;
     address creator;
     address recepient;
-    bool cashNote;
     uint256 createdDate;
     uint256 spentDate;
 }
@@ -32,7 +31,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
 
     address public relayer;
 
-    uint256 public fee; 
+    uint256 public fee;
 
     mapping(bytes32 => bool) public nullifierHashes;
     // We store all the commitments to make sure there are no accidental deposits twice and this allows us to query for transaction details later
@@ -63,7 +62,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
         @param _verifier is the address of SNARK verifier contract
         @param _denomination transfer amount for each deposit
         @param _feeDivider The amount to divide the denomination to calculate the fee
-        @param _relayer The relayer can make deposits on behalf of other accounts!
+        @param _relayer The relayer can make deposits on behalf of other accounts! It's used in the child contracts
         
     */
 
@@ -81,11 +80,11 @@ abstract contract BunnyNotes is ReentrancyGuard {
         relayer = _relayer;
     }
 
-    function deposit(
-        bytes32 _commitment,
-        bool cashNote,
-        address depositFor
-    ) external payable nonReentrant {
+    function deposit(bytes32 _commitment, address depositFor)
+        external
+        payable
+        nonReentrant
+    {
         require(
             !commitments[_commitment].used,
             "The commitment has been submitted"
@@ -93,7 +92,6 @@ abstract contract BunnyNotes is ReentrancyGuard {
 
         commitments[_commitment].used = true;
         commitments[_commitment].creator = depositFor;
-        commitments[_commitment].cashNote = cashNote;
         commitments[_commitment].createdDate = block.timestamp;
         _processDeposit(depositFor);
 
@@ -116,10 +114,6 @@ abstract contract BunnyNotes is ReentrancyGuard {
         require(
             !nullifierHashes[_nullifierHash],
             "The giftcard has already been spent"
-        );
-        require(
-            commitments[_commitment].cashNote == false,
-            "You can only withdraw gift cards."
         );
         require(
             verifier.verifyProof(
@@ -148,15 +142,10 @@ abstract contract BunnyNotes is ReentrancyGuard {
         bytes32 _commitment,
         address _recepient,
         uint256 _change
-    ) external payable {
+    ) external payable nonReentrant {
         require(
             !nullifierHashes[_nullifierHash],
             "The note has already been spent"
-        );
-
-        require(
-            commitments[_commitment].cashNote == true,
-            "You can only spend Cash notes."
         );
 
         require(_change <= denomination, "The requested change is too high!");
