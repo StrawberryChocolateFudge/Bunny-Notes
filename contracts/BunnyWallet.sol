@@ -41,9 +41,6 @@ contract BunnyWallet is ReentrancyGuard {
     ISwapRouter public immutable swapRouter;
     bytes32 public commitment;
     address public owner; // The Owner of this Wallet, he can add more tokens
-
-    address public feeCollector; // The address that collects withdraw fees
-    uint256 public transferFee; // The amount of fee collected in wei
     bool public paused; // The wallet contract can be paused by the owner
 
     event Received(address from, uint256 amount);
@@ -81,20 +78,13 @@ contract BunnyWallet is ReentrancyGuard {
         ISwapVerifier _swapVerifier,
         ISwapRouter _swapRouter,
         bytes32 _commitment,
-        address _owner,
-        address _feeCollector,
-        uint256 _fee
+        address _owner
     ) {
         ownerVerifier = _ownerVerifier;
         swapVerifier = _swapVerifier;
         commitment = _commitment;
         owner = _owner;
         swapRouter = _swapRouter;
-        feeCollector = _feeCollector;
-
-        //TODO: Implement the Fees!!s
-        transferFee = _fee;
-        
         paused = false;
     }
 
@@ -125,8 +115,6 @@ contract BunnyWallet is ReentrancyGuard {
     {
         require(msg.sender == owner, "Only owner");
         require(!paused, "Wallet paused");
-
-        // TODO: add the FEE
 
         Address.sendValue(payable(_to), _amount);
         emit TransferEthByOwner(_to, _amount);
@@ -161,7 +149,6 @@ contract BunnyWallet is ReentrancyGuard {
             ),
             "Invalid proof"
         );
-        //TODO: add the fee on token withdrawing!
         Address.sendValue(payable(_transferTo), _transferAmount);
         emit TransferEthRelayed(_transferTo, _transferAmount);
     }
@@ -174,9 +161,6 @@ contract BunnyWallet is ReentrancyGuard {
     ) external nonReentrant {
         require(!paused, "Wallet paused");
         require(msg.sender == owner, "Only owner");
-
-        //TODO: Add the fee on token withdrawing
-
         _token.transfer(_to, _amount);
         emit TransferTokenByOwner(_to, _amount);
     }
@@ -210,9 +194,6 @@ contract BunnyWallet is ReentrancyGuard {
             ),
             "Invalid proof"
         );
-
-        // TODO: add the fee on token withdrawing!
-
         IERC20(_token).transfer(_transferTo, _transferAmount);
         emit TransferTokenByRelayer(_transferTo, _transferAmount);
     }
