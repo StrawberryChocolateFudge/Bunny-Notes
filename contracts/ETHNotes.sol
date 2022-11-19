@@ -16,7 +16,7 @@ contract ETHNotes is BunnyNotes {
             require(msg.value == denomination, "Please send correct value");
             // If the relayer makes this tx, there are no fees
         } else {
-            require(msg.sender == depositFor,"You msut deposit for yourself");
+            require(msg.sender == depositFor,"You must deposit for yourself");
             require(
                 msg.value == denomination + fee,
                 "Please send correct value with fee"
@@ -27,20 +27,20 @@ contract ETHNotes is BunnyNotes {
         }
     }
 
-    function _processWithdrawGiftCard(address payable _recepient)
+    function _processWithdrawGiftCard(address payable _recipient)
         internal
         override
     {
-        Address.sendValue(_recepient, denomination);
+        Address.sendValue(_recipient, denomination);
     }
 
     function _processWithdrawCashNote(
-        address payable _recepient,
+        address payable _recipient,
         address payable _creator,
         uint256 _price,
         uint256 _change
     ) internal override{
-        Address.sendValue(_recepient, _price);
+        Address.sendValue(_recipient, _price);
 
         if(_change > 0){
             Address.sendValue(_creator, _change);

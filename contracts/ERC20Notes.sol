@@ -43,20 +43,20 @@ contract ERC20Notes is BunnyNotes {
         }
     }
 
-    function _processWithdrawGiftCard(address payable _recepient)
+    function _processWithdrawGiftCard(address payable _recipient)
         internal
         override
     {
-        token.safeTransfer(_recepient, denomination);
+        token.safeTransfer(_recipient, denomination);
     }
 
     function _processWithdrawCashNote(
-        address payable _recepient,
+        address payable _recipient,
         address payable creator,
         uint256 _price,
         uint256 _change
     ) internal override {
-        token.safeTransfer(_recepient, _price);
+        token.safeTransfer(_recipient, _price);
         if (_change > 0) {
             token.safeTransfer(creator, _change);
         }
