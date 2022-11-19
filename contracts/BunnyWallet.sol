@@ -25,7 +25,7 @@ interface ISwapVerifier {
         uint256[2] memory a,
         uint256[2][2] memory b,
         uint256[2] memory c,
-        uint256[9] memory _input
+        uint256[4] memory _input
     ) external returns (bool);
 }
 
@@ -201,7 +201,8 @@ contract BunnyWallet is ReentrancyGuard {
     function depositToBunnyNoteByOwner(
         ERC20Notes _notesContract,
         IERC20 _token,
-        bytes32 newCommitment
+        bytes32 _newCommitment,
+        bool _cashNote 
     ) external nonReentrant {
         require(!paused, "Wallet paused");
         require(msg.sender == owner, "Only owner!");
@@ -222,7 +223,7 @@ contract BunnyWallet is ReentrancyGuard {
         _token.approve(address(_notesContract), amount);
 
         //The smart contract wallet will deposit for itself: address(this)
-        _notesContract.deposit(newCommitment, address(this));
+        _notesContract.deposit(_newCommitment, _cashNote,address(this));
 
         emit DepositBunnyNoteByOwner(_notesContract, _token, commitment);
     }
@@ -235,7 +236,8 @@ contract BunnyWallet is ReentrancyGuard {
         address _transferTo, // the address of the bunny note contract
         uint256 _transferAmount, // the denomination of the bunny note
         bytes32 newCommitment, // the new commitment used for generating the bunny note
-        address _relayer
+        address _relayer,
+        bool cashNote
     ) external nonReentrant {
         require(!paused, "Wallet paused");
         //The transaction is relayed but the contract is depositing for itself!
@@ -271,7 +273,7 @@ contract BunnyWallet is ReentrancyGuard {
         IERC20(_token).approve(_transferTo, amount);
 
         // now the Smart Contract deposits the tokens
-        notesContract.deposit(newCommitment, address(this));
+        notesContract.deposit(newCommitment, cashNote,address(this));
         emit DepositBunnyNoteRelayed(notesContract, _token, newCommitment);
     }
 
@@ -323,48 +325,45 @@ contract BunnyWallet is ReentrancyGuard {
 
     function exactInputSingleSwapRelayed(
         uint256[8] calldata _proof, // the zkp
-        bytes32 _commitment,
+        bytes32[2] calldata hashes, //[0] = _commitment, [1] = parameterHash
         address _smartContract,
-        address _tokenIn,
-        address _tokenOut,
-        uint256 _amountIn,
-        uint256 _amountOutMin,
-        address _recipient,
-        address _relayer,
+        address[4] calldata addressParams, // [0] = tokenId, [1] = tokenOut,[2] = recipient, [3] = relayer
+        uint256[2] calldata amounts, //[0]= _amountIn,[1] = uint256 _amountOutMin,
         uint24 _fee
     ) external nonReentrant returns (uint256 amountOut) {
         require(!paused, "Wallet paused");
         //The transaction is relayed but the contract is depositing for itself!
-        require(msg.sender == _relayer, "Invalid Relayer!");
+        require(msg.sender == addressParams[3], "Invalid Relayer!");
         require(_smartContract == address(this), "Invalid contract address");
-        require(_commitment == commitment, "Invalid Commitment");
+        require(hashes[0] == commitment, "Invalid Commitment");
+                
         require(
             swapVerifier.verifyProof(
                 [_proof[0], _proof[1]],
                 [[_proof[2], _proof[3]], [_proof[4], _proof[5]]],
                 [_proof[6], _proof[7]],
                 [
-                    uint256(_commitment),
+                    uint256(hashes[0]),
                     uint256(uint160(_smartContract)),
-                    uint256(uint160(_tokenIn)),
-                    uint256(uint160(_tokenOut)),
-                    uint256(_amountIn),
-                    uint256(uint160(_recipient)),
-                    uint256(_amountOutMin),
-                    uint256(uint160(_relayer)),
-                    uint256(_fee)
+                    uint256(uint160(addressParams[3])),
+                    uint256(hashes[1])
                 ]
             ),
             "Invalid withdraw proof"
         );
         amountOut = exactInputSingleSwap(
-            _tokenIn,
-            _tokenOut,
-            _amountIn,
-            _amountOutMin,
-            _recipient,
+            addressParams[0],
+            addressParams[1],
+            amounts[0],
+            amounts[1],
+            addressParams[2],
             _fee
         );
-        emit SwapRelayed(_tokenIn, _tokenOut, _amountIn, _amountOutMin);
+        emit SwapRelayed(
+            addressParams[0],
+            addressParams[1],
+            amounts[0],
+            amounts[1]
+        );
     }
 }
