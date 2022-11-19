@@ -6,15 +6,15 @@ template Withdraw(){
     signal input nullifierHash;
     signal input commitmentHash;
 
-    signal input recepient;
+    signal input recipient;
     signal input change;
 
    signal input nullifier;
    signal input secret;
 
 
-   // hidden signals to make sure the recepient and fee cannot be tampered with later
-   signal recepientSquare;
+   // hidden signals to make sure the recipient and fee cannot be tampered with later
+   signal recipientSquare;
    signal feeSquare;
    signal changeSquare;
 
@@ -30,8 +30,8 @@ template Withdraw(){
   commitmentHasher.commitment === commitmentHash;
 
   // An extra signal to avoid tampering later
-  recepientSquare <== recepient * recepient;
+  recipientSquare <== recipient * recipient;
   changeSquare <== change * change;
 }
 
-component main {public [nullifierHash,commitmentHash,recepient,change]} = Withdraw();
+component main {public [nullifierHash,commitmentHash,recipient,change]} = Withdraw();

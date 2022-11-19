@@ -1,10 +1,10 @@
 1,1,141,main.nullifierHash
 2,2,141,main.commitmentHash
-3,3,141,main.recepient
+3,3,141,main.recipient
 4,4,141,main.change
 5,5,141,main.nullifier
 6,6,141,main.secret
-7,7,141,main.recepientSquare
+7,7,141,main.recipientSquare
 8,-1,141,main.feeSquare
 9,8,141,main.changeSquare
 10,-1,140,main.commitmentHasher.commitment

@@ -6,14 +6,10 @@ template SwapVerifier(){
     // Public inputs
     signal input commitmentHash; // The commitment hash of the smart contract
     signal input smartContractWallet; // The address of the smart contract wallet
-    signal input tokenIn; // The address of the token swapped
-    signal input tokenOut; // The address of the token we swap for
-    signal input amountIn; // The amount of tokens swapped
-    signal input recipient; // The address that will get the tokens
-    signal input amountOutMinimum; // The minimum amount to recieve
+    signal input parameterHash;
+    
     signal input relayer; // the address of the relayer
-    signal input poolFee; // The selected pool fee
-
+    
     // Secret inputs
     signal input nullifier;
     signal input secret;
@@ -21,14 +17,9 @@ template SwapVerifier(){
     // hidden signals to make sure the parameters cannot be altered
 
     signal smartContractWalletSquare;
-    signal tokenInSquare;
-    signal tokenOutSquare;
-    signal amountInSquare;
-    signal recipentSquare;
-    signal amountOutMinimumSquare;
+        
     signal relayerSquare;
-    signal poolFeeSquare;
-    
+    signal parameterHashSquare;
 
     // hashing the commitment and the nullifier
     component commitmentHasher = CommitmentHasher();
@@ -41,13 +32,9 @@ template SwapVerifier(){
 
     // The extra signals to avoid tampering later
     smartContractWalletSquare <== smartContractWallet * smartContractWallet;
-    tokenInSquare <== tokenIn * tokenIn;
-    tokenOutSquare <== tokenOut * tokenOut;
-    amountInSquare <== amountIn * amountIn;
-    recipentSquare <== recipient * recipient;
-    amountOutMinimumSquare <== amountOutMinimum * amountOutMinimum;
+
     relayerSquare <== relayer *relayer;
-    poolFeeSquare <== poolFee * poolFee;
+    parameterHashSquare <== parameterHash * parameterHash;
 }
 
-component main {public [commitmentHash, smartContractWallet,tokenIn,tokenOut,amountIn,recipient,amountOutMinimum,relayer]} = SwapVerifier();
+component main {public [commitmentHash, smartContractWallet,relayer,parameterHash]} = SwapVerifier();
