@@ -90,12 +90,12 @@ export async function bunnyNotesDeposit(contract: any, commitment: string, isCas
     return await contract.deposit(commitment, isCashNote, depositFor).send({ feeLimit, callValue, shouldPollResponse })
 }
 
-export async function bunnyNotesWithdrawGiftCard(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recepient: string, change: string) {
-    return await contract.withdrawGiftCard(solidityProof, nullifierHash, commitment, recepient, change).send({ feeLimit, callValue, shouldPollResponse });
+export async function bunnyNotesWithdrawGiftCard(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recipient: string, change: string) {
+    return await contract.withdrawGiftCard(solidityProof, nullifierHash, commitment, recipient, change).send({ feeLimit, callValue, shouldPollResponse });
 }
 
-export async function bunnyNotesWithdrawCashNote(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recepient: string, change: string) {
-    return await contract.withdrawCashNote(solidityProof, nullifierHash, commitment, recepient, change).send({ feeLimit, callValue, shouldPollResponse })
+export async function bunnyNotesWithdrawCashNote(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recipient: string, change: string) {
+    return await contract.withdrawCashNote(solidityProof, nullifierHash, commitment, recipient, change).send({ feeLimit, callValue, shouldPollResponse })
 }
 
 // View functions
