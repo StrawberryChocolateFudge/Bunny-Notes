@@ -22,8 +22,8 @@ export async function createNote(currency, amount): Promise<NoteDetails> {
     return [noteString, parsedNote];
 }
 
-export async function generateZKProof(deposit: Deposit, recepient: string, change: string): Promise<FullProof> {
-    return await generateProof({ deposit, recepient, change, snarkArtifacts })
+export async function generateZKProof(deposit: Deposit, recipient: string, change: string): Promise<FullProof> {
+    return await generateProof({ deposit, recipient, change, snarkArtifacts })
 }
 
 export function packSolidityProof(proof: any) {

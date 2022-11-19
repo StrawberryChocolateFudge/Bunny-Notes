@@ -124,7 +124,7 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
         //PAYMENTS ARE RELAYED!!
         try {
             // Need to send the proof and the publicSignals, why? the relayer will verify the ZKP off-chain before submitting it to the network!
-            const res = await relayCashNotePayment({ proof: zkp.proof, publicSignals: zkp.publicSignals, recepient: payTo, currency: parsedNote.currency, denomination: parsedNote.amount, type: "Cash Note" });
+            const res = await relayCashNotePayment({ proof: zkp.proof, publicSignals: zkp.publicSignals, recipient: payTo, currency: parsedNote.currency, denomination: parsedNote.amount, type: "Cash Note" });
 
             if (res.status === 200) {
                 setPaymentDone(true);

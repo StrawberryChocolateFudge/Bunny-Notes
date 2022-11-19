@@ -4,13 +4,13 @@ import { groth16 } from "snarkjs"
 import { FullProof } from "./types"
 
 
-export async function generateProof({ deposit, recepient, change, snarkArtifacts }: { deposit: Deposit, recepient: string, change: string, snarkArtifacts?: SnarkArtifacts }): Promise<FullProof> {
+export async function generateProof({ deposit, recipient, change, snarkArtifacts }: { deposit: Deposit, recipient: string, change: string, snarkArtifacts?: SnarkArtifacts }): Promise<FullProof> {
     console.log("Generate proof start");
 
     const input = {
         nullifierHash: deposit.nullifierHash,
         commitmentHash: deposit.commitment,
-        recepient,
+        recipient,
         change,
         // private snark inputs
         nullifier: deposit.nullifier,
@@ -20,8 +20,8 @@ export async function generateProof({ deposit, recepient, change, snarkArtifacts
 
     if (!snarkArtifacts) {
         snarkArtifacts = {
-            wasmFilePath: `circuits/withdraw_js/withdraw.wasm`,
-            zkeyFilePath: `circuits/withdraw_0001.zkey`
+            wasmFilePath: `circuits/withdraw_bunnyNote/withdraw_js/withdraw.wasm`,
+            zkeyFilePath: `circuits/withdraw_bunnyNote/withdraw_0001.zkey`
         }
     }
 
