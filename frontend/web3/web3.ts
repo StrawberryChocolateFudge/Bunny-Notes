@@ -163,12 +163,12 @@ export async function bunnyNotesDeposit(contract: any, commitment: string, isCas
     return await contract.deposit(commitment, isCashNote, depositFor);
 }
 
-export async function bunnyNotesWithdrawGiftCard(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recepient: string, change: string) {
-    return await contract.withdrawGiftCard(solidityProof, nullifierHash, commitment, recepient, change);
+export async function bunnyNotesWithdrawGiftCard(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recipient: string, change: string) {
+    return await contract.withdrawGiftCard(solidityProof, nullifierHash, commitment, recipient, change);
 }
 
-export async function bunnyNotesWithdrawCashNote(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recepient: string, change: string) {
-    return await contract.withdrawCashNote(solidityProof, nullifierHash, commitment, recepient, change);
+export async function bunnyNotesWithdrawCashNote(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recipient: string, change: string) {
+    return await contract.withdrawCashNote(solidityProof, nullifierHash, commitment, recipient, change);
 }
 
 export async function ERC20Approve(ERC20Contract: any, spenderContract: string, amount: any) {

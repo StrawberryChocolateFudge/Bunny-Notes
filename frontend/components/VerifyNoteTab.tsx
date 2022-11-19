@@ -24,7 +24,7 @@ export type Commitment = {
       validText: string
       noteType: boolean
       creator: string
-      recepient: string
+      recipient: string
       denomination: string
 }
 
@@ -69,12 +69,12 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                   return;
             }
 
-            const recepient = !isSpent ? "Not Spent" : commitments.recepient;
+            const recipient = !isSpent ? "Not Spent" : commitments.recipient;
             setCommitmentDetails({
                   validText: !isSpent ? "Valid!" : "The Note has been spent!",
                   noteType: commitments.cashNote,
                   creator: commitments.creator,
-                  recepient: recepient,
+                  recipient: recipient,
                   denomination: `${parsedNote.amount} ${parsedNote.currency}`
             })
             setLoading(false);
@@ -122,8 +122,8 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                                                 <TableCell align="right">{commitmentDetails.creator}</TableCell>
                                           </TableRow>
                                           <TableRow>
-                                                <TableCell align="left">Recepient:</TableCell>
-                                                <TableCell align="right">{commitmentDetails.recepient}</TableCell>
+                                                <TableCell align="left">recipient:</TableCell>
+                                                <TableCell align="right">{commitmentDetails.recipient}</TableCell>
                                           </TableRow>
                                           <TableRow>
                                                 <TableCell align="left">Note Type:</TableCell>
