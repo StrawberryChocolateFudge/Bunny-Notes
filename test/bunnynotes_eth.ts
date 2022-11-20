@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import { BigNumber, providers } from "ethers";
 import { ethers } from "hardhat";
-import { generateProof } from "../lib/generateProof";
-import { deposit, parseNote, toNoteHex } from "../lib/note";
+import { generateNoteWithdrawProof } from "../lib/generateProof";
+import { deposit, parseNote, toNoteHex } from "../lib/BunnyNote";
 import packToSolidityProof from "../lib/packToSolidityProof";
 import { ERC20Notes } from "../typechain";
 import { setUp } from "./setup";
@@ -114,7 +114,7 @@ describe("Bunny Notes with ETH notes", function () {
         await ETHNotes.connect(alice).deposit(toNoteHex(parsedNote.deposit.commitment), false, alice.address, { value });
 
         // Now Bob will withdraw it!
-        const { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recipient: bob.address, change: ethers.utils.parseEther("0").toString() })
+        const { proof, publicSignals } = await generateNoteWithdrawProof({ deposit: parsedNote.deposit, recipient: bob.address, change: ethers.utils.parseEther("0").toString() })
 
         // Bob withdraws the ETH
         const solidityProof = packToSolidityProof(proof);
@@ -176,7 +176,7 @@ describe("Bunny Notes with ETH notes", function () {
 
         const change = ethers.utils.parseEther("1"); // This means bob is getting 9 eth, the change is 1
 
-        const { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recipient: bob.address, change: change.toString() });
+        const { proof, publicSignals } = await generateNoteWithdrawProof({ deposit: parsedNote.deposit, recipient: bob.address, change: change.toString() });
 
         //Now alice can give the proof and public signals to BOB or the relayer or she can do the withdrawing herself
 
