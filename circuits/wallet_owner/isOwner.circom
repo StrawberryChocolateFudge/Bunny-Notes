@@ -7,21 +7,23 @@ template IsOwner(){
         // Public inputs 
     signal input commitmentHash; // The commitment hash of the smart contract
     signal input smartContractWallet; // The address of the smart contract wallet
-    signal input tokenAddress; // The address of the ERC20 to transfer could be zero address for ETH transaction
-    signal input transferTo; // The address to transfer to
-    signal input transferAmount; // the amount to transfer
-    signal input relayer;
-
+    signal input relayer; // The address that relays this transaction
+    signal input paramsHash; // The hash of the parameters values passed to the solidity function, for verification!
+    
     // Secret inputs
     signal input nullifier;
     signal input secret;
 
     // hidden signals to make sure this is only used on that smart contract
     signal smartContractWalletSquare;
-    signal tokenAddressSquare;
-    signal transferToSquare;
-    signal transferAmountSquare;
     signal relayerSquare;
+    signal paramsHashSquare;
+    
+   // The exra signals to avoid tampering later
+    smartContractWalletSquare <== smartContractWallet * smartContractWallet;
+    paramsHashSquare <== paramsHash * paramsHash;
+    relayerSquare <== relayer * relayer;
+
     // hashing the commitment and the nullifier
     component commitmentHasher = CommitmentHasher();
 
@@ -29,14 +31,7 @@ template IsOwner(){
     commitmentHasher.secret <== secret;
 
     // Assert that the hashes are correct
-    commitmentHasher.commitment === commitmentHash;
-
-    // The exra signals to avoid tampering later
-    smartContractWalletSquare <== smartContractWallet * smartContractWallet;
-    tokenAddressSquare <== tokenAddress * tokenAddress;
-    transferToSquare <== transferTo * transferTo;
-    transferAmountSquare <== transferAmount * transferAmount;
-    relayerSquare <== relayer * relayer;    
+    commitmentHasher.commitment === commitmentHash; 
 }
 
-component main {public [commitmentHash,smartContractWallet,tokenAddress,transferTo,transferAmount,relayer]} = IsOwner();
+component main {public [commitmentHash,smartContractWallet,relayer,paramsHash]} = IsOwner();
