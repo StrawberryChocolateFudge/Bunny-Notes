@@ -1,6 +1,6 @@
 import { Deposit, FullProof } from "../../lib/types";
-import { generateProof } from "../../lib/generateProof";
-import { deposit, parseNote } from "../../lib/note";
+import { generateNoteWithdrawProof } from "../../lib/generateProof";
+import { deposit, parseNote } from "../../lib/BunnyNote";
 import packToSolidityProof from "../../lib/packToSolidityProof";
 import { netId } from "../web3/web3";
 const urlBASE = "https://bunnynotes.finance"
@@ -23,7 +23,7 @@ export async function createNote(currency, amount): Promise<NoteDetails> {
 }
 
 export async function generateZKProof(deposit: Deposit, recipient: string, change: string): Promise<FullProof> {
-    return await generateProof({ deposit, recipient, change, snarkArtifacts })
+    return await generateNoteWithdrawProof({ deposit, recipient, change, snarkArtifacts })
 }
 
 export function packSolidityProof(proof: any) {
