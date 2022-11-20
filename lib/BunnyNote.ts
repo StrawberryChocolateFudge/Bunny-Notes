@@ -24,7 +24,7 @@ export function toNoteHex(number: Buffer | any, length = 32) {
     return '0x' + str.padStart(length * 2, '0')
 }
 
-export async function deposit({ currency, amount, netId }: { currency: string, amount: number, netId: number }) {
+export async function deposit({ currency, amount, netId }: { currency: string, amount: number, netId: number }): Promise<string> {
     const deposit = await createDeposit({ nullifier: rbigint(), secret: rbigint() });
     const note = toNoteHex(deposit.preimage, 62);
     const noteString = `bunnynote-${currency}-${amount}-${netId}-${note}`
