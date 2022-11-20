@@ -4,6 +4,8 @@ import "./BunnyNotes.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
 contract ETHNotes is BunnyNotes {
+    string public constant NOTE_TYPE = "ETH";
+
     constructor(
         IVerifier _verifier,
         uint256 _denomination,
@@ -16,7 +18,7 @@ contract ETHNotes is BunnyNotes {
             require(msg.value == denomination, "Please send correct value");
             // If the relayer makes this tx, there are no fees
         } else {
-            require(msg.sender == depositFor,"You must deposit for yourself");
+            require(msg.sender == depositFor, "You must deposit for yourself");
             require(
                 msg.value == denomination + fee,
                 "Please send correct value with fee"
@@ -39,10 +41,10 @@ contract ETHNotes is BunnyNotes {
         address payable _creator,
         uint256 _price,
         uint256 _change
-    ) internal override{
+    ) internal override {
         Address.sendValue(_recipient, _price);
 
-        if(_change > 0){
+        if (_change > 0) {
             Address.sendValue(_creator, _change);
         }
     }
