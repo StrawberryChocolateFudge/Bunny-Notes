@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { generateProof } from "../lib/generateProof";
-import { deposit, parseNote, toNoteHex } from "../lib/note";
+import { generateNoteWithdrawProof } from "../lib/generateProof";
+import { deposit, parseNote, toNoteHex } from "../lib/BunnyNote";
 import packToSolidityProof from "../lib/packToSolidityProof";
 import { setUp } from "./setup";
 
@@ -118,7 +118,7 @@ describe("BunnyNotes with ERC20 Notes", function () {
 
     //Alice generates a proof that she owns the note!
     // Fee is passed in as WEI always!
-    const { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recipient: bob.address, change: ethers.utils.parseEther("0").toString() });
+    const { proof, publicSignals } = await generateNoteWithdrawProof({ deposit: parsedNote.deposit, recipient: bob.address, change: ethers.utils.parseEther("0").toString() });
 
     // // Now Alice withdraws the USDTM
 
@@ -224,7 +224,7 @@ describe("BunnyNotes with ERC20 Notes", function () {
 
     const change = ethers.utils.parseEther("1"); // This means BOB is requesting 9 dollars, the change is 1
 
-    const { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recipient: bob.address, change: change.toString() });
+    const { proof, publicSignals } = await generateNoteWithdrawProof({ deposit: parsedNote.deposit, recipient: bob.address, change: change.toString() });
 
     // // Now alice can give the proof and public signals to BOB or she can do the withdrawing herself
 
@@ -301,7 +301,7 @@ describe("BunnyNotes with ERC20 Notes", function () {
     const change = ethers.utils.parseEther("100000"); // The change is extremely high
 
     //   // Create a proof with too high fee
-    let { proof, publicSignals } = await generateProof({ deposit: parsedNote.deposit, recipient: bob.address, change: change.toString() });
+    let { proof, publicSignals } = await generateNoteWithdrawProof({ deposit: parsedNote.deposit, recipient: bob.address, change: change.toString() });
 
     // Now alice can give the proof and public signals to BOB or she can do the withdrawing herself
 
@@ -321,7 +321,7 @@ describe("BunnyNotes with ERC20 Notes", function () {
     // now lets test zero price payments
     const change2 = ethers.utils.parseEther("10") // I ask for all the value back as change!
 
-    let { proof: proof2, publicSignals: pubSig2 } = await generateProof({ deposit: parsedNote.deposit, recipient: bob.address, change: change2.toString() })
+    let { proof: proof2, publicSignals: pubSig2 } = await generateNoteWithdrawProof({ deposit: parsedNote.deposit, recipient: bob.address, change: change2.toString() })
 
     let solidityProof2 = packToSolidityProof(proof2);
 
