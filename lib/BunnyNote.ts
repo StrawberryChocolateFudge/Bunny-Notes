@@ -6,7 +6,9 @@ import bigInt from "big-integer";
 import { rbigint } from "./random";
 /**
  * Create deposit object from secret and nullifier
- */
+   NOTE: Do not run this function to create notes on higher level.
+   Rely on deposit or creteBunnyWalletNote functions instead 
+*/
 export async function createDeposit({ nullifier, secret }: { nullifier: bigint, secret: bigint }) {
     const deposit: Deposit = {
         nullifier,
