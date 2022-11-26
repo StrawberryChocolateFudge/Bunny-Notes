@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { parseEther } from "ethers/lib/utils";
+import { isAddress, parseEther } from "ethers/lib/utils";
 import { setUpBunnyWallet, expectRevert } from "./setup";
 import { ArgType, createBunnyWalletNote, parseOwnerNote, prepareRelayProof, relayedNoteNullifierHash, TransferERC721ParamsArgs } from "../lib/OwnerNote";
 import { toNoteHex } from "../lib/BunnyNote";
@@ -454,11 +454,46 @@ describe("Bunny Wallet", async function () {
         expect(approveERC721ByOwnerLogs.args.forAll).to.be.false;
         expect(approveERC721ByOwnerLogs.args.approved).to.be.true;
 
-        // TODO: Test disapproving, setApprovalForAll with owner
+        expect(await NFT.getApproved(2)).to.equal(bob.address);
 
-        // TODO: Test the same with relayed!!
+        // Test the same with relayed!!
+
+        const zkOwner2 = await prepareRelayProof(
+            note,
+            bunnyWallet.address,
+            relayer.address,
+            ArgType.ApproveERC721ParamsArgs,
+            { token: NFT.address, to: bob.address, tokenId: 2, forAll: false, approved: false });
 
 
+        const approveERC721RelayedTx = await bunnyWallet.connect(relayer).approveERC721Relayed(zkOwner2, NFT.address, bob.address, 2, false, false);
+        const approveERC721RelayedReceipt = await approveERC721RelayedTx.wait();
+        const approveERC721RelayedLog = parseLog(eventABIs.ApproveERC721Relayed, approveERC721RelayedReceipt.logs[1]);
+        expect(approveERC721RelayedLog.name).to.equal("ApproveERC721Relayed");
+        expect(approveERC721RelayedLog.signature).to.equal("ApproveERC721Relayed(address,address,uint256,bool,bool)");
+        expect(approveERC721RelayedLog.args.token).to.equal(NFT.address);
+        expect(approveERC721RelayedLog.args.to).to.equal(bob.address);
+        expect(approveERC721RelayedLog.args.tokenId).to.equal(2);
+        expect(approveERC721RelayedLog.args.forAll).to.equal(false);
+        expect(approveERC721RelayedLog.args.approved).to.equal(false);
+
+        expect(await NFT.getApproved(2)).to.equal("0x0000000000000000000000000000000000000000");
+
+        // Now test approve for all! I approve all the rest of the tokens to bob!
+        const approveERC721ForAllTX = await bunnyWallet.connect(alice).approveERC721ByOwner(NFT.address, bob.address, 2, true, true);
+        const approveERC721ForAllReceipt = await approveERC721ForAllTX.wait();
+        const approveERC721ForAllLog = parseLog(eventABIs.ApproveERC721ByOwner, approveERC721ForAllReceipt.logs[1]);
+        expect(approveERC721ForAllLog.name).to.equal("ApproveERC721ByOwner");
+        expect(await NFT.isApprovedForAll(bunnyWallet.address, bob.address)).to.equal(true);
+
+        // disapprove for all
+        const approveNOTERC721ForAllTX = await bunnyWallet.connect(alice).approveERC721ByOwner(NFT.address, bob.address, 2, true, false);
+        const approveNOTERC721ForAllReceipt = await approveNOTERC721ForAllTX.wait();
+        const approveNOTERC721ForAllLog = parseLog(eventABIs.ApproveERC721ByOwner, approveNOTERC721ForAllReceipt.logs[1]);
+        expect(approveNOTERC721ForAllLog.name).to.equal("ApproveERC721ByOwner");
+        expect(await NFT.isApprovedForAll(bunnyWallet.address, bob.address)).to.equal(false);
     })
+
+    it("deppsit Bunny Notes!", async function () { })
 
 })

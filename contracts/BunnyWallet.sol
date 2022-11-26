@@ -13,6 +13,7 @@ import "./ERC20Notes.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
+
 interface IOwnerVerifier {
     function verifyProof(
         uint256[2] memory a,
@@ -370,6 +371,24 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         );
     }
 
+    function _approveAction(
+        address _token,
+        address _to,
+        uint256 _tokenId,
+        bool _forAll,
+        bool _approved
+    ) internal {
+        if (_forAll) {
+            IERC721(_token).setApprovalForAll(_to, _approved);
+        } else {
+            if (_approved) {
+                IERC721(_token).approve(_to, _tokenId);
+            } else {
+                IERC721(_token).approve(address(0), _tokenId);
+            }
+        }
+    }
+
     function approveERC721ByOwner(
         address _token,
         address _to,
@@ -380,12 +399,7 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         require(msg.sender == owner, "Only owner!");
         require(!paused, walletPausedError);
 
-        if (_forAll) {
-            IERC721(_token).setApprovalForAll(_to, _approved);
-        } else {
-            IERC721(_token).approve(_to, _tokenId);
-        }
-
+        _approveAction(_token, _to, _tokenId, _forAll, _approved);
         emit ApproveERC721ByOwner(_token, _to, _tokenId, _forAll, _approved);
     }
 
@@ -431,13 +445,7 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
                 ),
             "Invalid Params"
         );
-
-        if (_forAll) {
-            IERC721(_token).setApprovalForAll(_to, _approved);
-        } else {
-            IERC721(_token).approve(_to, _tokenId);
-        }
-
+        _approveAction(_token, _to, _tokenId, _forAll, _approved);
         emit ApproveERC721Relayed(_token, _to, _tokenId, _forAll, _approved);
     }
 
