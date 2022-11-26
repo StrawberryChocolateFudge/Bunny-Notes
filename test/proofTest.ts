@@ -1,11 +1,9 @@
 import { expect } from "chai";
-import { generateIsOwnerProof, generateNoteWithdrawProof, IsOwnerProofDetails, verifyFourPublicSignals } from "../lib/generateProof";
+import { generateIsOwnerProof, generateNoteWithdrawProof, IsOwnerProofDetails, verifySixPublicSignals, verifyFourPublicSignals } from "../lib/generateProof";
 import { createDeposit, deposit, parseNote, toNoteHex } from "../lib/BunnyNote";
-import { createBunnyWalletNote, parseOwnerNote } from "../lib/OwnerNote";
-import { transferParamsHash } from "../lib/ParamsHasher";
+import { createBunnyWalletNote, parseOwnerNote, relayedNoteNullifierHash } from "../lib/OwnerNote";
 import fs from "fs";
 import { rbigint } from "../lib/random";
-import { ethers } from "hardhat";
 
 describe("Bunny ZKP", function () {
     it("Should create a note, a proof to withdraw and verify it", async function () {
@@ -41,18 +39,22 @@ describe("Bunny ZKP", function () {
         const noteString = await createBunnyWalletNote({ smartContract: "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7", netId: 1 });
         const parsedNote = await parseOwnerNote(noteString);
 
+        const { newNullifierHash, salt } = await relayedNoteNullifierHash(parsedNote.deposit.nullifier);
+
         const relayer = "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65";
         const testToken = "0xa756b2b52Ba893a6109561bC86138Cbb897Fb2e0";
         const to = "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65";
-        const paramsHash = await transferParamsHash(testToken, to, ethers.utils.parseEther("1"));
+       
+
         const smartContract = "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65";
 
         const details: IsOwnerProofDetails = {
             secret: parsedNote.deposit.secret,
-            nullifiler: parsedNote.deposit.nullifier,
+            nullifier: parsedNote.deposit.nullifier,
+            salt,
+            nullifierHash: newNullifierHash,
             commitmentHash: parsedNote.deposit.commitment,
             relayer,
-            paramsHash,
             smartContract
         };
 
