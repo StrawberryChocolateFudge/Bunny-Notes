@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { generateIsOwnerProof, generateNoteWithdrawProof, IsOwnerProofDetails, verifySixPublicSignals, verifyFourPublicSignals } from "../lib/generateProof";
+import { generateIsOwnerProof, generateNoteWithdrawProof, IsOwnerProofDetails, verifyFourPublicSignals } from "../lib/generateProof";
 import { createDeposit, deposit, parseNote, toNoteHex } from "../lib/BunnyNote";
 import { createBunnyWalletNote, parseOwnerNote, relayedNoteNullifierHash } from "../lib/OwnerNote";
 import fs from "fs";
@@ -44,7 +44,7 @@ describe("Bunny ZKP", function () {
         const relayer = "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65";
         const testToken = "0xa756b2b52Ba893a6109561bC86138Cbb897Fb2e0";
         const to = "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65";
-       
+
 
         const smartContract = "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65";
 
