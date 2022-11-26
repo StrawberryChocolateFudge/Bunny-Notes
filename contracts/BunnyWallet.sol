@@ -2,27 +2,18 @@
 pragma solidity ^0.8.0;
 pragma abicoder v2;
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "./ERC20Notes.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-
 interface IOwnerVerifier {
-    function verifyProof(
-        uint256[2] memory a,
-        uint256[2][2] memory b,
-        uint256[2] memory c,
-        uint256[4] memory _input
-    ) external returns (bool);
-}
-
-interface ISwapVerifier {
     function verifyProof(
         uint256[2] memory a,
         uint256[2][2] memory b,
@@ -36,28 +27,39 @@ struct ZkOwner {
     bytes32 commitment;
     address smartContract;
     address relayer;
-    bytes32 paramHash;
+    bytes32 paramsHash;
+    bytes32 nullifierHash;
 }
 
 // A Bunny wallet that needs to be deployed per user!
-contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
+contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
     using SafeMath for uint256;
     // Users can deposit into the bunny wallet tokens, eth or interact with bunny notes
 
-    IOwnerVerifier public immutable ownerVerifier;
-    ISwapRouter public immutable swapRouter;
+    IOwnerVerifier public ownerVerifier;
+    ISwapRouter public swapRouter;
     bytes32 public commitment;
     address public owner; // The Owner of this Wallet, he can add more tokens
     bool public paused; // The wallet contract can be paused by the owner
+
+    uint256 public totalWeiReceived;
+
     string public constant walletPausedError = "Wallet Paused";
 
+    mapping(bytes32 => bool) public nullifierHashes;
+    event InitializedContract(
+        address _ownerVerifier,
+        address _swapRouter,
+        bytes32 _commitment,
+        address _owner
+    );
     event Received(address from, uint256 amount);
     event CommitmentReset(bytes32 oldCommitment, bytes32 newCommitment);
     event TransferEthByOwner(address to, uint256 amount);
     event TransferEthRelayed(address to, uint256 amount);
-    event TransferTokenByOwner(IERC20 token, address to, uint256 amount);
+    event TransferTokenByOwner(address token, address to, uint256 amount);
     event TransferTokenByRelayer(address token, address to, uint256 amount);
-    event ApproveSpendByOwner(IERC20 token, address spender, uint256 amount);
+    event ApproveSpendByOwner(address token, address spender, uint256 amount);
     event ApproveSpendRelayed(address token, address spender, uint256 amount);
     event TransferERC721ByOwner(
         address token,
@@ -119,9 +121,10 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     );
 
     modifier ZkOwnerCheck(ZkOwner calldata _zkOwner) {
+        require(!nullifierHashes[_zkOwner.nullifierHash], "Proof used!");
         require(_zkOwner.smartContract == address(this), "Invalid contract");
         require(_zkOwner.commitment == commitment, "Invalid commitment");
-        require(msg.sender == _zkOwner.relayer, "Invalid sender");
+        require(msg.sender == _zkOwner.relayer, "Invalid Relayer");
         require(
             ownerVerifier.verifyProof(
                 [_zkOwner.proof[0], _zkOwner.proof[1]],
@@ -134,25 +137,32 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
                     uint256(_zkOwner.commitment),
                     uint256(uint160(_zkOwner.smartContract)),
                     uint256(uint160(_zkOwner.relayer)),
-                    uint256(_zkOwner.paramHash)
+                    uint256(_zkOwner.nullifierHash)
                 ]
             ),
             "Invalid proof"
         );
+        nullifierHashes[_zkOwner.nullifierHash] = true;
         _;
     }
 
-    constructor(
+    function initialize(
         IOwnerVerifier _ownerVerifier,
         ISwapRouter _swapRouter,
         bytes32 _commitment,
         address _owner
-    ) {
+    ) public initializer {
         ownerVerifier = _ownerVerifier;
         commitment = _commitment;
         owner = _owner;
         swapRouter = _swapRouter;
         paused = false;
+        emit InitializedContract(
+            address(_ownerVerifier),
+            address(_swapRouter),
+            _commitment,
+            _owner
+        );
     }
 
     // The owner can reset the commitment to create a new note!
@@ -164,15 +174,25 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     }
 
     receive() external payable {
+        totalWeiReceived += msg.value;
         emit Received(msg.sender, msg.value);
     }
 
     function transferParamsHash(
+        ZkOwner calldata _zkOwner,
         address _token,
         address _transferTo,
         uint256 _transferAmount
     ) public pure returns (bytes32 h) {
-        h = keccak256(abi.encodePacked(_token, _transferTo, _transferAmount));
+        h = keccak256(
+            abi.encodePacked(
+                _zkOwner.commitment,
+                _zkOwner.nullifierHash,
+                _token,
+                _transferTo,
+                _transferAmount
+            )
+        );
     }
 
     function onERC721Received(
@@ -188,7 +208,7 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
             );
     }
 
-    // The tokens are passed in per function, so I don't store all the available tokens
+    // The tokens are passed in >per function, so I don't store all the available tokens
     function getTokenBalance(IERC20 token)
         public
         view
@@ -204,7 +224,7 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
         require(msg.sender == owner, "Only owner");
         require(!paused, walletPausedError);
 
-        Address.sendValue(payable(_to), _amount);
+        AddressUpgradeable.sendValue(payable(_to), _amount);
         emit TransferEthByOwner(_to, _amount);
     }
 
@@ -216,12 +236,17 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     ) external nonReentrant ZkOwnerCheck(_zkOwner) {
         require(!paused, "Wallet paused");
         require(
-            _zkOwner.paramHash ==
-                transferParamsHash(_token, _transferTo, _transferAmount),
+            _zkOwner.paramsHash ==
+                transferParamsHash(
+                    _zkOwner,
+                    _token,
+                    _transferTo,
+                    _transferAmount
+                ),
             "Invalid Params"
         );
 
-        Address.sendValue(payable(_transferTo), _transferAmount);
+        AddressUpgradeable.sendValue(payable(_transferTo), _transferAmount);
         emit TransferEthRelayed(_transferTo, _transferAmount);
     }
 
@@ -234,7 +259,7 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
         require(!paused, "Wallet paused");
         require(msg.sender == owner, "Only owner");
         _token.transfer(_to, _amount);
-        emit TransferTokenByOwner(_token, _to, _amount);
+        emit TransferTokenByOwner(address(_token), _to, _amount);
     }
 
     function transferTokenRelayed(
@@ -245,8 +270,13 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     ) external nonReentrant ZkOwnerCheck(_zkOwner) {
         require(!paused, "Wallet paused");
         require(
-            _zkOwner.paramHash ==
-                transferParamsHash(_token, _transferTo, _transferAmount),
+            _zkOwner.paramsHash ==
+                transferParamsHash(
+                    _zkOwner,
+                    _token,
+                    _transferTo,
+                    _transferAmount
+                ),
             "Invalid Params"
         );
         IERC20(_token).transfer(_transferTo, _transferAmount);
@@ -262,7 +292,7 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
         require(!paused, "Wallet paused");
         require(msg.sender == owner, "Only owner");
         _token.approve(_spender, _amount);
-        emit ApproveSpendByOwner(_token, _spender, _amount);
+        emit ApproveSpendByOwner(address(_token), _spender, _amount);
     }
 
     function approveERC20SpendRelayed(
@@ -273,7 +303,8 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     ) external nonReentrant ZkOwnerCheck(_zkOwner) {
         require(!paused, "Wallet paused");
         require(
-            _zkOwner.paramHash == transferParamsHash(_token, _spender, _amount),
+            _zkOwner.paramsHash ==
+                transferParamsHash(_zkOwner, _token, _spender, _amount),
             "Invalid params"
         );
         IERC20(_token).approve(_spender, _amount);
@@ -293,13 +324,21 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     }
 
     function transferERC721ParamsHash(
+        ZkOwner calldata _zkOwner,
         address _token,
         address _transferFrom,
         address _transferTo,
         uint256 _tokenId
     ) public pure returns (bytes32 h) {
         h = keccak256(
-            abi.encodePacked(_token, _transferFrom, _transferTo, _tokenId)
+            abi.encodePacked(
+                _zkOwner.commitment,
+                _zkOwner.nullifierHash,
+                _token,
+                _transferFrom,
+                _transferTo,
+                _tokenId
+            )
         );
     }
 
@@ -312,8 +351,9 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     ) external nonReentrant ZkOwnerCheck(_zkOwner) {
         require(!paused, "Wallet paused");
         require(
-            _zkOwner.paramHash ==
+            _zkOwner.paramsHash ==
                 transferERC721ParamsHash(
+                    _zkOwner,
                     _token,
                     _transferFrom,
                     _transferTo,
@@ -350,6 +390,7 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     }
 
     function approveERC721ParamsHash(
+        ZkOwner calldata _zkOwner,
         address _token,
         address _to,
         uint256 _tokenId,
@@ -357,7 +398,15 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
         bool _approved
     ) public pure returns (bytes32 h) {
         h = keccak256(
-            abi.encodePacked(_token, _to, _tokenId, _forAll, _approved)
+            abi.encodePacked(
+                _zkOwner.commitment,
+                _zkOwner.nullifierHash,
+                _token,
+                _to,
+                _tokenId,
+                _forAll,
+                _approved
+            )
         );
     }
 
@@ -371,8 +420,9 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     ) external nonReentrant ZkOwnerCheck(_zkOwner) {
         require(!paused, walletPausedError);
         require(
-            _zkOwner.paramHash ==
+            _zkOwner.paramsHash ==
                 approveERC721ParamsHash(
+                    _zkOwner,
                     _token,
                     _to,
                     _tokenId,
@@ -391,6 +441,7 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
         emit ApproveERC721Relayed(_token, _to, _tokenId, _forAll, _approved);
     }
 
+    //TODO: Refactor this to use also ETHNotes!
     function depositToBunnyNoteByOwner(
         ERC20Notes _notesContract,
         IERC20 _token,
@@ -422,6 +473,7 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     }
 
     function depositToBunnyNoteParamsHash(
+        ZkOwner calldata _zkOwner,
         address _token,
         address _transferTo,
         uint256 _transferAmount,
@@ -430,6 +482,8 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     ) public pure returns (bytes32 h) {
         h = keccak256(
             abi.encodePacked(
+                _zkOwner.commitment,
+                _zkOwner.nullifierHash,
                 _token,
                 _transferTo,
                 _transferAmount,
@@ -449,8 +503,9 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     ) external nonReentrant ZkOwnerCheck(_zkOwner) {
         require(!paused, "Wallet paused");
         require(
-            _zkOwner.paramHash ==
+            _zkOwner.paramsHash ==
                 depositToBunnyNoteParamsHash(
+                    _zkOwner,
                     _token,
                     _transferTo,
                     _transferAmount,
@@ -522,12 +577,15 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     }
 
     function exactInputSingleSwapParamsHash(
+        ZkOwner calldata _zkOwner,
         address[4] calldata _addressParams,
         uint256[2] calldata _amounts,
         uint24 _fee
     ) public pure returns (bytes32 h) {
         h = keccak256(
             abi.encodePacked(
+                _zkOwner.commitment,
+                _zkOwner.nullifierHash,
                 _addressParams[0],
                 _addressParams[1],
                 _addressParams[2],
@@ -547,8 +605,13 @@ contract BunnyWallet is ReentrancyGuard, IERC721Receiver {
     ) external nonReentrant ZkOwnerCheck(_zkOwner) returns (uint256 amountOut) {
         require(!paused, "Wallet paused");
         require(
-            _zkOwner.paramHash ==
-                exactInputSingleSwapParamsHash(_addressParams, _amounts, _fee),
+            _zkOwner.paramsHash ==
+                exactInputSingleSwapParamsHash(
+                    _zkOwner,
+                    _addressParams,
+                    _amounts,
+                    _fee
+                ),
             "Invalid Params"
         );
         amountOut = exactInputSingleSwap(
