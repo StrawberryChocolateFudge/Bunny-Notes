@@ -3,11 +3,11 @@ import { ethers } from "hardhat";
 import { generateNoteWithdrawProof } from "../lib/generateProof";
 import { deposit, parseNote, toNoteHex } from "../lib/BunnyNote";
 import packToSolidityProof from "../lib/packToSolidityProof";
-import { setUp } from "./setup";
+import { setUpNotes } from "./setup";
 
 describe("BunnyNotes with ERC20 Notes", function () {
   it("It should deploy and Alice can create a bunny note and make a deposit!", async function () {
-    const { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes } = await setUp();
+    const { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes } = await setUpNotes();
 
     // the fee to deposit is 1 dollar
     expect(await ERC20Notes.fee()).to.equal(ethers.utils.parseEther("1"));
@@ -66,7 +66,7 @@ describe("BunnyNotes with ERC20 Notes", function () {
   });
 
   it("Alice can create a bunny note and a relayer makes the deposit on her behalf", async function () {
-    const { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes, relayer } = await setUp();
+    const { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes, relayer } = await setUpNotes();
     const noteString = await deposit({ currency: "USDTM", amount: 10, netId: 1337 });
     const parsedNote = await parseNote(noteString);
 
@@ -101,7 +101,7 @@ describe("BunnyNotes with ERC20 Notes", function () {
 
   it("It should create a gift card deposit and another address will withdraw it!", async function () {
 
-    const { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes } = await setUp();
+    const { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes } = await setUpNotes();
     const noteString = await deposit({ currency: "USDTM", amount: 10, netId: 1337 });
     const parsedNote = await parseNote(noteString);
 
@@ -180,7 +180,7 @@ describe("BunnyNotes with ERC20 Notes", function () {
 
 
   it("Alice Should create a cash note and then Bob requests payment", async function () {
-    const { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes } = await setUp();
+    const { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes } = await setUpNotes();
 
     // Alice createa a Note 
 
@@ -272,7 +272,7 @@ describe("BunnyNotes with ERC20 Notes", function () {
 
 
   it("Testing some error conditions that can happen with the price!", async function () {
-    const { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes } = await setUp();
+    const { owner, alice, bob, attacker, USDTM, Verifier, ERC20Notes } = await setUpNotes();
 
     // Alice createa a Note 
 

@@ -5,9 +5,9 @@ import { generateNoteWithdrawProof } from "../lib/generateProof";
 import { deposit, parseNote, toNoteHex } from "../lib/BunnyNote";
 import packToSolidityProof from "../lib/packToSolidityProof";
 import { ERC20Notes } from "../typechain";
-import { setUp } from "./setup";
+import { setUpNotes } from "./setup";
 
-const getBalance = async (provider: any, addr: string) => {
+export const getBalance = async (provider: any, addr: string) => {
     const bal = await provider.getBalance(addr)
     return ethers.utils.formatEther(bal)
 };
@@ -16,7 +16,7 @@ const getBalanceNoFMT = async (provider: any, addr: string) => await provider.ge
 
 describe("Bunny Notes with ETH notes", function () {
     it("It should deploy and Alice can create a bunny note and make a deposit", async function () {
-        const { owner, alice, bob, attacker, Verifier, ETHNotes, provider } = await setUp();
+        const { owner, alice, bob, attacker, Verifier, ETHNotes, provider } = await setUpNotes();
         // the fee to deposit is 1.
         expect(await ETHNotes.fee()).to.equal(ethers.utils.parseEther("1"));
 
@@ -68,7 +68,7 @@ describe("Bunny Notes with ETH notes", function () {
     })
 
     it("Alice can create a bunny note and a relayer makes the deposit on her behalf", async function () {
-        const { owner, alice, bob, attacker, USDTM, Verifier, ETHNotes, relayer, provider } = await setUp();
+        const { owner, alice, bob, attacker, USDTM, Verifier, ETHNotes, relayer, provider } = await setUpNotes();
         const noteString = await deposit({ currency: "ETH", amount: 10, netId: 1337 });
         const parsedNote = await parseNote(noteString);
 
@@ -100,7 +100,7 @@ describe("Bunny Notes with ETH notes", function () {
     });
 
     it("alice should createa gift card deposit and another address will withdraw it!", async function () {
-        const { owner, alice, bob, attacker, USDTM, Verifier, ETHNotes, provider } = await setUp();
+        const { owner, alice, bob, attacker, USDTM, Verifier, ETHNotes, provider } = await setUpNotes();
         const noteString = await deposit({ currency: "ETH", amount: 10, netId: 1337 });
         const parsedNote = await parseNote(noteString);
 
@@ -144,7 +144,7 @@ describe("Bunny Notes with ETH notes", function () {
     })
 
     it("Alice should create a a cash note and then bob requests payment", async function () {
-        const { owner, alice, bob, relayer, attacker, Verifier, ETHNotes, provider } = await setUp();
+        const { owner, alice, bob, relayer, attacker, Verifier, ETHNotes, provider } = await setUpNotes();
 
         // Alice creates the note
         const noteString = await deposit({ currency: "ETH", amount: 10, netId: 1337 });
