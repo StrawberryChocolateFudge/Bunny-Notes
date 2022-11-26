@@ -58,11 +58,12 @@ export function verifyFourPublicSignals(verificationKey: any, { proof, publicSig
 
 export type IsOwnerProofDetails = {
     secret: bigint;
-    nullifiler: bigint;
+    nullifier: bigint;
+    salt: bigint;
     commitmentHash: bigint;
     smartContract: string;
     relayer: string,
-    paramsHash: string;
+    nullifierHash: bigint;
 };
 
 // The IsOwnerProof generation and verification
@@ -73,11 +74,12 @@ export async function generateIsOwnerProof({ details, snarkArtifacts }: { detail
         commitmentHash: details.commitmentHash,
         smartContractWallet: details.smartContract,
         relayer: details.relayer,
-        paramsHash: details.paramsHash,
+        nullifierHash: details.nullifierHash,
 
         // private 
         secret: details.secret,
-        nullifier: details.nullifiler
+        nullifier: details.nullifier,
+        salt: details.salt
     }
 
     if (!snarkArtifacts) {
