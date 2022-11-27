@@ -52,29 +52,31 @@ export async function approveERC721ParamsHash(
 export async function depositToBunnyNoteParamsHash(
     commitment: string,
     nullifierHash: string,
+    notesContract: string,
     token: string,
-    to: string,
-    amount: BigNumber,
     newCommitment: string,
-    cashNote: boolean) {
+    cashNote: boolean,
+    isERC20Note: boolean
+
+) {
     return keccak256(
         [
             "bytes32",
             "bytes32",
             "address",
             "address",
-            "uint256",
             "bytes32",
+            "bool",
             "bool"
         ],
         [
             commitment,
             nullifierHash,
+            notesContract,
             token,
-            to,
-            amount,
             newCommitment,
-            cashNote
+            cashNote,
+            isERC20Note
         ]
     );
 }

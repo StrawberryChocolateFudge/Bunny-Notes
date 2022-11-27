@@ -1,16 +1,16 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { isAddress, parseEther } from "ethers/lib/utils";
+import { parseEther } from "ethers/lib/utils";
 import { setUpBunnyWallet, expectRevert } from "./setup";
 import { ArgType, createBunnyWalletNote, parseOwnerNote, prepareRelayProof, relayedNoteNullifierHash, TransferERC721ParamsArgs } from "../lib/OwnerNote";
-import { toNoteHex } from "../lib/BunnyNote";
+import { deposit, parseNote, toNoteHex } from "../lib/BunnyNote";
 import { transferParamsHash } from "../lib/ParamsHasher";
 import { generateIsOwnerProof, IsOwnerProofDetails } from "../lib/generateProof";
 import packToSolidityProof from "../lib/packToSolidityProof";
 import { getBalance } from "./bunnynotes_eth";
 import { eventABIs, parseLog } from "../lib/EventInterfaces";
 
-
+const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 
 
@@ -440,7 +440,7 @@ describe("Bunny Wallet", async function () {
 
         //approveERC721ByOwner
         //Let's see if token 2 is approved to be used by an account!
-        expect(await NFT.getApproved(2)).to.equal("0x0000000000000000000000000000000000000000");
+        expect(await NFT.getApproved(2)).to.equal(zeroAddress);
 
         // Now the owner of bunnyWallet will approve that for bob to spend!
         const approveERC721ByOwnerTx = await bunnyWallet.connect(alice).approveERC721ByOwner(NFT.address, bob.address, 2, false, true);
@@ -477,7 +477,7 @@ describe("Bunny Wallet", async function () {
         expect(approveERC721RelayedLog.args.forAll).to.equal(false);
         expect(approveERC721RelayedLog.args.approved).to.equal(false);
 
-        expect(await NFT.getApproved(2)).to.equal("0x0000000000000000000000000000000000000000");
+        expect(await NFT.getApproved(2)).to.equal(zeroAddress);
 
         // Now test approve for all! I approve all the rest of the tokens to bob!
         const approveERC721ForAllTX = await bunnyWallet.connect(alice).approveERC721ByOwner(NFT.address, bob.address, 2, true, true);
@@ -494,6 +494,158 @@ describe("Bunny Wallet", async function () {
         expect(await NFT.isApprovedForAll(bunnyWallet.address, bob.address)).to.equal(false);
     })
 
-    it("deppsit Bunny Notes!", async function () { })
+    it("deposit Bunny Notes ETHNotes,ERC20Notes ByOwner and Relayed!", async function () {
+        const { relayer, USDTM, alice, bob, bunnyWallet, ETHNotes, ERC20Notes, provider, note } = await setUpBunnyWallet();
+
+        // Deposit ETH with bunny wallet to a bunny notes contract
+        // I expect the bunnyWallet has no ETH!
+        const walletBalance = await getBalance(provider, bunnyWallet.address);
+        expect(walletBalance).to.equal("0.0");
+
+        // Now I deposit some ETH to the contract!
+        await alice.sendTransaction(
+            {
+                to: bunnyWallet.address,
+                value: parseEther("30")
+            }
+        )
+
+        const walletBalance2 = await getBalance(provider, bunnyWallet.address);
+        expect(walletBalance2).to.equal("30.0")
+
+        //GONNA CREATE AN ETH NOTE FROM OWNER
+
+        const bunnyNoteStringETHGiftCard = await deposit({ currency: "ETH", amount: 10, netId: 1337 });
+        const parsedBunnyNoteETHGiftCard = await parseNote(bunnyNoteStringETHGiftCard);
+
+
+        const depositToBunnyNoteETHGiftCardByOwnerTx = await bunnyWallet.connect(alice).depositToBunnyNoteByOwner(
+            ETHNotes.address,
+            zeroAddress, // passing zero address cuz this is not an erc 20 note
+            toNoteHex(parsedBunnyNoteETHGiftCard.deposit.commitment),
+            false, false);
+
+        const depositToBunnyNoteETHGiftCardByOwnerReceipt = await depositToBunnyNoteETHGiftCardByOwnerTx.wait();
+        const depositToBunnyNoteETHGiftCardByOwnerLog = parseLog(eventABIs.DepositBunnyNoteByOwner, depositToBunnyNoteETHGiftCardByOwnerReceipt.logs[1])
+        expect(depositToBunnyNoteETHGiftCardByOwnerLog.name).to.equal("DepositBunnyNoteByOwner");
+        expect(depositToBunnyNoteETHGiftCardByOwnerLog.signature).to.equal("DepositBunnyNoteByOwner(address,address,bytes32,bool,bool)");
+        expect(depositToBunnyNoteETHGiftCardByOwnerLog.args._notesContract).to.equal(ETHNotes.address);
+        expect(depositToBunnyNoteETHGiftCardByOwnerLog.args.token).to.equal(zeroAddress);
+        expect(depositToBunnyNoteETHGiftCardByOwnerLog.args.commitment).to.equal(toNoteHex(parsedBunnyNoteETHGiftCard.deposit.commitment))
+        expect(depositToBunnyNoteETHGiftCardByOwnerLog.args.cashNote).to.equal(false);
+        expect(depositToBunnyNoteETHGiftCardByOwnerLog.args.isERC20).to.equal(false);
+        // 10 eth + 1 eth fee was taken with the deposit!
+        expect(await getBalance(provider, bunnyWallet.address)).to.equal("19.0");
+
+        // I expect the note is valid!
+        const ethGiftCardDepositCommitment = await ETHNotes.commitments(toNoteHex(parsedBunnyNoteETHGiftCard.deposit.commitment));
+        expect(ethGiftCardDepositCommitment.used).to.be.true;
+        expect(ethGiftCardDepositCommitment.creator).to.equal(bunnyWallet.address);
+        expect(ethGiftCardDepositCommitment.cashNote).to.be.false;
+
+        // Now I create a cash note with the same ETHNote contract!
+
+        const bunnyNotesStringCashNote = await deposit({ currency: "ETH", amount: 10, netId: 1337 });
+        const parsedBunnyNoteCashNote = await parseNote(bunnyNotesStringCashNote);
+
+        const depositToBunnyNoteETHCashNoteByOwnerTx = await bunnyWallet.connect(alice).depositToBunnyNoteByOwner(
+            ETHNotes.address,
+            zeroAddress, // passing zero address cuz this is not an erc 20 note
+            toNoteHex(parsedBunnyNoteCashNote.deposit.commitment),
+            true, // Cash note
+            false);
+        const depositToBunnyNoteETHCashNoteByOwnerReceipt = await depositToBunnyNoteETHCashNoteByOwnerTx.wait();
+        const depositToBunnyNoteETHCashNotebyOwnerLog = parseLog(eventABIs.DepositBunnyNoteByOwner, depositToBunnyNoteETHCashNoteByOwnerReceipt.logs[1]);
+        expect(depositToBunnyNoteETHCashNotebyOwnerLog.name).to.equal("DepositBunnyNoteByOwner");
+        expect(depositToBunnyNoteETHCashNotebyOwnerLog.signature).to.equal("DepositBunnyNoteByOwner(address,address,bytes32,bool,bool)");
+        expect(depositToBunnyNoteETHCashNotebyOwnerLog.args._notesContract).to.equal(ETHNotes.address);
+        expect(depositToBunnyNoteETHCashNotebyOwnerLog.args.token).to.equal(zeroAddress);
+        expect(depositToBunnyNoteETHCashNotebyOwnerLog.args.commitment).to.equal(toNoteHex(parsedBunnyNoteCashNote.deposit.commitment));
+        expect(depositToBunnyNoteETHCashNotebyOwnerLog.args.cashNote).to.equal(true);
+        expect(depositToBunnyNoteETHCashNotebyOwnerLog.args.isERC20).to.equal(false);
+
+        const ethCashNoteDepositCommitment = await ETHNotes.commitments(toNoteHex(parsedBunnyNoteCashNote.deposit.commitment));
+        expect(ethCashNoteDepositCommitment.used).to.be.true;
+        expect(ethCashNoteDepositCommitment.creator).to.equal(bunnyWallet.address);
+        expect(ethCashNoteDepositCommitment.cashNote).to.be.true;
+
+        //NOW I TEST ERC20 NOTES!!
+
+        const bunnyNoteStringERC20GiftCard = await deposit({ currency: "USDTM", amount: 10, netId: 1337 });
+        const parsedBunnyNoteERC20GiftCard = await parseNote(bunnyNoteStringERC20GiftCard);
+
+        // I mint some USDTM to the bunnyWallet so it can deposit to create a NOTE
+        await USDTM.mint(bunnyWallet.address, parseEther("10000"));
+
+        const depositToBunnyNoteERC20GiftCardByOwnerTx = await bunnyWallet.connect(alice).depositToBunnyNoteByOwner(
+            ERC20Notes.address,
+            USDTM.address,
+            toNoteHex(parsedBunnyNoteERC20GiftCard.deposit.commitment),
+            false,
+            true // This is an ERC20 Note
+        )
+        const depositToBunnyNoteERC20GiftCardByOwnerReceipt = await depositToBunnyNoteERC20GiftCardByOwnerTx.wait();
+        const depositToBunnyNoteERC20GiftCardByOwnerLog = parseLog(eventABIs.DepositBunnyNoteByOwner, depositToBunnyNoteERC20GiftCardByOwnerReceipt.logs[6]);
+
+        expect(depositToBunnyNoteERC20GiftCardByOwnerLog.name).to.equal("DepositBunnyNoteByOwner");
+        expect(depositToBunnyNoteERC20GiftCardByOwnerLog.signature).to.equal("DepositBunnyNoteByOwner(address,address,bytes32,bool,bool)");
+        expect(depositToBunnyNoteERC20GiftCardByOwnerLog.args._notesContract).to.equal(ERC20Notes.address);
+        expect(depositToBunnyNoteERC20GiftCardByOwnerLog.args.token).to.equal(USDTM.address);
+        expect(depositToBunnyNoteERC20GiftCardByOwnerLog.args.commitment).to.equal(toNoteHex(parsedBunnyNoteERC20GiftCard.deposit.commitment));
+        expect(depositToBunnyNoteERC20GiftCardByOwnerLog.args.cashNote).to.equal(false);
+        expect(depositToBunnyNoteERC20GiftCardByOwnerLog.args.isERC20).to.equal(true);
+
+        const ERC20GiftCardDepositCommitment = await ERC20Notes.commitments(toNoteHex(parsedBunnyNoteERC20GiftCard.deposit.commitment));
+        expect(ERC20GiftCardDepositCommitment.used).to.be.true;
+        expect(ERC20GiftCardDepositCommitment.creator).to.equal(bunnyWallet.address);
+        expect(ERC20GiftCardDepositCommitment.cashNote).to.be.false;
+
+        // Now TEST relayed transactions!
+
+        const relayed_bunnyWalletETHGiftCardNoteString = await deposit({ currency: "ETH", amount: 10, netId: 1337 });
+        const relayed_parsedBunnyWalletETHGiftCardNote = await parseNote(relayed_bunnyWalletETHGiftCardNoteString);
+
+
+        const relayedBunnyDepositzkOwner = await prepareRelayProof(
+            note,
+            bunnyWallet.address,
+            relayer.address,
+            ArgType.DepositToBunnyNote,
+            {
+                notesContract: ETHNotes.address,
+                token: zeroAddress,
+                newCommitment: toNoteHex(relayed_parsedBunnyWalletETHGiftCardNote.deposit.commitment),
+                isCashNote: false,
+                isERC20Note: false,
+            })
+
+        // send some more ETH to the bunnyWallet contract
+        await alice.sendTransaction({ to: bunnyWallet.address, value: parseEther("30") });
+
+        const relayed_depositToBunnyNotesETHGiftCard_tx = await bunnyWallet.connect(relayer).depositToBunnyNoteRelayed(
+            relayedBunnyDepositzkOwner,
+            ETHNotes.address,
+            zeroAddress,
+            toNoteHex(relayed_parsedBunnyWalletETHGiftCardNote.deposit.commitment),
+            false,
+            false
+        );
+
+        const relayedNoteCommitment = await ETHNotes.commitments(toNoteHex(relayed_parsedBunnyWalletETHGiftCardNote.deposit.commitment));
+        expect(relayedNoteCommitment.used).to.equal(true);
+        expect(relayedNoteCommitment.creator).to.equal(bunnyWallet.address);
+
+        const relayed_depositToBunnyNotesETHGiftCard_Receipt = await relayed_depositToBunnyNotesETHGiftCard_tx.wait()
+        const relayed_depositToBunnyNotesETHGiftCard_logs = parseLog(eventABIs.DepositBunnyNoteRelayed, relayed_depositToBunnyNotesETHGiftCard_Receipt.logs[1])
+
+        expect(relayed_depositToBunnyNotesETHGiftCard_logs.name).to.equal("DepositBunnyNoteRelayed");
+        expect(relayed_depositToBunnyNotesETHGiftCard_logs.signature).to.equal("DepositBunnyNoteRelayed(address,address,bytes32,bool,bool)");
+        expect(relayed_depositToBunnyNotesETHGiftCard_logs.args._notesContract).to.equal(ETHNotes.address);
+        expect(relayed_depositToBunnyNotesETHGiftCard_logs.args.token).to.equal(zeroAddress);
+        expect(relayed_depositToBunnyNotesETHGiftCard_logs.args.commitment).to.equal(toNoteHex(relayed_parsedBunnyWalletETHGiftCardNote.deposit.commitment));
+        expect(relayed_depositToBunnyNotesETHGiftCard_logs.args.cashNote).to.equal(false);
+        expect(relayed_depositToBunnyNotesETHGiftCard_logs.args.isERC20).to.equal(false);
+
+    })
 
 })

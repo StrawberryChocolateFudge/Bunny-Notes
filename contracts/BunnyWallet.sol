@@ -10,6 +10,8 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "./ERC20Notes.sol";
+import "./ETHNotes.sol";
+import "./BunnyNotes.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
@@ -98,14 +100,18 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
     );
 
     event DepositBunnyNoteByOwner(
-        ERC20Notes _notesContract,
-        IERC20 token,
-        bytes32 commitment
+        address _notesContract,
+        address token,
+        bytes32 commitment,
+        bool cashNote,
+        bool isERC20
     );
     event DepositBunnyNoteRelayed(
-        ERC20Notes _notesContract,
+        address _notesContract,
         address token,
-        bytes32 commitment
+        bytes32 commitment,
+        bool cashNote,
+        bool isERC20
     );
 
     event SwapByOwner(
@@ -449,93 +455,128 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         emit ApproveERC721Relayed(_token, _to, _tokenId, _forAll, _approved);
     }
 
-    //TODO: Refactor this to use also ETHNotes!
-    function depositToBunnyNoteByOwner(
-        ERC20Notes _notesContract,
-        IERC20 _token,
+    function _depositToBunnyNote(
+        address _notesContract,
+        address _token,
         bytes32 _newCommitment,
-        bool _cashNote
+        bool _cashNote,
+        bool _isERC20Note
+    ) internal {
+        uint256 denomination = BunnyNotes(_notesContract).denomination();
+        uint256 fee = BunnyNotes(_notesContract).fee();
+        uint256 amount = denomination + fee;
+        if (_isERC20Note) {
+            require(
+                address(ERC20Notes(_notesContract).token()) == _token,
+                "Invalid token"
+            );
+            require(
+                amount <= IERC20(_token).balanceOf(address(this)),
+                "Invalid token balance!"
+            );
+            // Approve the spending of tokens for the Bunny Note contract
+            IERC20(_token).approve(address(_notesContract), amount);
+            //The smart contract wallet will deposit for itself: address(this)
+            ERC20Notes(_notesContract).deposit(
+                _newCommitment,
+                _cashNote,
+                address(this)
+            );
+        } else {
+            require(address(this).balance > amount, "Invalid Balance!");
+            //The smart contract wallet will deposit for itself: address(this)
+            ETHNotes(_notesContract).deposit{value: amount}(
+                _newCommitment,
+                _cashNote,
+                address(this)
+            );
+        }
+    }
+
+    function depositToBunnyNoteByOwner(
+        address _notesContract,
+        address _token,
+        bytes32 _newCommitment,
+        bool _cashNote,
+        bool _isERC20Note
     ) external payable nonReentrant {
         require(!paused, "Wallet paused");
         require(msg.sender == owner, "Only owner!");
-        require(
-            address(_notesContract.token()) == address(_token),
-            "Invalid token"
+        _depositToBunnyNote(
+            _notesContract,
+            _token,
+            _newCommitment,
+            _cashNote,
+            _isERC20Note
         );
-        // The smart contract must have enough balance to deposit the tokens for the bunny note!
 
-        uint256 denomination = _notesContract.denomination();
-        uint256 fee = _notesContract.fee();
-        uint256 amount = denomination + fee;
-        require(
-            amount <= _token.balanceOf(address(this)),
-            "Invalid token balance!"
+        emit DepositBunnyNoteByOwner(
+            _notesContract,
+            _token,
+            _newCommitment,
+            _cashNote,
+            _isERC20Note
         );
-        // Approve the spending of tokens for the Bunny Note contract
-        _token.approve(address(_notesContract), amount);
-
-        //The smart contract wallet will deposit for itself: address(this)
-        _notesContract.deposit(_newCommitment, _cashNote, address(this));
-
-        emit DepositBunnyNoteByOwner(_notesContract, _token, commitment);
     }
 
     function depositToBunnyNoteParamsHash(
         ZkOwner calldata _zkOwner,
+        address _notesContract,
         address _token,
-        address _transferTo,
-        uint256 _transferAmount,
         bytes32 _newCommitment,
-        bool _cashNote
+        bool _cashNote,
+        bool _isERC20Note
     ) public pure returns (bytes32 h) {
         h = keccak256(
             abi.encodePacked(
                 _zkOwner.commitment,
                 _zkOwner.nullifierHash,
+                _notesContract,
                 _token,
-                _transferTo,
-                _transferAmount,
                 _newCommitment,
-                _cashNote
+                _cashNote,
+                _isERC20Note
             )
         );
     }
 
     function depositToBunnyNoteRelayed(
         ZkOwner calldata _zkOwner,
+        address _notesContract, // the address of the bunny note contract
         address _token, // the token used by the bunny note
-        address _transferTo, // the address of the bunny note contract
-        uint256 _transferAmount, // the denomination of the bunny note
         bytes32 _newCommitment, // the new commitment used for generating the bunny note
-        bool _cashNote
+        bool _cashNote,
+        bool _isERC20Note
     ) external nonReentrant ZkOwnerCheck(_zkOwner) {
         require(!paused, "Wallet paused");
         require(
             _zkOwner.paramsHash ==
                 depositToBunnyNoteParamsHash(
                     _zkOwner,
+                    _notesContract,
                     _token,
-                    _transferTo,
-                    _transferAmount,
                     _newCommitment,
-                    _cashNote
+                    _cashNote,
+                    _isERC20Note
                 ),
             "Invalid ParamHash"
         );
-        //
-        ERC20Notes notesContract = ERC20Notes(_transferTo);
-        // Verify that the transfer amount is the same as the denomination!
-        uint256 denomination = notesContract.denomination();
-        uint256 fee = notesContract.fee();
-        uint256 amount = denomination + fee;
-        require(amount == _transferAmount, "Invalid transfer amount!");
-        // the bunny note must use the same token as passed into the contract
-        require(address(notesContract.token()) == _token, "Invalid ERC20!");
-        // approve the spend
-        IERC20(_token).approve(_transferTo, amount);
-        // now the Smart Contract deposits the tokens
-        notesContract.deposit(_newCommitment, _cashNote, address(this));
-        emit DepositBunnyNoteRelayed(notesContract, _token, _newCommitment);
+
+        _depositToBunnyNote(
+            _notesContract,
+            _token,
+            _newCommitment,
+            _cashNote,
+            _isERC20Note
+        );
+
+        emit DepositBunnyNoteRelayed(
+            _notesContract,
+            _token,
+            _newCommitment,
+            _cashNote,
+            _isERC20Note
+        );
     }
 
     function exactInputSingleSwap(

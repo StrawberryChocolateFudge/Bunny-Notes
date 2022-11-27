@@ -23,8 +23,6 @@ contract ETHNotes is BunnyNotes {
                 msg.value == denomination + fee,
                 "Please send correct value with fee"
             );
-
-            // Forward the fee to the owner
             Address.sendValue(_owner, fee);
         }
     }

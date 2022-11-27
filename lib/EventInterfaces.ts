@@ -18,8 +18,8 @@ export const eventABIs = {
     ApproveERC721ByOwner: ["event ApproveERC721ByOwner(address token,address to,uint256 tokenId,bool forAll,bool approved)"],
     ApproveERC721Relayed: ["event ApproveERC721Relayed(address token,address to,uint256 tokenId,bool forAll,bool approved)"],
     ERC721Received: ["event ERC721Received(address operator,address from,uint256 tokenId,bytes data)"],
-    DepositBunnyNoteByOwner: ["event DepositBunnyNoteByOwner(ERC20Notes _notesContract,IERC20 token,bytes32 commitment)"],
-    DepositBunnyNoteRelayed: ["event DepositBunnyNoteRelayed(ERC20Notes _notesContract,address token,bytes32 commitment)"],
+    DepositBunnyNoteByOwner: ["event DepositBunnyNoteByOwner(address _notesContract,address token,bytes32 commitment,bool cashNote,bool isERC20)"],
+    DepositBunnyNoteRelayed: ["event DepositBunnyNoteRelayed(address _notesContract,address token,bytes32 commitment,bool cashNote, bool isERC20)"],
     SwapByOwner: ["event SwapByOwner(address tokenIn,address tokenOut,uint256 amountIn,uint256 amountOutMin)"],
     SwapRelayed: ["  event SwapRelayed(address tokenIn,address tokenOut,uint256 amountIn,uint256 amountOutMin)"]
 }

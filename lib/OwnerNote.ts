@@ -6,7 +6,7 @@ import { createDeposit, toNoteHex } from "./BunnyNote";
 import { generateNullifierWithSalt } from "./generateCommitmentHash";
 import { generateIsOwnerProof } from "./generateProof";
 import packToSolidityProof from "./packToSolidityProof";
-import { transferERC721ParamsHash, transferParamsHash } from "./ParamsHasher";
+import { approveERC721ParamsHash, depositToBunnyNoteParamsHash, transferERC721ParamsHash, transferParamsHash } from "./ParamsHasher";
 import { rbigint } from "./random";
 import { Deposit } from "./types";
 
@@ -57,8 +57,28 @@ export type TransferERC721ParamsArgs = {
     tokenId: BigNumber
 }
 
+export type ApproveERC721ParamsArgs = {
+    token: string,
+    to: string,
+    tokenId: BigNumber,
+    forAll: boolean,
+    approved: boolean
+}
+
+export type DepositBunnyNoteParamsArgs = {
+    notesContract: string,
+    token: string,
+    newCommitment: string,
+    amount: BigNumber
+    isCashNote: boolean,
+    isERC20Note: boolean
+}
+
 export enum ArgType {
-    TransferParamsArgs, TransferERC721ParamsArgs
+    TransferParamsArgs,
+    TransferERC721ParamsArgs,
+    ApproveERC721ParamsArgs,
+    DepositToBunnyNote
 }
 
 export async function prepareRelayProof(note: string,
@@ -89,6 +109,28 @@ export async function prepareRelayProof(note: string,
             typedargs.transferFrom,
             typedargs.transferTo,
             typedargs.tokenId
+        )
+    } else if (argType === ArgType.ApproveERC721ParamsArgs) {
+        const typedargs = args as ApproveERC721ParamsArgs
+        paramsHash = await approveERC721ParamsHash(
+            toNoteHex(parsedNote.deposit.commitment),
+            toNoteHex(newNullifierHash),
+            typedargs.token,
+            typedargs.to,
+            typedargs.tokenId,
+            typedargs.forAll,
+            typedargs.approved
+        )
+    } else if (argType === ArgType.DepositToBunnyNote) {
+        const typedargs = args as DepositBunnyNoteParamsArgs;
+        paramsHash = await depositToBunnyNoteParamsHash(
+            toNoteHex(parsedNote.deposit.commitment),
+            toNoteHex(newNullifierHash),
+            typedargs.notesContract,
+            typedargs.token,
+            typedargs.newCommitment,
+            typedargs.isCashNote,
+            typedargs.isERC20Note
         )
     }
 
