@@ -21,6 +21,11 @@ import { BunnyWallet } from "../typechain";
 import { expect } from "chai";
 import { Network } from "hardhat/types";
 import { MOCKERC721 } from "../typechain/MOCKERC721";
+import { parseEther } from "ethers/lib/utils";
+
+//ERC20 Notes denomiantion and FeeDivider, file scoped so I can use it in other tests!
+const DENOMINATION = ethers.utils.parseEther("10"); // 10 Dollars!
+const FEEDIVIDER = 10 // The fee is calculated like DENOMINATION / FEEDIVIDEr
 
 // deploy the bytecode
 
@@ -132,7 +137,25 @@ async function uniswapSetup(actor: SignerWithAddress, provider: any) {
 }
 
 
-export async function setUpBunnyWallet(): Promise<{ NFT: MOCKERC721, USDTM: MOCKERC20, netId: number, owner: SignerWithAddress, alice: SignerWithAddress, bob: SignerWithAddress, attacker: SignerWithAddress, relayer: SignerWithAddress, bunnyWallet: BunnyWallet, provider: any, note: string, isOwnerVerifier: Verifier, swapRouterContract: Contract, network: any }> {
+export async function setUpBunnyWallet(): Promise<
+    {
+        ERC20Notes: ERC20Notes,
+        ETHNotes: ETHNotes,
+        NFT: MOCKERC721,
+        USDTM: MOCKERC20,
+        netId: number,
+        owner: SignerWithAddress,
+        alice: SignerWithAddress,
+        bob: SignerWithAddress,
+        attacker: SignerWithAddress,
+        relayer: SignerWithAddress,
+        bunnyWallet: BunnyWallet,
+        provider: any,
+        note: string,
+        isOwnerVerifier: Verifier,
+        swapRouterContract: Contract,
+        network: any
+    }> {
     const MockERC20Factory = await ethers.getContractFactory("MOCKERC20");
     const MockERC20 = await MockERC20Factory.deploy();
     const USDTM: MOCKERC20 = await MockERC20.deployed();
@@ -173,6 +196,19 @@ export async function setUpBunnyWallet(): Promise<{ NFT: MOCKERC721, USDTM: MOCK
     expect(toNoteHex(parsedNote.deposit.preimage)).to.equal(toNoteHex(parseFirstNote.deposit.preimage));
 
 
+    //Bunny Notes Verifier
+    const WithdrawVerifierFactory = await ethers.getContractFactory("contracts/WithdrawVerifier.sol:Verifier");
+    const WithdrawVerifierDeploy = await WithdrawVerifierFactory.deploy();
+    const withdrwVerifier = await WithdrawVerifierDeploy.deployed() as Verifier;
+    const ERC20NotesFactory = await ethers.getContractFactory("ERC20Notes");
+    const ERC20NotesDeploy = await ERC20NotesFactory.deploy(withdrwVerifier.address, DENOMINATION, FEEDIVIDER, USDTM.address, relayer.address);
+    const ERC20Notes: ERC20Notes = await ERC20NotesDeploy.deployed();
+
+    const ETHNotesFactory = await ethers.getContractFactory("ETHNotes");
+    const ETHNotesDeploy = await ETHNotesFactory.deploy(withdrwVerifier.address, DENOMINATION, FEEDIVIDER, relayer.address);
+    const ETHNotes: ETHNotes = await ETHNotesDeploy.deployed();
+
+
 
     //const ProxyFactory = await ethers.getContractFactory("TransparentUpgradeableProxy");
     //TODO:
@@ -185,15 +221,12 @@ export async function setUpBunnyWallet(): Promise<{ NFT: MOCKERC721, USDTM: MOCK
     //    console.log("Bunny Wallet Proxy: ", bunnyWalletInstance.address);
 
 
-    return { NFT, USDTM, netId, owner, alice, bob, attacker, relayer, bunnyWallet, provider, note, isOwnerVerifier, swapRouterContract, network };
+    return { ERC20Notes, ETHNotes, NFT, USDTM, netId, owner, alice, bob, attacker, relayer, bunnyWallet, provider, note, isOwnerVerifier, swapRouterContract, network };
 }
 
 
 export async function setUpNotes(): Promise<{ owner: SignerWithAddress, alice: SignerWithAddress, bob: SignerWithAddress, USDTM: MOCKERC20, Verifier: Contract, ERC20Notes: ERC20Notes, relayer: SignerWithAddress, ETHNotes: ETHNotes, provider: any, attacker: SignerWithAddress }> {
 
-    const DENOMINATION = ethers.utils.parseEther("10"); // 10 Dollars!
-
-    const FEEDIVIDER = 10 // The fee is calculated like DENOMINATION / FEEDIVIDEr
 
     const [owner, alice, bob, attacker, relayer] = await ethers.getSigners();
 
