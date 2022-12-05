@@ -1,7 +1,8 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { Contract, ContractFactory } from "ethers";
+import { BigNumber, Contract, ContractFactory } from "ethers";
 import { ethers, upgrades } from "hardhat";
 import { ERC20Notes, ETHNotes, MOCKERC20, Verifier } from "../typechain";
+
 //@ts-ignore
 import swapRouter from '@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json'
 //@ts-ignore
@@ -13,28 +14,23 @@ import UniswapV3Pool from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.so
 //@ts-ignore
 import NFTDescriptorArtifact from "@uniswap/v3-periphery/artifacts/contracts/libraries/NFTDescriptor.sol/NFTDescriptor.json";
 //@ts-ignore
-import NonfungibleTokenPositionDescriptorArtifact from "@uniswap/v3-periphery/artifacts/contracts/NonfungibleTokenPositionDescriptor.sol/NonfungibleTokenPositionDescriptor.json"
+import NonfungibleTokenPositionDescriptorArtifact from "@uniswap/v3-periphery/artifacts/contracts/NonfungibleTokenPositionDescriptor.sol/NonfungibleTokenPositionDescriptor.json";
+import NonFungiblePositionManagerArtifact from "@uniswap/v3-periphery/artifacts/contracts/NonfungiblePositionManager.sol/NonfungiblePositionManager.json";
+
 import { createBunnyWalletNote, parseOwnerNote } from "../lib/OwnerNote";
-import { createDeposit, toNoteHex } from "../lib/BunnyNote";
-import { rbigint } from "../lib/random";
+import { toNoteHex } from "../lib/BunnyNote";
 import { BunnyWallet } from "../typechain";
 import { expect } from "chai";
-import { Network } from "hardhat/types";
 import { MOCKERC721 } from "../typechain/MOCKERC721";
-import { parseEther } from "ethers/lib/utils";
 
-//ERC20 Notes denomiantion and FeeDivider, file scoped so I can use it in other tests!
-const DENOMINATION = ethers.utils.parseEther("10"); // 10 Dollars!
-const FEEDIVIDER = 10 // The fee is calculated like DENOMINATION / FEEDIVIDEr
+import bn from "bignumber.js";
+import { parseLog } from "../lib/EventInterfaces";
 
-// deploy the bytecode
+const DENOMINATION = ethers.utils.parseEther("10");
+const FEEDIVIDER = 10 // The fee is calculated like DENOMINATION / FEEDIVIDER
 
-// TODO: I need to deploy the unsiwap swap Router for testing!
 // I need to deploy a proxy admin and proxies
 // I need to deploy the bunny wallet logic contract!
-// I need to deploy bunny notes for testing
-// I need to deploy the erc20 for testing
-// I need to deploy an erc721 for testing!
 
 export const linkLibraries = (
     {
@@ -74,6 +70,7 @@ export const linkLibraries = (
     return bytecode
 }
 
+
 export async function expectRevert(callback: CallableFunction, errorMessage: string) {
     let throws = false;
     try {
@@ -92,6 +89,20 @@ export async function expectRevert(callback: CallableFunction, errorMessage: str
 
 }
 
+bn.config({ EXPONENTIAL_AT: 999999, DECIMAL_PLACES: 40 });
+function encodePriceSqrt(reserve1: any, reserve0: any) {
+
+    const nr = new bn(reserve1.toString())
+        .div(reserve0.toString())
+        .sqrt()
+        .multipliedBy(
+            new bn(2).pow(96))
+        .integerValue()
+        .toString()
+
+    return BigNumber.from(nr)
+
+}
 
 async function uniswapSetup(actor: SignerWithAddress, provider: any) {
     const wethFactory = new ContractFactory(WETH9.abi, WETH9.bytecode, actor);
@@ -112,26 +123,47 @@ async function uniswapSetup(actor: SignerWithAddress, provider: any) {
 
     const NFTDescriptorFactory = new ContractFactory(NFTDescriptorArtifact.abi, NFTDescriptorArtifact.bytecode, actor);
     const NFTDescriptor = await NFTDescriptorFactory.deploy();
+
     // console.log("NFTDescriptor: ", NFTDescriptor.address);
 
-    // const linkedBytecode = linkLibraries({
-    //     bytecode: NonfungibleTokenPositionDescriptorArtifact.bytecode,
-    //     linkReferences: {
-    //         "NFTDescriptor.sol": {
-    //             NFTDescriptor: [{ length: 20, start: 1261 }]
-    //         },
-    //     }
-    // },
-    //     { NFTDescriptor: NFTDescriptor.address })
+    const linkedBytecode = linkLibraries({
+        bytecode: NonfungibleTokenPositionDescriptorArtifact.bytecode,
+        linkReferences: {
+            "NFTDescriptor.sol": {
+                NFTDescriptor: [{ length: 20, start: 1681 }]
+            },
+        }
+    },
+        { NFTDescriptor: NFTDescriptor.address })
 
-    // ///TODO: Invalid bytecode argument!
-    // const NonfungibleTokenPositionDescriptorFactory = new ContractFactory(NonfungibleTokenPositionDescriptorArtifact.abi, linkedBytecode, actor)
-    // const NonfungibleTokenPositionDescriptor = await NonfungibleTokenPositionDescriptorFactory.deploy(weth.address);
+
+    const NonfungibleTokenPositionDescriptorFactory = new ContractFactory(NonfungibleTokenPositionDescriptorArtifact.abi, linkedBytecode, actor)
+    const NonfungibleTokenPositionDescriptor = await NonfungibleTokenPositionDescriptorFactory.deploy(weth.address, ethers.utils.formatBytes32String("ETH"));
     // console.log("NonfungibleTokenPositionDescriptor: ", NonfungibleTokenPositionDescriptor.address);
 
+    const NonfungiblePositionManagerFactory = new ContractFactory(NonFungiblePositionManagerArtifact.abi, NonFungiblePositionManagerArtifact.bytecode, actor);
+    const NonfungiblePositionManager = await NonfungiblePositionManagerFactory.deploy(UniswapV3Factory.address, weth.address, NonfungibleTokenPositionDescriptor.address);
+    // console.log("NonFungiblePositionManager address : ", NonfungiblePositionManager.address);
 
+    // Deploying a pool!
 
-    //TODO: watching this: https://www.youtube.com/watch?v=0rQo4tODpxI
+    const sqrtPrice = encodePriceSqrt(1, 1);
+
+    const createdPoolTx = await UniswapV3Factory.connect(actor).createPool(weth.address, USDTM.address, 500);
+    const createdPoolReceipt = await createdPoolTx.wait();
+    const createdPoolLog = parseLog(["event PoolCreated(address indexed token0,address indexed token1,uint24 indexed fee,int24 tickSpacing,address pool)"], createdPoolReceipt.logs[0]);
+
+    const createdPoolAddress = createdPoolLog.args.pool;
+
+    const pool = new Contract(createdPoolAddress, UniswapV3Pool.abi, provider);
+    await pool.connect(actor).initialize(sqrtPrice);
+
+    // console.log("pool fee", await pool.fee());
+    // console.log("slot0 ", await pool.slot0());
+    // console.log("pool liquidity ", await pool.liquidity());
+
+    //NOTE: SWAPPING IS TESTED ON TESTNET AND NOT ON LOCAL NETWORK
+
 
     return { swapRouterContract }
 }
