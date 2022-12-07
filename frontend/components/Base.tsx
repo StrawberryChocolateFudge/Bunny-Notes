@@ -25,6 +25,7 @@ import { TestnetInfo } from './TestnetInfo';
 import { PaymentRequestPage } from './PaymentRequestPage';
 import { NotFoundPage } from './404page';
 import HelpPage from './HelpPage';
+import BunnyWalletTab from './BunnyWalletTab';
 
 
 export interface Base {
@@ -89,7 +90,7 @@ export default function Base() {
     };
 
 
-   
+
 
     const genericProps = {
         displayError: openSnackbar,
@@ -121,6 +122,8 @@ export default function Base() {
                 return <CashOutGiftCardTab {...genericProps} {...noteStringProps}></CashOutGiftCardTab>
             case 4:
                 return <PaymentRequestTab {...genericProps} {...paymentRequestProps}></PaymentRequestTab>;
+            case 5:
+                return <BunnyWalletTab {...genericProps}></BunnyWalletTab>
             default:
                 break;
         }
@@ -129,7 +132,7 @@ export default function Base() {
     const mainRoute = () => <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Header withTabs={true} selectedTab={selectedTab} onTabToggle={onTabToggle} />
         <Box component="main" sx={{ flex: 1, py: 6, px: 4, bgcolor: '#eaeff1' }}>
-            <TestnetInfo {...genericProps}></TestnetInfo>
+            {/* <TestnetInfo {...genericProps}></TestnetInfo> */}
             <Spacer></Spacer>
             {getTabContent()}
         </Box>
