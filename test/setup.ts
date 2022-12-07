@@ -185,7 +185,6 @@ export async function setUpBunnyWallet(): Promise<
         provider: any,
         note: string,
         isOwnerVerifier: Verifier,
-        swapRouterContract: Contract,
         network: any
     }> {
     const MockERC20Factory = await ethers.getContractFactory("MOCKERC20");
@@ -203,24 +202,19 @@ export async function setUpBunnyWallet(): Promise<
     const netId = network.chainId
 
     // Now I need to set up construtor args.. Uniswap swap Router deploy!!
-    const { swapRouterContract } = await uniswapSetup(owner, ethers.provider);
+    // const { swapRouterContract } = await uniswapSetup(owner, ethers.provider);
 
     const IsOwnerVerifierFactory = await ethers.getContractFactory("contracts/IsOwnerVerifier.sol:Verifier");
     const IsOwnerVerifierDeploy = await IsOwnerVerifierFactory.deploy();
     const isOwnerVerifier = await IsOwnerVerifierDeploy.deployed() as Verifier;
 
-    const proxyAdminFactory = await ethers.getContractFactory("ProxyAdmin");
-    const proxyAdmin = await proxyAdminFactory.deploy();
 
     const BunnyWalletFactory = await ethers.getContractFactory("BunnyWallet");
     const firstNoteWithZeroAddress = await createBunnyWalletNote({ smartContract: "0x0000000000000000000000000000000000000000", netId, });
     const bunnyWallet: BunnyWallet = await BunnyWalletFactory.deploy();
-    //Initialize without a proxy for now
 
-    // I do not know the address of the contract beforehand 
-    // console.log("Original commitment: ", toNoteHex(deposit.commitment));
     const parseFirstNote = await parseOwnerNote(firstNoteWithZeroAddress);
-    await bunnyWallet.initialize(isOwnerVerifier.address, swapRouterContract.address, toNoteHex(parseFirstNote.deposit.commitment), alice.address)
+    await bunnyWallet.initialize(isOwnerVerifier.address, toNoteHex(parseFirstNote.deposit.commitment), alice.address)
 
     const note = await createBunnyWalletNote({ smartContract: bunnyWallet.address, netId, deposit: parseFirstNote.deposit })
     const parsedNote = await parseOwnerNote(note);
@@ -240,20 +234,7 @@ export async function setUpBunnyWallet(): Promise<
     const ETHNotesDeploy = await ETHNotesFactory.deploy(withdrwVerifier.address, DENOMINATION, FEEDIVIDER, relayer.address);
     const ETHNotes: ETHNotes = await ETHNotesDeploy.deployed();
 
-
-
-    //const ProxyFactory = await ethers.getContractFactory("TransparentUpgradeableProxy");
-    //TODO:
-    // const proxy = await ProxyFactory.deploy(bunnyWallet.address, proxyAdmin.address,);
-
-    //TODO: LATER Manually create this deploy to recreate without hre
-    //TODO: Deploy TransparentUpgradeableProxy and the Proxy Admin Manually. Create .sol files for them!
-    //const bunnyWalletInstance = await upgrades.deployProxy(BunnyWalletFactory, [verifier.address, swapRouterContract.address, toNoteHex(deposit.commitment), alice.address]);
-
-    //    console.log("Bunny Wallet Proxy: ", bunnyWalletInstance.address);
-
-
-    return { ERC20Notes, ETHNotes, NFT, USDTM, netId, owner, alice, bob, attacker, relayer, bunnyWallet, provider, note, isOwnerVerifier, swapRouterContract, network };
+    return { ERC20Notes, ETHNotes, NFT, USDTM, netId, owner, alice, bob, attacker, relayer, bunnyWallet, provider, note, isOwnerVerifier, network };
 }
 
 

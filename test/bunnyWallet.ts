@@ -16,14 +16,13 @@ const zeroAddress = "0x0000000000000000000000000000000000000000";
 
 describe("Bunny Wallet", async function () {
     it("Should set up a bunny wallet and change the commitment", async function () {
-        const { owner, alice, bob, attacker, relayer, bunnyWallet, provider, note, isOwnerVerifier, swapRouterContract, network } = await setUpBunnyWallet();
+        const { owner, alice, bob, attacker, relayer, bunnyWallet, provider, note, isOwnerVerifier, network } = await setUpBunnyWallet();
         //Test trying to call the initializer again!
         const parsedNote = await parseOwnerNote(note);
         const commitment = toNoteHex(parsedNote.deposit.commitment);
         await expectRevert(
             async () => await bunnyWallet.initialize(
                 isOwnerVerifier.address,
-                swapRouterContract.address,
                 commitment,
                 alice.address),
             "Initializable: contract is already initialized"
@@ -648,4 +647,50 @@ describe("Bunny Wallet", async function () {
 
     })
 
+    it("Test ownerValid function", async function () {
+        const { note, bunnyWallet, alice, relayer, USDTM, bob } = await setUpBunnyWallet();
+        const parsedNote = await parseOwnerNote(note);
+        // A new nullifier hash is created, with random salt that makes this transaction non-replayable!!
+        const { newNullifierHash, salt } = await relayedNoteNullifierHash(parsedNote.deposit.nullifier);
+        const paramsHash = await transferParamsHash(toNoteHex(parsedNote.deposit.commitment), toNoteHex(newNullifierHash), USDTM.address, bob.address, parseEther("1"));
+
+        const ownerProof = await generateIsOwnerProof({
+            details: {
+                secret: parsedNote.deposit.secret,
+                nullifier: parsedNote.deposit.nullifier,
+                nullifierHash: newNullifierHash,
+                salt: salt,
+                commitmentHash: parsedNote.deposit.commitment,
+                smartContract: bunnyWallet.address,
+                relayer: relayer.address,
+            }
+        });
+        // ownerProof public signals:     
+        // [0] = commitmentHash, [1] = smartcontractwallet, [2] = relayer, [3] = nullifierHash
+        const proof = packToSolidityProof(ownerProof.proof);
+
+        const getZKOwner = () => {
+            return {
+                proof,
+                commitment: toNoteHex(ownerProof.publicSignals[0]),
+                smartContract: bunnyWallet.address,
+                relayer: relayer.address,
+                paramsHash,
+                nullifierHash: toNoteHex(newNullifierHash),
+            }
+        }
+
+        const owner = getZKOwner();
+
+        await bunnyWallet.connect(relayer).ownerValid(owner);
+        //After this runs the nullfier hash will be saved in the contract
+        expect(await bunnyWallet.nullifierHashes(owner.nullifierHash)).to.equal(true);
+
+        await expectRevert(
+            async () => await bunnyWallet.connect(relayer).ownerValid(
+                owner
+            ),
+            "Proof used!"
+        )
+    })
 })
