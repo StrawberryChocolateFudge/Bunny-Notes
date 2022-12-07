@@ -29,6 +29,17 @@ export function doOnBoarding() {
 }
 
 
+export function getWalletCurrency(netId: number): string {
+    switch (netId) {
+        case 1:
+            return "ETH"
+        case 0x405:
+            return " BTT"
+        default:
+            return "ETH"
+    }
+}
+
 export function onBoardOrGetProvider(handleError): any {
     if (!web3Injected()) {
         handleError("You need to install metamask!");
