@@ -4,7 +4,7 @@
 import { ethers } from "hardhat"
 
 export const eventABIs = {
-    InitializedContract: ["event InitializedContract(address _ownerVerifier,address _swapRouter,bytes32 _commitment,address _owner)"],
+    InitializedContract: ["event InitializedContract(address _ownerVerifier,bytes32 _commitment,address _owner)"],
     Received: ["event Received(address from, uint256 amount)"],
     CommitmentReset: ["event CommitmentReset(bytes32 oldCommitment, bytes32 newCommitment)"],
     TransferEthByOwner: ["event TransferEthByOwner(address to, uint256 amount)"],
@@ -20,7 +20,6 @@ export const eventABIs = {
     ERC721Received: ["event ERC721Received(address operator,address from,uint256 tokenId,bytes data)"],
     DepositBunnyNoteByOwner: ["event DepositBunnyNoteByOwner(address _notesContract,address token,bytes32 commitment,bool cashNote,bool isERC20)"],
     DepositBunnyNoteRelayed: ["event DepositBunnyNoteRelayed(address _notesContract,address token,bytes32 commitment,bool cashNote, bool isERC20)"],
-    SwapByOwner: ["event SwapByOwner(address tokenIn,address tokenOut,uint256 amountIn,uint256 amountOutMin)"],
     SwapRelayed: ["  event SwapRelayed(address tokenIn,address tokenOut,uint256 amountIn,uint256 amountOutMin)"]
 }
 
