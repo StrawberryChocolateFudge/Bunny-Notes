@@ -5,7 +5,7 @@ import Dialog from '@mui/material/Dialog';
 import { QrReader } from 'react-qr-reader';
 import styled from '@emotion/styled';
 import { isMobile } from 'react-device-detect';
-import { parseNote } from '../../lib/note';
+import { parseNote } from '../../lib/BunnyNote';
 
 
 const ReaderFrame = styled("div")({

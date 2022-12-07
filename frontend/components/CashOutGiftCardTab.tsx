@@ -10,7 +10,7 @@ import VerifyIcon from "@mui/icons-material/Note"
 import Box from "@mui/material/Box"
 import { Base } from './Base';
 import ScanNoteButton from './QRScannerModal';
-import { parseNote, toNoteHex } from '../../lib/note';
+import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { generateZKProof, packSolidityProof } from '../zkp/generateProof';
 import { bunnyNotesWithdrawGiftCard, getChainId, getContract, getContractAddressFromCurrencyDenomination, netId, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
 interface CashOutGiftCardTabProps extends Base {

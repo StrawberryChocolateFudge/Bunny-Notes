@@ -10,7 +10,7 @@ import VerifyIcon from "@mui/icons-material/Note"
 import Box from "@mui/material/Box"
 import { Base, Spacer } from './Base';
 import ScanNoteButton from './QRScannerModal';
-import { parseNote, toNoteHex } from '../../lib/note';
+import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
 import { bunnyNoteIsSpent, bunnyNotesCommitments, getContractAddressFromCurrencyDenomination, getJsonRpcProvider, getRpcContract } from '../web3/web3';
 import { getLoading } from './LoadingIndicator';

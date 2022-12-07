@@ -7,7 +7,7 @@ import VerifyIcon from "@mui/icons-material/Note"
 import TextField from '@mui/material/TextField';
 import ScanNoteButton from './QRScannerModal';
 import { bunnyNoteIsSpent, bunnyNotesCommitments, bunnyNotesWithdrawCashNote, getContract, getContractAddressFromCurrencyDenomination, getJsonRpcProvider, getRpcContract, MAXCASHNOTESIZE, onBoardOrGetProvider, relayCashNotePayment, requestAccounts } from "../web3/web3";
-import { parseNote, toNoteHex } from "../../lib/note";
+import { parseNote, toNoteHex } from "../../lib/BunnyNote";
 import { ethers } from "ethers";
 import { generateZKProof } from "../zkp/generateProof";
 import { getLoading } from "./LoadingIndicator";

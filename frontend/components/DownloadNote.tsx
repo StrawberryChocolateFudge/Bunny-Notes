@@ -1,6 +1,6 @@
 import { AppBar, Button, ButtonBase, Grid, Paper, styled, Toolbar, Tooltip, Typography } from "@mui/material";
 import React from "react";
-import { toNoteHex } from "../../lib/note";
+import { toNoteHex } from "../../lib/BunnyNote";
 import { downloadPDF } from "../pdf";
 import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
