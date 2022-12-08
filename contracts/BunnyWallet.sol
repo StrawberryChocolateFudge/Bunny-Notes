@@ -30,6 +30,11 @@ struct ZkOwner {
     bytes32 nullifierHash;
 }
 
+struct ERC721ReceivedData {
+    address tokenContract;
+    uint256 tokenId;
+}
+
 // A Bunny wallet that needs to be deployed per user!
 contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
     using SafeMath for uint256;
@@ -38,13 +43,15 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
     IOwnerVerifier public ownerVerifier;
     bytes32 public commitment;
     address public owner; // The Owner of this Wallet, he can add more tokens
-    bool public paused; // The wallet contract can be paused by the owner
 
     uint256 public totalWeiReceived;
 
-    string public constant walletPausedError = "Wallet Paused";
-
     mapping(bytes32 => bool) public nullifierHashes;
+
+    // The NFT transfer history of the contract is pushed into this array!
+    mapping(uint256 => ERC721ReceivedData) public receivedERC721Data;
+    uint256 public receivedERC721DataIndex;
+
     event InitializedContract(
         address _ownerVerifier,
         bytes32 _commitment,
@@ -144,7 +151,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         ownerVerifier = _ownerVerifier;
         commitment = _commitment;
         owner = _owner;
-        paused = false;
         emit InitializedContract(address(_ownerVerifier), _commitment, _owner);
     }
 
@@ -185,6 +191,12 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         bytes calldata data
     ) external override returns (bytes4) {
         emit ERC721Received(operator, from, tokenId, data);
+        ERC721ReceivedData memory tokenReceived = ERC721ReceivedData(
+            msg.sender,
+            tokenId
+        );
+        receivedERC721DataIndex += 1;
+        receivedERC721Data[receivedERC721DataIndex] = tokenReceived;
         return
             bytes4(
                 keccak256("onERC721Received(address,address,uint256,bytes)")
@@ -205,7 +217,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         nonReentrant
     {
         require(msg.sender == owner, "Only owner");
-        require(!paused, walletPausedError);
 
         AddressUpgradeable.sendValue(payable(_to), _amount);
         emit TransferEthByOwner(_to, _amount);
@@ -217,7 +228,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         address _transferTo, // the address to transfer to
         uint256 _transferAmount // the amount of eth transferred,
     ) external nonReentrant ZkOwnerCheck(_zkOwner, true) {
-        require(!paused, "Wallet paused");
         require(
             _zkOwner.paramsHash ==
                 transferParamsHash(
@@ -239,7 +249,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         address _to,
         uint256 _amount
     ) external nonReentrant {
-        require(!paused, "Wallet paused");
         require(msg.sender == owner, "Only owner");
         _token.transfer(_to, _amount);
         emit TransferTokenByOwner(address(_token), _to, _amount);
@@ -251,7 +260,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         address _transferTo, // the addres to transfer to
         uint256 _transferAmount // the amount of tokens transfered!
     ) external nonReentrant ZkOwnerCheck(_zkOwner, true) {
-        require(!paused, "Wallet paused");
         require(
             _zkOwner.paramsHash ==
                 transferParamsHash(
@@ -272,7 +280,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         address _spender,
         uint256 _amount
     ) external {
-        require(!paused, "Wallet paused");
         require(msg.sender == owner, "Only owner");
         _token.approve(_spender, _amount);
         emit ApproveSpendByOwner(address(_token), _spender, _amount);
@@ -284,7 +291,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         address _spender, //In this case (approval) we pass the spender here
         uint256 _amount // And this is the amount that is approved!
     ) external nonReentrant ZkOwnerCheck(_zkOwner, true) {
-        require(!paused, "Wallet paused");
         require(
             _zkOwner.paramsHash ==
                 transferParamsHash(_zkOwner, _token, _spender, _amount),
@@ -300,7 +306,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         address _to,
         uint256 _tokenId
     ) external {
-        require(!paused, "Wallet paused");
         require(msg.sender == owner, "Only owner");
         _token.safeTransferFrom(_from, _to, _tokenId);
         emit TransferERC721ByOwner(address(_token), _from, _to, _tokenId);
@@ -332,7 +337,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         address _transferTo, // the address to transfer the token to
         uint256 _tokenId // transferAmount from the circuit is tokenId in the case of the NFT standard
     ) external nonReentrant ZkOwnerCheck(_zkOwner, true) {
-        require(!paused, "Wallet paused");
         require(
             _zkOwner.paramsHash ==
                 transferERC721ParamsHash(
@@ -379,7 +383,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         bool _approved
     ) external nonReentrant {
         require(msg.sender == owner, "Only owner!");
-        require(!paused, walletPausedError);
 
         _approveAction(_token, _to, _tokenId, _forAll, _approved);
         emit ApproveERC721ByOwner(_token, _to, _tokenId, _forAll, _approved);
@@ -414,7 +417,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         bool _forAll,
         bool _approved
     ) external nonReentrant ZkOwnerCheck(_zkOwner, true) {
-        require(!paused, walletPausedError);
         require(
             _zkOwner.paramsHash ==
                 approveERC721ParamsHash(
@@ -476,7 +478,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         bool _cashNote,
         bool _isERC20Note
     ) external payable nonReentrant {
-        require(!paused, "Wallet paused");
         require(msg.sender == owner, "Only owner!");
         _depositToBunnyNote(
             _notesContract,
@@ -524,7 +525,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         bool _cashNote,
         bool _isERC20Note
     ) external nonReentrant ZkOwnerCheck(_zkOwner, true) {
-        require(!paused, "Wallet paused");
         require(
             _zkOwner.paramsHash ==
                 depositToBunnyNoteParamsHash(
