@@ -34,7 +34,7 @@ export function getWalletCurrency(netId: number): string {
         case 1:
             return "ETH"
         case 0x405:
-            return " BTT"
+            return "BTT"
         default:
             return "ETH"
     }
@@ -224,4 +224,23 @@ export async function relayCashNotePayment(details) {
 
     const res = await fetch(RELAYERURL, requestOptions);
     return res;
+}
+
+export interface AvailableERC20Token {
+    address: string;
+    name: string;
+    logo: string;
+}
+
+export function getAvailableERC20Tokens(netId): AvailableERC20Token[] {
+    switch (netId) {
+        case 1:
+            return [{ address: "", name: "", logo: "" }]
+        case 0x405:
+            return [{
+                name: "USDTM", address: USDTMCONTRACTADDRESS_DONAU, logo: "/imgs/Bunny.svg"
+            }]
+        default:
+            return [{ address: "", name: "", logo: "" }]
+    }
 }
