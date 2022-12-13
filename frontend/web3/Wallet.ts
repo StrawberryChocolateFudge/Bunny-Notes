@@ -24,12 +24,12 @@ export async function approveERC20SpendByOwner(contract: BunnyWallet, token: str
 }
 
 export async function transferERC721ByOwner(contract: BunnyWallet, token: string, from: string, to: string, tokenId: string) {
-    const res = await contract.transferERC721ByOwner(token, from, to, utils.parseEther(tokenId));
+    const res = await contract.transferERC721ByOwner(token, from, to, tokenId);
     return await res.wait();
 }
 
 export async function approveERC721ByOwner(contract: BunnyWallet, token: string, to: string, tokenId: string, forAll: boolean, approved: boolean) {
-    const res = await contract.approveERC721ByOwner(token, to, utils.parseEther(tokenId), forAll, approved);
+    const res = await contract.approveERC721ByOwner(token, to, tokenId, forAll, approved);
     return await res.wait();
 }
 
@@ -45,3 +45,10 @@ export async function getOwner(contract: BunnyWallet) {
     return await contract.owner();
 }
 
+export async function getReceivedERC721DataIndex(contract: BunnyWallet) {
+    return await contract.receivedERC721DataIndex();
+}
+
+export async function getERC721ReceivedData(contract: BunnyWallet, index: any) {
+    return await contract.receivedERC721Data(index);
+}
