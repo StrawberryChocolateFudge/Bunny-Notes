@@ -11,7 +11,7 @@ import Box from "@mui/material/Box"
 import { Base, Spacer } from './Base';
 import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/BunnyNote';
-import { Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
+import { styled, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
 import { bunnyNoteIsSpent, bunnyNotesCommitments, getContractAddressFromCurrencyDenomination, getJsonRpcProvider, getRpcContract } from '../web3/web3';
 import { getLoading } from './LoadingIndicator';
 interface VerifyNoteTabProps extends Base {
@@ -27,6 +27,11 @@ export type Commitment = {
       recipient: string
       denomination: string
 }
+
+const IMG = styled("img")({
+      margin: "0 auto",
+      width: '150px'
+})
 
 export default function VerifyNoteTab(props: VerifyNoteTabProps) {
 
@@ -105,8 +110,8 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                   <Spacer></Spacer>
 
                   {commitmentDetails === null ? (loading ? getLoading() : <Tooltip title="Verify the Note">
-                        <Button onClick={onVerify} variant="contained" sx={{ mr: 1 }}>
-                              Verify
+                        <Button onClick={onVerify} sx={{ mr: 1 }}>
+                              <IMG src="/imgs/VerifyLogo.svg"/>
                         </Button>
                   </Tooltip>) : <React.Fragment>
                         <Typography sx={{ textAlign: "center" }}>{commitmentDetails.validText}</Typography>

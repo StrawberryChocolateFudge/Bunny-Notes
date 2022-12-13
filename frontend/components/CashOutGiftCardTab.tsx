@@ -13,10 +13,15 @@ import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { generateZKProof, packSolidityProof } from '../zkp/generateProof';
 import { bunnyNotesWithdrawGiftCard, getChainId, getContract, getContractAddressFromCurrencyDenomination, netId, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
+import { styled } from '@mui/material';
 interface CashOutGiftCardTabProps extends Base {
     noteString: string
     setMyNoteString: (newValue: string) => void;
 }
+const IMG = styled("img")({
+      margin: "0 auto",
+      width: "200px"
+})
 
 export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
 
@@ -89,8 +94,8 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
         </AppBar>
         <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center" }}>
             <Tooltip title="Cash out the Gift Card">
-                <Button onClick={cashOutAction} variant="contained" sx={{ mr: 1 }}>
-                    Cash out
+                <Button onClick={cashOutAction} sx={{ mr: 1 }}>
+                    <IMG src="/imgs/CashOut.svg"/>
                 </Button>
             </Tooltip>
         </Box>
