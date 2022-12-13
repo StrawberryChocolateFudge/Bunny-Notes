@@ -1,51 +1,20 @@
-import { styled, AppBar, Box, Button, Grid, Paper, TextField, Toolbar, Typography, FormControl, InputLabel, Select, SelectChangeEvent, MenuItem, FormHelperText, Autocomplete, createFilterOptions } from "@mui/material";
+import { SelectChangeEvent, styled } from "@mui/material";
 import * as React from "react";
 import { Base } from "./Base";
-import WalletIcon from "@mui/icons-material/AccountBalanceWallet"
-import { AvailableERC20Token, getAvailableERC20Tokens, getChainId, getContract, getWalletCurrency, onBoardOrGetProvider, requestAccounts } from "../web3/web3";
-import { getOwner, transferETHByOwner, transferTokenByOwner } from "../web3/Wallet";
-import { Contract, utils } from "ethers";
+import { AvailableERC20Token, getChainId, getContract, getWalletCurrency, onBoardOrGetProvider, requestAccounts } from "../web3/web3";
+import { approveERC20SpendByOwner, approveERC721ByOwner, getOwner, transferERC721ByOwner, transferETHByOwner, transferTokenByOwner } from "../web3/Wallet";
+import { BigNumber, utils } from "ethers";
 import { BunnyWallet } from "../../typechain/BunnyWallet";
-import { formatEther, isAddress } from "ethers/lib/utils";
+import { IERC721 } from "../../typechain/IERC721"
+import { formatEther, isAddress, parseEther } from "ethers/lib/utils";
+import { ApproveERC20Elements, ApproveNFTElements, NftBalanceElements, NftTransferElements, ResetCommitmentElements, TransferERC20Elements, TransferETHElements, WalletConnected, WalletNotConnected } from "./utils/BunnyWalletElements";
 
 interface BunnyWalletTabProps extends Base { }
 
-const Img = styled('img')({
-    margin: 'auto',
-    display: 'block',
-    width: "200px"
-});
-
-const Center = styled('div')({
-    margin: '0 auto',
-    textAlign: "center"
+const IMG = styled("img")({
+    margin: "0 auto",
+    width: "100%"
 })
-
-const ActionSelector = styled("div")({
-    textAlign: "center",
-    marginTop: "10px",
-    marginBottom: "20px"
-})
-
-const Column = styled("div")({
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-around"
-});
-
-const PaddedDiv = styled("div")({
-    padding: "5px"
-})
-const RowSpaceBetween = styled("div")({
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between"
-})
-
-const Erc20BalanceDisplay = styled("div")({
-    margin: "auto"
-})
-
 export default function BunnyWalletTab(props: BunnyWalletTabProps) {
     const [smartContractWallet, setSmartContractWallet] = React.useState("");
     const [connected, setConnected] = React.useState(false);
@@ -66,6 +35,29 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
     const [transferERC20To, setTransferERC20To] = React.useState("");
     const [transferERC20Amount, setTransferERC20Amount] = React.useState("");
 
+    const [erc20Allowance, setERC20Allowance] = React.useState("");
+    const [approveERC20To, setApproveERC20To] = React.useState("");
+    const [approveERC20Amount, setApproveERC20Amount] = React.useState("");
+
+    const [nftDataLoading, setNFTDataLoading] = React.useState(false);
+    const [nftData, setNFTData] = React.useState<Array<any>>([]);
+    const [nftAddressToCheck, setNFTAddressToCheck] = React.useState("");
+
+    const [erc721ContractAddress, setERC721ContractAddress] = React.useState("");
+    const [transferERC721To, setTransferERC721To] = React.useState("");
+    const [transferERC721TokenId, setTransferERC721TokenId] = React.useState("");
+
+    const [approveERC721To, setApproveERC721To] = React.useState("");
+    const [erc721Allowance, setERC721Allowance] = React.useState("");
+    const [approveERC721TokenId, setApproveERC721TokenId] = React.useState("");
+
+    const [approveForAllChecked, setApproveForAllChecked] = React.useState(false);
+    const [approveAllowance, setApproveAllowance] = React.useState(false);
+
+    const [isTokenIdApproved, setIsTokenIdApproved] = React.useState("");
+    const [isApprovedForAll, setIsApprovedForAll] = React.useState("");
+
+
     const transferEthToSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         setTransferEthTo(event.target.value);
     }
@@ -73,15 +65,53 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         setTransferERC20To(event.target.value);
     }
 
+    const approveERC20ToSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setApproveERC20To(event.target.value)
+    }
+
+    const nftAddressToCheckSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setNFTAddressToCheck(event.target.value);
+    }
+
+    const erc721ContractAddressSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setERC721ContractAddress(event.target.value);
+        setIsTokenIdApproved("");
+        setIsApprovedForAll("");
+    }
+
+    const transferERC721ToSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setTransferERC721To(event.target.value);
+    }
+    const transferERC721TokenIdSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setTransferERC721TokenId(event.target.value);
+    }
+
+    const approveERC721ToSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setApproveERC721To(event.target.value);
+        setIsTokenIdApproved("");
+        setIsApprovedForAll("");
+    }
+
+    const approveForAllCheckedSetter = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setApproveForAllChecked(event.target.checked);
+        setIsTokenIdApproved("");
+        setIsApprovedForAll("");
+    }
+
+    const approveAllowanceSetter = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setApproveAllowance(event.target.checked);
+    }
+
+    const approveERC721TokenIdSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setApproveERC721TokenId(event.target.value);
+    }
+
+
     const setERC20AddressAndFetchBalance = async (data) => {
         if (data === null) {
             return;
         }
-
-        // Get the contract using the address and fetch the balance
-
         let errorOccured = false;
-
         const contract = await getContract(props.provider, data.address, "/MOCKERC20.json").catch(err => {
             props.displayError("Unable to connect to contract!");
             errorOccured = true;
@@ -113,7 +143,6 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         } else {
             setTransferEthAmount("");
         }
-
     }
 
     const transferERC20AmountSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -125,6 +154,15 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         }
     }
 
+    const approveERC20AmountSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        const value = parseFloat(event.target.value);
+        if (!isNaN(value)) {
+            setApproveERC20Amount(value.toString());
+        } else {
+            setApproveERC20Amount("");
+        }
+    }
+
     const setTransferETHAmountMax = () => {
         setTransferEthAmount(walletBalance);
     }
@@ -132,6 +170,11 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
     const setTransferERC20AmountMax = () => {
         setTransferERC20Amount(erc20Balance);
     }
+
+    const walletAddressSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setSmartContractWallet(event.target.value);
+    }
+
 
     async function transferETH() {
 
@@ -151,6 +194,14 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         const receipt = await transferETHByOwner(bunnyWallet, transferEthTo, transferEthAmount);
         const balance = await props.provider.getBalance(smartContractWallet);
         setWalletBalance(utils.formatEther(balance))
+    }
+
+    const showTokenName = (name) => {
+        if (name === "Add ") {
+            return ""
+        } else {
+            return name;
+        }
     }
 
     async function transferERC20() {
@@ -208,16 +259,307 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         if (errorOccured) {
             return;
         }
-        setFormattedERC20Balance(`Balance: ${formatEther(balance)} ${erc20Address.name}`);
+        setFormattedERC20Balance(`Balance: ${formatEther(balance)} ${showTokenName(erc20Address.name)}`);
         setERC20Balance(formatEther(balance));
     }
 
+    async function approveERC20() {
+        if (erc20Address === null) {
+            return;
+        }
+        if (approveERC20Amount === "") {
+            props.displayError("Invalid Approve Amount");
+            return;
+        }
 
-    const walletAddressSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        setSmartContractWallet(event.target.value);
+        if (!isAddress(erc20Address.address)) {
+            props.displayError("Invalid Contract Address");
+            return;
+        }
+        let errorOccured = false;
+
+
+        const erc20Contract = await getContract(props.provider, erc20Address.address, "/MOCKERC20.json").catch(err => {
+            props.displayError("Unable to connect to contract!");
+            errorOccured = true;
+        });
+        // Tries to get balance to check if address is an ERC20 compatible contract!
+        await erc20Contract.balanceOf(smartContractWallet).catch(err => {
+            errorOccured = true;
+            props.displayError("Unable to connect to contract");
+        })
+
+        if (errorOccured) {
+            props.displayError("Invalid Contract");
+            return;
+        }
+
+        if (!isAddress(approveERC20To)) {
+            props.displayError("Invalid Spender Address");
+            return;
+        }
+
+        if (parseFloat(approveERC20Amount) < 0) {
+            props.displayError("Invalid Approve Amount");
+            return;
+        }
+
+        const bunnyWallet = await getContract(props.provider, smartContractWallet, "/BunnyWallet.json") as BunnyWallet;
+        const receipt = await approveERC20SpendByOwner(bunnyWallet, erc20Address.address, approveERC20To, approveERC20Amount);
+
+        const allowance = await erc20Contract.allowance(smartContractWallet, approveERC20To).catch(err => {
+            props.displayError("Unable to fetch allowance!")
+            errorOccured = true;
+        });
+
+        if (errorOccured) {
+            return;
+        }
+
+        setERC20Allowance(`Allowance: ${formatEther(allowance)} ${showTokenName(erc20Address.name)}`);
+
     }
 
-    const actionSelector = (event: SelectChangeEvent) => {
+    async function getERC20Allowance() {
+        if (erc20Address === null) {
+            return;
+        }
+
+        if (!isAddress(erc20Address.address)) {
+            props.displayError("Invalid Contract Address");
+            return;
+        }
+        let errorOccured = false;
+
+
+        const erc20Contract = await getContract(props.provider, erc20Address.address, "/MOCKERC20.json").catch(err => {
+            props.displayError("Unable to connect to contract!");
+            errorOccured = true;
+        });
+        // Tries to get balance to check if address is an ERC20 compatible contract!
+        await erc20Contract.balanceOf(smartContractWallet).catch(err => {
+            errorOccured = true;
+            props.displayError("Unable to connect to contract");
+        })
+
+        if (errorOccured) {
+            props.displayError("Invalid Contract");
+            return;
+        }
+
+        if (!isAddress(approveERC20To)) {
+            props.displayError("Invalid Spender Address");
+            return;
+        }
+
+        const allowance = await erc20Contract.allowance(smartContractWallet, approveERC20To).catch(err => {
+            props.displayError("Unable to fetch allowance!")
+            errorOccured = true;
+        });
+
+        if (errorOccured) {
+            return;
+        }
+
+        setERC20Allowance(`Allowance: ${formatEther(allowance)} ${showTokenName(erc20Address.name)}`);
+
+    }
+
+    async function getOnERC721ReceivedData() {
+
+        const bunnyWallet = await getContract(props.provider, smartContractWallet, "/BunnyWallet.json") as BunnyWallet;
+
+        setNFTDataLoading(true);
+        let errorOccured = false;
+        const index = await bunnyWallet.receivedERC721DataIndex().catch(err => {
+            props.displayError("Unable to fetch ERC721 History Index");
+            errorOccured = true;
+            setNFTDataLoading(false);
+        });
+        if (errorOccured) {
+            return;
+        }
+        if (index === undefined) {
+            return
+        }
+        // Fetch all the data by index
+        let fetchedData = new Array<any>;
+
+        //Check for duplicate token entries in history
+        let containsToken = {};
+
+        for (let i = 1; i <= index.toNumber(); i++) {
+            const res = await bunnyWallet.receivedERC721Data(i).catch(err => {
+                props.displayError("Unable to fetch ERC721 History")
+                errorOccured = true;
+                setNFTDataLoading(false)
+            });
+            if (errorOccured) {
+                break;
+            }
+
+            //@ts-ignore
+            const tokenId = res.tokenId;
+            //@ts-ignore
+            const tokenContract = res.tokenContract;
+
+            //Get the NFT Contract and fetch the tokenURI
+            const nftcontract = await getContract(props.provider, tokenContract, "/MOCKERC721.json")
+
+            const currentOwner = await nftcontract.ownerOf(tokenId);
+
+            if (currentOwner === smartContractWallet && !containsToken[tokenContract + tokenId]) {
+                const URI = await nftcontract.tokenURI(tokenId);
+                fetchedData.push({ tokenContract: tokenContract, tokenId: tokenId, tokenURI: URI });
+                containsToken[tokenContract + tokenId] = true;
+
+            }
+        }
+
+        setNFTData(fetchedData);
+        setNFTDataLoading(false);
+    }
+
+    async function transferERC721() {
+        if (!isAddress(erc721ContractAddress)) {
+            props.displayError("Invalid NFT Contract Address");
+            return;
+        }
+        if (!isAddress(transferERC721To)) {
+            props.displayError("Invalid Address To Transfer To!")
+            return;
+        }
+
+        if (isNaN(parseInt(transferERC721TokenId))) {
+            props.displayError("Invalid Token Id");
+            return;
+        }
+
+        // check if the contract owns the token id
+        const nftContract = await getContract(props.provider, erc721ContractAddress, "/MOCKERC721.json") as IERC721;
+        const currentOwner = await nftContract.ownerOf(transferERC721TokenId);
+
+        if (currentOwner !== smartContractWallet) {
+            props.displayError("You don't own this token!");
+            return;
+        }
+
+        const bunnyWallet = await getContract(props.provider, smartContractWallet, "/BunnyWallet.json");
+
+
+        const receipt = await transferERC721ByOwner(bunnyWallet, erc721ContractAddress, smartContractWallet, transferERC721To, transferERC721TokenId).catch((err) => {
+            console.log(err)
+            props.displayError("Unable to transfer token!")
+        });
+    }
+
+    async function getERC721Allowance() {
+        if (!isAddress(erc721ContractAddress)) {
+            props.displayError("Invalid NFT Contract Address");
+            return;
+        }
+
+        if (!isAddress(approveERC721To)) {
+            props.displayError("Invalid Spender Address");
+            return;
+        }
+
+        const nftContract = await getContract(props.provider, erc721ContractAddress, "/MOCKERC721.json") as IERC721;
+        let errorOccured = false;
+        if (approveForAllChecked) {
+            const isApproved = await nftContract.isApprovedForAll(smartContractWallet, approveERC721To).catch(err => {
+                props.displayError("Unable to fetch approvals");
+                errorOccured = true;
+            });
+
+            if (errorOccured) {
+                setIsApprovedForAll("");
+                return;
+            }
+            setIsApprovedForAll(isApproved ? "Address is approved for all" : "Address is not approved for all");
+        } else {
+
+            if (isNaN(parseInt(approveERC721TokenId))) {
+                props.displayError("Invalid Token Id");
+                return;
+            }
+
+            const tokenApprovedTo = await nftContract.getApproved(approveERC721TokenId).catch(err => {
+                props.displayError("Unable to fetch approvals");
+                errorOccured = true;
+            });
+
+            let message = "";
+
+            if (errorOccured) {
+                setIsTokenIdApproved(message);
+                return;
+            }
+
+            if (tokenApprovedTo === "0x0000000000000000000000000000000000000000") {
+                message = "Token is not approved to be spent";
+            } else if (tokenApprovedTo === approveERC721To) {
+                message = "Token is approved to spender!";
+            } else {
+                message = "Token is approved to " + tokenApprovedTo
+            }
+            setIsTokenIdApproved(message);
+        }
+    }
+
+    async function approveERC721() {
+        if (!isAddress(erc721ContractAddress)) {
+            props.displayError("Invalid NFT Contract Address");
+            return;
+        }
+        if (!isAddress(approveERC721To)) {
+            props.displayError("Invalid Address to Approve");
+            return;
+        }
+        let errorOccured = false;
+        const bunnyWallet = await getContract(props.provider, smartContractWallet, "/BunnyWallet.json") as BunnyWallet;
+        const nftContract = await getContract(props.provider, erc721ContractAddress, "/MOCKERC721.json") as IERC721;
+
+        if (approveForAllChecked) {
+
+            const balanceOf = await nftContract.balanceOf(smartContractWallet);
+
+            if (balanceOf.toNumber() === 0) {
+                props.displayError("Token Balance is zero! Nothing to approve!");
+                return;
+            }
+
+            const receipt = await approveERC721ByOwner(bunnyWallet, erc721ContractAddress, approveERC721To, "0", true, approveAllowance);
+        } else {
+            if (isNaN(parseInt(approveERC721TokenId))) {
+                props.displayError("Invalid Token Id");
+                return;
+            }
+
+
+            const ownerOfToken = await nftContract.ownerOf(approveERC721TokenId).catch(err => {
+                props.displayError("Unable to fetch token id owner!");
+                errorOccured = true;
+            });
+
+            if (errorOccured) {
+                return;
+            }
+
+            if (ownerOfToken !== smartContractWallet) {
+                props.displayError("You do not own the Token!");
+                return;
+            }
+
+            const receipt = await approveERC721ByOwner(bunnyWallet, erc721ContractAddress, approveERC721To, approveERC721TokenId, false, approveAllowance);
+        }
+
+    }
+
+
+
+
+    const actionSelector = async (event: SelectChangeEvent) => {
         setSelectedAction(event.target.value as string);
         switch (event.target.value as string) {
             case "transferEth":
@@ -230,7 +572,11 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
                 setFormHelperText("Approve Spending from the Bunny Wallet");
                 break;
             case "NFTBalance":
-                setFormHelperText("Check the NFT balance of the Wallet");
+                setFormHelperText("Check the NFT history of the Wallet");
+
+                //TODO: I need to fetch the onERC721Transferred Data
+                await getOnERC721ReceivedData();
+
                 break;
             case "transferERC721":
                 setFormHelperText("Transfer your NFT to another wallet");
@@ -333,13 +679,57 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
                     transferERC20={transferERC20}
                 ></TransferERC20Elements>
             case "approveERC20":
-                return <ApproveERC20Elements></ApproveERC20Elements>
+                return <ApproveERC20Elements
+                    netId={netId}
+                    setERC20Address={setERC20AddressAndFetchBalance}
+                    erc20Address={erc20Address}
+                    erc20Allowance={erc20Allowance}
+                    formattedERC20Balance={formattedERC20Balance}
+                    approveERC20To={approveERC20To}
+                    approveERC20ToSetter={approveERC20ToSetter}
+                    approveERC20Amount={approveERC20Amount}
+                    approveERC20AmountSetter={approveERC20AmountSetter}
+                    approveERC20={approveERC20}
+                    getERC20Allowance={getERC20Allowance}
+                ></ApproveERC20Elements>
             case "NFTBalance":
-                return <NftBalanceElements></NftBalanceElements>
+                return <NftBalanceElements
+                    netId={netId}
+                    nftDataLoading={nftDataLoading}
+                    nftData={nftData}
+                    nftAddressToCheck={nftAddressToCheck}
+                    nftAddressToCheckSetter={nftAddressToCheckSetter}
+                ></NftBalanceElements>
             case "transferERC721":
-                return <NftTransferElements></NftTransferElements>
+                return <NftTransferElements
+                    netId={netId}
+                    erc721ContractAddressSetter={erc721ContractAddressSetter}
+                    erc721Address={erc721ContractAddress}
+                    transferERC721To={transferERC721To}
+                    transferERC721ToSetter={transferERC721ToSetter}
+                    transferERC721TokenId={transferERC721TokenId}
+                    transferERC721TokenIdSetter={transferERC721TokenIdSetter}
+                    transferERC721={transferERC721}
+                ></NftTransferElements>
             case "approveERC721":
-                return <ApproveNFTElements></ApproveNFTElements>
+                return <ApproveNFTElements
+                    netId={netId}
+                    erc721Address={erc721ContractAddress}
+                    erc721ContractAddressSetter={erc721ContractAddressSetter}
+                    approveERC721To={approveERC721To}
+                    approveERC721ToSetter={approveERC721ToSetter}
+                    erc721Allowance={erc721Allowance}
+                    getERC721Allowance={getERC721Allowance}
+                    approveForAllChecked={approveForAllChecked}
+                    approveForAllCheckedSetter={approveForAllCheckedSetter}
+                    approveERC721={approveERC721}
+                    approveAllowance={approveAllowance}
+                    approveAllowanceSetter={approveAllowanceSetter}
+                    approveERC721TokenIdSetter={approveERC721TokenIdSetter}
+                    approveERC721TokenId={approveERC721TokenId}
+                    isTokenIdApproved={isTokenIdApproved}
+                    isApprovedForAll={isApprovedForAll}
+                ></ApproveNFTElements>
             case "resetCommitment":
                 return <ResetCommitmentElements></ResetCommitmentElements>
             default:
@@ -348,166 +738,22 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
     }
 
     if (!connected) {
-        return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
-            <AppBar
-                position="static"
-                color="default"
-                elevation={0}
-                sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
-            >
-                <Toolbar>
-                    <Grid container spacing={2} alignItems="center">
-                        <Grid item>
-                            <WalletIcon color="inherit" sx={{ display: 'block' }} />
-                        </Grid>
-                        <Grid item xs>
-                            <TextField autoComplete='off' value={smartContractWallet} onChange={walletAddressSetter} fullWidth placeholder="Paste your Smart Contract Wallet Address Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
-                        </Grid>
-                        <Grid item>
-                            <Button onClick={connectButtonAction} variant="contained">Connect</Button>
-                        </Grid>
-                    </Grid>
-                </Toolbar>
-            </AppBar>
-            <Box>
-                <Typography sx={{ padding: "5px", textAlign: "center" }} component={"h5"} variant="h5">Connect to the Bunny Wallet created with the Mobile App</Typography>
-                <Center>
-                    <Button sx={{ margin: "0 auto" }}><Img src="/imgs/get-it-on-google-play-badge.png" /></Button>
-                </Center>
-            </Box>
-        </Paper>
+        return <WalletNotConnected
+            smartContractWallet={smartContractWallet}
+            walletAddressSetter={walletAddressSetter}
+            connectButtonAction={connectButtonAction}
+        ></WalletNotConnected>
     }
     else {
-        return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
-            <Box>
-                <Typography variant="subtitle2" sx={{ padding: "5px", textAlign: "center" }}>Administer your Bunny Wallet. For best experience, use the Mobile App!</Typography>
-                <Typography sx={{ padding: "5px", textAlign: "center" }} component={"p"} variant="subtitle1">{smartContractWallet}
-                </Typography>
-                <Typography sx={{ padding: "5px", textAlign: "center" }} component={"p"} variant="subtitle1">Balance: {walletBalance} {walletCurrency}
-                </Typography>
-            </Box>
-            <Box>
-                <ActionSelector>
-                    <FormControl sx={{ minWidth: "100px" }}>
-                        <InputLabel id="contract-actions-label">Actions</InputLabel>
-                        <Select
-                            labelId="contract-actions-label"
-                            id="contract-actions-select"
-                            value={selectedAction}
-                            onChange={actionSelector}
-                            label="Actions"
-                        >
-                            <MenuItem value="transferEth">Transfer {walletCurrency}</MenuItem>
-                            <MenuItem value="transferERC20">Transfer Token</MenuItem>
-                            <MenuItem value="approveERC20">Approve Token Spend</MenuItem>
-                            <MenuItem value="NFTBalance">NFT Balance</MenuItem>
-                            <MenuItem value="transferERC721">Transfer NFT</MenuItem>
-                            <MenuItem value="approveERC721">Approve NFT</MenuItem>
-                            <MenuItem value="resetCommitment">Reset Commitment</MenuItem>
-                        </Select>
-                        <FormHelperText>{formHelperText}</FormHelperText>
-                    </FormControl>
-                </ActionSelector>
-            </Box>
-            <Box>{renderSelectedAction()}</Box>
-        </Paper>
+        return <WalletConnected
+            smartContractWallet={smartContractWallet}
+            walletBalance={walletBalance}
+            walletCurrency={walletCurrency}
+            selectedAction={selectedAction}
+            actionSelector={actionSelector}
+            formHelperText={formHelperText}
+            renderSelectedAction={renderSelectedAction}
+        ></WalletConnected>
     }
 }
 
-function TransferETHElements(props: any) {
-    return <Box>
-        <PaddedDiv>
-            <TextField key="transferEthToKey" value={props.transferEthTo} onChange={props.transferEthToSetter} sx={{ marginBottom: "20px", width: "100%" }} label="Transfer To" variant="filled"></TextField>
-        </PaddedDiv>
-        <PaddedDiv>
-            <RowSpaceBetween>
-                <div>
-                    <TextField key="transferETHAmountKey" value={props.transferEtAmount} onChange={props.transferEthAmountSetter} type={"number"} label="Transfer Amount" variant="filled"></TextField>
-                    <Button onClick={props.setTransferETHAmountMax} sx={{ top: "20%" }} variant="text">Max</Button>
-                </div>
-                <Button onClick={props.transferETH} variant="contained">Submit</Button>
-            </RowSpaceBetween>
-        </PaddedDiv>
-    </Box>
-}
-
-
-const filter = createFilterOptions<AvailableERC20Token>();
-
-function TransferERC20Elements(props: any) {
-    return <Box>
-        <PaddedDiv>
-            <Autocomplete
-                disablePortal
-                id="select-erc20-token"
-                options={getAvailableERC20Tokens(props.netId)}
-                getOptionLabel={(option) => option.address}
-                isOptionEqualToValue={(option, value) => { return true }}
-                sx={{ width: "100%" }}
-                value={props.erc20Address}
-                onChange={(event, newValue) => {
-                    if (typeof newValue === 'string') {
-                        props.setERC20Address({
-                            address: newValue,
-                        });
-                    } else if (newValue && newValue.inputValue) {
-                        // Create a new value from the user input
-                        props.setERC20Address({
-                            address: newValue.inputValue,
-                        });
-                    } else {
-                        props.setERC20Address(newValue);
-                    }
-                }}
-                filterOptions={(options, params) => {
-                    const filtered = filter(options, params);
-
-                    const { inputValue } = params;
-                    // Suggest the creation of a new value
-                    const isExisting = options.some((option) => inputValue === option.address);
-                    if (inputValue !== '' && !isExisting) {
-                        filtered.push({
-                            address: inputValue,
-                            name: `Add `,
-                            logo: ""
-                        });
-                    }
-
-                    return filtered;
-                }}
-                renderOption={(props, option) => (
-                    <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-                        <img
-                            loading="lazy"
-                            width="20"
-                            src={option.logo}
-                            alt=""
-                        />
-                        {option.name} {option.address}
-                    </Box>
-                )}
-                renderInput={(params) => <TextField {...params} label="Token Address"></TextField>}
-            />
-
-        </PaddedDiv>
-        <PaddedDiv>
-            <TextField value={props.transferERC20To} onChange={props.transferERC20ToSetter} key="transferERC20Token" variant="filled" sx={{ marginBottom: "20p", width: "100%" }} label="Transfer To"></TextField>
-        </PaddedDiv>
-        <PaddedDiv>
-            <RowSpaceBetween>
-                <div>
-                    <TextField key="transferERC20AmountKey" value={props.transferERC20Amount} onChange={props.transferERC20AmountSetter} type={"number"} label="Transfer Amount" variant="filled"></TextField>
-                    <Button onClick={props.setTransferERC20AmountMax} sx={{ top: "20%" }} variant="text">Max</Button>
-                </div>
-                <Erc20BalanceDisplay sx={{ top: "20%" }}>{props.formattedERC20Balance}</Erc20BalanceDisplay>
-                <Button onClick={props.transferERC20} variant="contained">Submit</Button>
-            </RowSpaceBetween>
-        </PaddedDiv>
-    </Box >
-}
-
-const ApproveERC20Elements = () => <React.Fragment>Approve ERC20 Elements</React.Fragment>
-const NftBalanceElements = () => <React.Fragment>NFT Balance ELements</React.Fragment>
-const NftTransferElements = () => <React.Fragment>NFTTransfer Elements</React.Fragment>
-const ApproveNFTElements = () => <React.Fragment>Approve NFT Elements</React.Fragment>
-const ResetCommitmentElements = () => <React.Fragment>Reset commitment elements</React.Fragment>
