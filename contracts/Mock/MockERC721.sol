@@ -17,4 +17,8 @@ contract MOCKERC721 is ERC721 {
     ) public override {
         super.safeTransferFrom(from, to, tokenId);
     }
+
+    function _baseURI() internal pure override returns (string memory) {
+        return "http://localhost:1234/";
+    }
 }
