@@ -114,7 +114,7 @@ export function downloadNote(props: DownloadNoteProps) {
 
             const approveAmount = parseFloat(formattedFee) + parseFloat(noteDetails[1].amount);
 
-            const ERC20Contract = await getContract(props.provider, USDTMCONTRACTADDRESS_DONAU, "/MOCKERC20.json");
+            const ERC20Contract = await getContract(props.provider, USDTMCONTRACTADDRESS_DONAU, "/ERC20.json");
 
             const convertedApproveAmount = ethers.utils.parseEther(approveAmount.toString());
             props.setShowApproval(false);
