@@ -92,6 +92,7 @@ export default function ScanNoteButton(props: ScanNoteButtonProps) {
     return (
         <div>
             <Button variant="contained"
+                sx={{ height: "100%" }}
                 onClick={handleClickOpen}>
                 Scan
             </Button>
