@@ -38,8 +38,6 @@ interface BunnyWalletInterface extends ethers.utils.Interface {
     "owner()": FunctionFragment;
     "ownerValid((uint256[8],bytes32,address,address,bytes32,bytes32))": FunctionFragment;
     "ownerVerifier()": FunctionFragment;
-    "receivedERC721Data(uint256)": FunctionFragment;
-    "receivedERC721DataIndex()": FunctionFragment;
     "resetCommitment(bytes32)": FunctionFragment;
     "totalWeiReceived()": FunctionFragment;
     "transferERC721ByOwner(address,address,address,uint256)": FunctionFragment;
@@ -245,14 +243,6 @@ interface BunnyWalletInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "receivedERC721Data",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "receivedERC721DataIndex",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "resetCommitment",
     values: [BytesLike]
   ): string;
@@ -453,14 +443,6 @@ interface BunnyWalletInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "receivedERC721Data",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "receivedERC721DataIndex",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "resetCommitment",
     data: BytesLike
   ): Result;
@@ -509,7 +491,6 @@ interface BunnyWalletInterface extends ethers.utils.Interface {
     "CommitmentReset(bytes32,bytes32)": EventFragment;
     "DepositBunnyNoteByOwner(address,address,bytes32,bool,bool)": EventFragment;
     "DepositBunnyNoteRelayed(address,address,bytes32,bool,bool)": EventFragment;
-    "ERC721Received(address,address,uint256,bytes)": EventFragment;
     "Initialized(uint8)": EventFragment;
     "InitializedContract(address,bytes32,address)": EventFragment;
     "Received(address,uint256)": EventFragment;
@@ -528,7 +509,6 @@ interface BunnyWalletInterface extends ethers.utils.Interface {
   getEvent(nameOrSignatureOrTopic: "CommitmentReset"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "DepositBunnyNoteByOwner"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "DepositBunnyNoteRelayed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ERC721Received"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "InitializedContract"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Received"): EventFragment;
@@ -597,15 +577,6 @@ export type DepositBunnyNoteRelayedEvent = TypedEvent<
     commitment: string;
     cashNote: boolean;
     isERC20: boolean;
-  }
->;
-
-export type ERC721ReceivedEvent = TypedEvent<
-  [string, string, BigNumber, string] & {
-    operator: string;
-    from: string;
-    tokenId: BigNumber;
-    data: string;
   }
 >;
 
@@ -874,10 +845,10 @@ export class BunnyWallet extends BaseContract {
     ): Promise<[boolean]>;
 
     onERC721Received(
-      operator: string,
-      from: string,
-      tokenId: BigNumberish,
-      data: BytesLike,
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -905,15 +876,6 @@ export class BunnyWallet extends BaseContract {
     ): Promise<ContractTransaction>;
 
     ownerVerifier(overrides?: CallOverrides): Promise<[string]>;
-
-    receivedERC721Data(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [string, BigNumber] & { tokenContract: string; tokenId: BigNumber }
-    >;
-
-    receivedERC721DataIndex(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     resetCommitment(
       newCommitment: BytesLike,
@@ -1233,10 +1195,10 @@ export class BunnyWallet extends BaseContract {
   nullifierHashes(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
   onERC721Received(
-    operator: string,
-    from: string,
-    tokenId: BigNumberish,
-    data: BytesLike,
+    arg0: string,
+    arg1: string,
+    arg2: BigNumberish,
+    arg3: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -1264,15 +1226,6 @@ export class BunnyWallet extends BaseContract {
   ): Promise<ContractTransaction>;
 
   ownerVerifier(overrides?: CallOverrides): Promise<string>;
-
-  receivedERC721Data(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [string, BigNumber] & { tokenContract: string; tokenId: BigNumber }
-  >;
-
-  receivedERC721DataIndex(overrides?: CallOverrides): Promise<BigNumber>;
 
   resetCommitment(
     newCommitment: BytesLike,
@@ -1598,10 +1551,10 @@ export class BunnyWallet extends BaseContract {
     ): Promise<boolean>;
 
     onERC721Received(
-      operator: string,
-      from: string,
-      tokenId: BigNumberish,
-      data: BytesLike,
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -1629,15 +1582,6 @@ export class BunnyWallet extends BaseContract {
     ): Promise<boolean>;
 
     ownerVerifier(overrides?: CallOverrides): Promise<string>;
-
-    receivedERC721Data(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [string, BigNumber] & { tokenContract: string; tokenId: BigNumber }
-    >;
-
-    receivedERC721DataIndex(overrides?: CallOverrides): Promise<BigNumber>;
 
     resetCommitment(
       newCommitment: BytesLike,
@@ -1979,26 +1923,6 @@ export class BunnyWallet extends BaseContract {
       }
     >;
 
-    "ERC721Received(address,address,uint256,bytes)"(
-      operator?: null,
-      from?: null,
-      tokenId?: null,
-      data?: null
-    ): TypedEventFilter<
-      [string, string, BigNumber, string],
-      { operator: string; from: string; tokenId: BigNumber; data: string }
-    >;
-
-    ERC721Received(
-      operator?: null,
-      from?: null,
-      tokenId?: null,
-      data?: null
-    ): TypedEventFilter<
-      [string, string, BigNumber, string],
-      { operator: string; from: string; tokenId: BigNumber; data: string }
-    >;
-
     "Initialized(uint8)"(
       version?: null
     ): TypedEventFilter<[number], { version: number }>;
@@ -2312,10 +2236,10 @@ export class BunnyWallet extends BaseContract {
     ): Promise<BigNumber>;
 
     onERC721Received(
-      operator: string,
-      from: string,
-      tokenId: BigNumberish,
-      data: BytesLike,
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -2343,13 +2267,6 @@ export class BunnyWallet extends BaseContract {
     ): Promise<BigNumber>;
 
     ownerVerifier(overrides?: CallOverrides): Promise<BigNumber>;
-
-    receivedERC721Data(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    receivedERC721DataIndex(overrides?: CallOverrides): Promise<BigNumber>;
 
     resetCommitment(
       newCommitment: BytesLike,
@@ -2676,10 +2593,10 @@ export class BunnyWallet extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     onERC721Received(
-      operator: string,
-      from: string,
-      tokenId: BigNumberish,
-      data: BytesLike,
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -2707,15 +2624,6 @@ export class BunnyWallet extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     ownerVerifier(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    receivedERC721Data(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    receivedERC721DataIndex(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     resetCommitment(
       newCommitment: BytesLike,
