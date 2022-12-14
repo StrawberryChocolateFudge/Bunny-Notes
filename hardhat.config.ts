@@ -44,7 +44,7 @@ const config: HardhatUserConfig = {
     // donau: {
     //   url: process.env.BTT_DONAU_TESTNET_API || "",
     //   accounts:
-    //     process.env.PRIVATE_KEY_DONAU !== undefined ? [process.env.PRIVATE_KEY_DONAU] : [],
+    //     process.env.KEY_DONAU !== undefined ? [process.env.KEY_DONAU] : [],
     // }
   },
   gasReporter: {
