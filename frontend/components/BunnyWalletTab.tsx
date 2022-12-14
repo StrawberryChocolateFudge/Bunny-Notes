@@ -2,12 +2,12 @@ import { SelectChangeEvent, styled } from "@mui/material";
 import * as React from "react";
 import { Base } from "./Base";
 import { AvailableERC20Token, getChainId, getContract, getWalletCurrency, onBoardOrGetProvider, requestAccounts } from "../web3/web3";
-import { approveERC20SpendByOwner, approveERC721ByOwner, getOwner, transferERC721ByOwner, transferETHByOwner, transferTokenByOwner } from "../web3/Wallet";
-import { BigNumber, utils } from "ethers";
+import { approveERC20SpendByOwner, approveERC721ByOwner, getOwner, resetCommitment, transferERC721ByOwner, transferETHByOwner, transferTokenByOwner } from "../web3/Wallet";
+import { utils } from "ethers";
 import { BunnyWallet } from "../../typechain/BunnyWallet";
 import { IERC721 } from "../../typechain/IERC721"
-import { formatEther, isAddress, parseEther } from "ethers/lib/utils";
-import { ApproveERC20Elements, ApproveNFTElements, NftBalanceElements, NftTransferElements, ResetCommitmentElements, TransferERC20Elements, TransferETHElements, WalletConnected, WalletNotConnected } from "./utils/BunnyWalletElements";
+import { formatEther, isAddress } from "ethers/lib/utils";
+import { ApproveERC20Elements, ApproveNFTElements, NftTransferElements, ResetCommitmentElements, TransferERC20Elements, TransferETHElements, WalletConnected, WalletNotConnected } from "./utils/BunnyWalletElements";
 
 interface BunnyWalletTabProps extends Base { }
 
@@ -39,16 +39,17 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
     const [approveERC20To, setApproveERC20To] = React.useState("");
     const [approveERC20Amount, setApproveERC20Amount] = React.useState("");
 
-    const [nftDataLoading, setNFTDataLoading] = React.useState(false);
-    const [nftData, setNFTData] = React.useState<Array<any>>([]);
-    const [nftAddressToCheck, setNFTAddressToCheck] = React.useState("");
 
     const [erc721ContractAddress, setERC721ContractAddress] = React.useState("");
+
+    const [erc721Balance, setERC721Balance] = React.useState("");
+
     const [transferERC721To, setTransferERC721To] = React.useState("");
     const [transferERC721TokenId, setTransferERC721TokenId] = React.useState("");
 
     const [approveERC721To, setApproveERC721To] = React.useState("");
-    const [erc721Allowance, setERC721Allowance] = React.useState("");
+
+
     const [approveERC721TokenId, setApproveERC721TokenId] = React.useState("");
 
     const [approveForAllChecked, setApproveForAllChecked] = React.useState(false);
@@ -57,6 +58,8 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
     const [isTokenIdApproved, setIsTokenIdApproved] = React.useState("");
     const [isApprovedForAll, setIsApprovedForAll] = React.useState("");
 
+    const [currentCommitment, setCurrentCommitment] = React.useState("");
+    const [newCommitment, setNewCommitment] = React.useState("");
 
     const transferEthToSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         setTransferEthTo(event.target.value);
@@ -69,14 +72,12 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         setApproveERC20To(event.target.value)
     }
 
-    const nftAddressToCheckSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        setNFTAddressToCheck(event.target.value);
-    }
 
     const erc721ContractAddressSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         setERC721ContractAddress(event.target.value);
         setIsTokenIdApproved("");
         setIsApprovedForAll("");
+        setERC721Balance("");
     }
 
     const transferERC721ToSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -106,13 +107,17 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         setApproveERC721TokenId(event.target.value);
     }
 
+    const newCommitmentSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setNewCommitment(event.target.value);
+    }
+
 
     const setERC20AddressAndFetchBalance = async (data) => {
         if (data === null) {
             return;
         }
         let errorOccured = false;
-        const contract = await getContract(props.provider, data.address, "/MOCKERC20.json").catch(err => {
+        const contract = await getContract(props.provider, data.address, "/ERC20.json").catch(err => {
             props.displayError("Unable to connect to contract!");
             errorOccured = true;
         });
@@ -163,6 +168,7 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         }
     }
 
+    // TODO: THIS SETTER DON"T WORK!!
     const setTransferETHAmountMax = () => {
         setTransferEthAmount(walletBalance);
     }
@@ -220,7 +226,7 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         }
         let errorOccured = false;
 
-        const erc20Contract = await getContract(props.provider, erc20Address.address, "/MOCKERC20.json").catch(err => {
+        const erc20Contract = await getContract(props.provider, erc20Address.address, "/ERC20.json").catch(err => {
             props.displayError("Unable to connect to contract!");
             errorOccured = true;
         });
@@ -279,7 +285,7 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         let errorOccured = false;
 
 
-        const erc20Contract = await getContract(props.provider, erc20Address.address, "/MOCKERC20.json").catch(err => {
+        const erc20Contract = await getContract(props.provider, erc20Address.address, "/ERC20.json").catch(err => {
             props.displayError("Unable to connect to contract!");
             errorOccured = true;
         });
@@ -332,7 +338,7 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         let errorOccured = false;
 
 
-        const erc20Contract = await getContract(props.provider, erc20Address.address, "/MOCKERC20.json").catch(err => {
+        const erc20Contract = await getContract(props.provider, erc20Address.address, "/ERC20.json").catch(err => {
             props.displayError("Unable to connect to contract!");
             errorOccured = true;
         });
@@ -365,60 +371,6 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
 
     }
 
-    async function getOnERC721ReceivedData() {
-
-        const bunnyWallet = await getContract(props.provider, smartContractWallet, "/BunnyWallet.json") as BunnyWallet;
-
-        setNFTDataLoading(true);
-        let errorOccured = false;
-        const index = await bunnyWallet.receivedERC721DataIndex().catch(err => {
-            props.displayError("Unable to fetch ERC721 History Index");
-            errorOccured = true;
-            setNFTDataLoading(false);
-        });
-        if (errorOccured) {
-            return;
-        }
-        if (index === undefined) {
-            return
-        }
-        // Fetch all the data by index
-        let fetchedData = new Array<any>;
-
-        //Check for duplicate token entries in history
-        let containsToken = {};
-
-        for (let i = 1; i <= index.toNumber(); i++) {
-            const res = await bunnyWallet.receivedERC721Data(i).catch(err => {
-                props.displayError("Unable to fetch ERC721 History")
-                errorOccured = true;
-                setNFTDataLoading(false)
-            });
-            if (errorOccured) {
-                break;
-            }
-
-            //@ts-ignore
-            const tokenId = res.tokenId;
-            //@ts-ignore
-            const tokenContract = res.tokenContract;
-
-            //Get the NFT Contract and fetch the tokenURI
-            const nftcontract = await getContract(props.provider, tokenContract, "/MOCKERC721.json")
-
-            const currentOwner = await nftcontract.ownerOf(tokenId);
-
-            if (currentOwner === smartContractWallet && !containsToken[tokenContract + tokenId]) {
-                const URI = await nftcontract.tokenURI(tokenId);
-                fetchedData.push({ tokenContract: tokenContract, tokenId: tokenId, tokenURI: URI });
-                containsToken[tokenContract + tokenId] = true;
-
-            }
-        }
-
-        setNFTData(fetchedData);
-        setNFTDataLoading(false);
-    }
 
     async function transferERC721() {
         if (!isAddress(erc721ContractAddress)) {
@@ -436,7 +388,7 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         }
 
         // check if the contract owns the token id
-        const nftContract = await getContract(props.provider, erc721ContractAddress, "/MOCKERC721.json") as IERC721;
+        const nftContract = await getContract(props.provider, erc721ContractAddress, "/ERC721.json") as IERC721;
         const currentOwner = await nftContract.ownerOf(transferERC721TokenId);
 
         if (currentOwner !== smartContractWallet) {
@@ -464,7 +416,7 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
             return;
         }
 
-        const nftContract = await getContract(props.provider, erc721ContractAddress, "/MOCKERC721.json") as IERC721;
+        const nftContract = await getContract(props.provider, erc721ContractAddress, "/ERC721.json") as IERC721;
         let errorOccured = false;
         if (approveForAllChecked) {
             const isApproved = await nftContract.isApprovedForAll(smartContractWallet, approveERC721To).catch(err => {
@@ -518,7 +470,7 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         }
         let errorOccured = false;
         const bunnyWallet = await getContract(props.provider, smartContractWallet, "/BunnyWallet.json") as BunnyWallet;
-        const nftContract = await getContract(props.provider, erc721ContractAddress, "/MOCKERC721.json") as IERC721;
+        const nftContract = await getContract(props.provider, erc721ContractAddress, "/ERC721.json") as IERC721;
 
         if (approveForAllChecked) {
 
@@ -556,6 +508,55 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
 
     }
 
+    async function getERC721Balance() {
+        if (!isAddress(erc721ContractAddress)) {
+            props.displayError("Invalid Contract Address");
+            return;
+        }
+        const nftContract = await getContract(props.provider, erc721ContractAddress, "/ERC721.json") as IERC721;
+        let errorOccured = false;
+        const balance = await nftContract.balanceOf(smartContractWallet).catch(err => {
+            props.displayError("Unable to fetch balance")
+            errorOccured = true;
+        });
+
+        if (errorOccured || balance === undefined) {
+            return;
+        }
+
+        setERC721Balance(`The Smart Contract Wallet owns ${balance} ${balance.toNumber() === 1 ? "NFT" : "NFTs"}`)
+    }
+
+    async function callResetCommitment() {
+        //Check if the commitment is a valid bytes32
+        //TODO: Test with Wallet App!
+
+        if (newCommitment === "") {
+            props.displayError("Please scan the commitment from the app!")
+            return;
+        }
+
+        let formatted;
+
+        try {
+            formatted = utils.formatBytes32String(newCommitment)
+        } catch (err) {
+            props.displayError("Invalid Commitment Format")
+
+        }
+        if (formatted === undefined) {
+            return;
+        }
+        if (!utils.isBytesLike(formatted)) {
+            props.displayError("Invalid Commitment");
+            return;
+        }
+
+        const bunnyWallet = await getContract(props.provider, smartContractWallet, "/BunnyWallet.json") as BunnyWallet;
+
+        const receipt = await resetCommitment(bunnyWallet, newCommitment.toString());
+        setCurrentCommitment(newCommitment);
+    }
 
 
 
@@ -571,13 +572,6 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
             case "approveERC20":
                 setFormHelperText("Approve Spending from the Bunny Wallet");
                 break;
-            case "NFTBalance":
-                setFormHelperText("Check the NFT history of the Wallet");
-
-                //TODO: I need to fetch the onERC721Transferred Data
-                await getOnERC721ReceivedData();
-
-                break;
             case "transferERC721":
                 setFormHelperText("Transfer your NFT to another wallet");
                 break;
@@ -585,7 +579,17 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
                 setFormHelperText("Approve your NFT to be transferred by others");
                 break;
             case "resetCommitment":
-                setFormHelperText("If your wallet was lost you can reset the note")
+
+                // I can fetch the current commitment here
+                const bunnyWallet = await getContract(props.provider, smartContractWallet, "/BunnyWallet.json");
+                const commitment = await bunnyWallet.commitment().catch(err => {
+                    props.displayError("Unable to fetch current commitment!")
+                });
+                if (commitment === undefined) {
+                    return;
+                }
+                setCurrentCommitment(commitment);
+                setFormHelperText("If your old wallet was lost you can reset the note")
                 break;
             default:
                 break;
@@ -692,19 +696,13 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
                     approveERC20={approveERC20}
                     getERC20Allowance={getERC20Allowance}
                 ></ApproveERC20Elements>
-            case "NFTBalance":
-                return <NftBalanceElements
-                    netId={netId}
-                    nftDataLoading={nftDataLoading}
-                    nftData={nftData}
-                    nftAddressToCheck={nftAddressToCheck}
-                    nftAddressToCheckSetter={nftAddressToCheckSetter}
-                ></NftBalanceElements>
             case "transferERC721":
                 return <NftTransferElements
                     netId={netId}
                     erc721ContractAddressSetter={erc721ContractAddressSetter}
                     erc721Address={erc721ContractAddress}
+                    erc721Balance={erc721Balance}
+                    getERC721Balance={getERC721Balance}
                     transferERC721To={transferERC721To}
                     transferERC721ToSetter={transferERC721ToSetter}
                     transferERC721TokenId={transferERC721TokenId}
@@ -716,9 +714,10 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
                     netId={netId}
                     erc721Address={erc721ContractAddress}
                     erc721ContractAddressSetter={erc721ContractAddressSetter}
+                    erc721Balance={erc721Balance}
+                    getERC721Balance={getERC721Balance}
                     approveERC721To={approveERC721To}
                     approveERC721ToSetter={approveERC721ToSetter}
-                    erc721Allowance={erc721Allowance}
                     getERC721Allowance={getERC721Allowance}
                     approveForAllChecked={approveForAllChecked}
                     approveForAllCheckedSetter={approveForAllCheckedSetter}
@@ -731,7 +730,15 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
                     isApprovedForAll={isApprovedForAll}
                 ></ApproveNFTElements>
             case "resetCommitment":
-                return <ResetCommitmentElements></ResetCommitmentElements>
+                return <ResetCommitmentElements
+                    netId={netId}
+                    displayError={props.displayError}
+                    newCommitment={newCommitment}
+                    newCommitmentSetter={newCommitmentSetter}
+                    setNewCommitment={setNewCommitment}
+                    resetCommitment={callResetCommitment}
+                    currentCommitment={currentCommitment}
+                ></ResetCommitmentElements>
             default:
                 break;
         }

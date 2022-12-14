@@ -2,6 +2,7 @@ import { styled, AppBar, Box, Button, Grid, Paper, TextField, Toolbar, Typograph
 import * as React from "react";
 import { AvailableERC20Token, getAvailableERC20Tokens } from "../../web3/web3";
 import WalletIcon from "@mui/icons-material/AccountBalanceWallet"
+import ScanNoteButton from "../QRScannerModal";
 
 const Img = styled('img')({
     margin: 'auto',
@@ -31,16 +32,16 @@ const RowSpaceBetween = styled("div")({
 })
 
 const Display = styled("div")({
-    margin: "auto"
+    margin: "auto",
+    top: "20%",
+    marginLeft: "11px"
 })
-
 
 const ActionSelector = styled("div")({
     textAlign: "center",
     marginTop: "10px",
     marginBottom: "20px"
 })
-
 
 
 
@@ -98,7 +99,6 @@ export function WalletConnected(props: any) {
                         <MenuItem value="transferEth">Transfer {props.walletCurrency}</MenuItem>
                         <MenuItem value="transferERC20">Transfer Token</MenuItem>
                         <MenuItem value="approveERC20">Approve Token Spend</MenuItem>
-                        <MenuItem value="NFTBalance">NFT History</MenuItem>
                         <MenuItem value="transferERC721">Transfer NFT</MenuItem>
                         <MenuItem value="approveERC721">Approve NFT</MenuItem>
                         <MenuItem value="resetCommitment">Reset Commitment</MenuItem>
@@ -144,7 +144,7 @@ export function TransferERC20Elements(props: any) {
                 <TextField key="transferERC20AmountKey" value={props.transferERC20Amount} onChange={props.transferERC20AmountSetter} type={"number"} label="Transfer Amount" variant="filled"></TextField>
                 <Button onClick={props.setTransferERC20AmountMax} sx={{ top: "20%" }} variant="text">Max</Button>
 
-                <Display sx={{ top: "20%" }}>{props.formattedERC20Balance}</Display>
+                <Display>{props.formattedERC20Balance}</Display>
                 <Button onClick={props.transferERC20} variant="contained">Transfer</Button>
             </RowSpaceBetween>
         </PaddedDiv>
@@ -220,42 +220,25 @@ export function ApproveERC20Elements(props: any) {
         <PaddedDiv>
             <RowSpaceBetween>
                 <TextField key="approveERC20AmountKey" value={props.approveERC20Amount} onChange={props.approveERC20AmountSetter} type="number" label="Approve Amount" variant="filled"></TextField>
-                <Display sx={{ top: "20%" }}>{props.erc20Allowance}</Display>
+                <Display>{props.erc20Allowance}</Display>
                 <Button sx={{ width: "93px" }} onClick={props.approveERC20} variant="contained">Approve</Button>
             </RowSpaceBetween>
         </PaddedDiv>
     </Box>
 }
 
-export const NftBalanceElements = (props: any) => {
-    const dataDisplay = () => props.nftData.map((d) => <div key={d.tokenContract.toString() + d.tokenId.toString()}>
-        {d.tokenContract.toString()} {" "}
-        {d.tokenId.toString()} {" "}
-        {d.tokenURI.toString()}{" "}
-    </div>)
-
-    return <Box>
-        <PaddedDiv>
-            <Center>
-                <div>
-                    {props.nftDataLoading ? <CircularProgress></CircularProgress> : <Box>{dataDisplay()}</Box>}
-                </div>
-                <Box>
-                    <Typography component="p" variant="body1" >If your NFT does not show up in the list, you can search for it.</Typography>
-                </Box>
-                <div>
-                    <TextField key="searchForNFTAddress" label="Contract Address"></TextField>
-                    <TextField key="searchForNFTTokenId" label="TokenId (optional)"></TextField>
-                    <Button variant="outlined" sx={{ height: "100%" }}>Check Balance</Button>
-                </div>
-            </Center>
-        </PaddedDiv>
-    </Box>
-}
 export function NftTransferElements(props: any) {
     return <Box>
         <PaddedDiv>
-            <TextField value={props.erc721Address} onChange={props.erc721ContractAddressSetter} key="ERC721ContractAddress" variant="filled" sx={{ marginBottom: "20p", width: "100%" }} label="NFT Contract Address" ></TextField>
+            <RowSpaceBetween>
+                <TextField value={props.erc721Address} onChange={props.erc721ContractAddressSetter} key="ERC721ContractAddress" variant="filled" sx={{ marginBottom: "20p", width: "100%" }} label="NFT Contract Address" ></TextField>
+                <Button onClick={props.getERC721Balance} sx={{ width: "100px" }} variant="outlined">Balance</Button>
+            </RowSpaceBetween>
+        </PaddedDiv>
+        <PaddedDiv>
+            <Display key="displayNFTbalance" >
+                {props.erc721Balance}
+            </Display>
         </PaddedDiv>
         <PaddedDiv>
             <TextField value={props.transferERC721To} onChange={props.transferERC721ToSetter} key="transferERC721TokenTo" variant="filled" sx={{ marginBottom: "20p", width: "100%" }} label="Transfer To" ></TextField>
@@ -271,16 +254,24 @@ export function NftTransferElements(props: any) {
 export function ApproveNFTElements(props: any) {
     return <Box>
         <PaddedDiv>
-            <TextField value={props.erc721Address} onChange={props.erc721ContractAddressSetter} key="ERC721ContractAddress" variant="filled" sx={{ marginBottom: "20p", width: "100%" }} label="NFT Contract Address" ></TextField>
+            <RowSpaceBetween>
+                <TextField value={props.erc721Address} onChange={props.erc721ContractAddressSetter} key="ERC721ContractAddress" variant="filled" sx={{ marginBottom: "20p", width: "100%" }} label="NFT Contract Address" ></TextField>
+                <Button onClick={props.getERC721Balance} sx={{ width: "100px" }} variant="outlined">Balance</Button>
+            </RowSpaceBetween>
+        </PaddedDiv>
+        <PaddedDiv>
+            <Display key="displayNFTbalance">
+                {props.erc721Balance}
+            </Display>
         </PaddedDiv>
         <PaddedDiv>
             <RowSpaceBetween>
-                <TextField value={props.approveERC721To} onChange={props.approveERC721ToSetter} key="approveERC721TokenTo" variant="filled" sx={{ marginBottom: "20p", width: "100%" }} label="Spender" ></TextField>
+                <TextField value={props.approveERC721To} onChange={props.approveERC721ToSetter} key="approveERC721TokenTo" variant="filled" sx={{ marginBottom: "20px", width: "100%" }} label="Spender" ></TextField>
                 <Button onClick={props.getERC721Allowance} sx={{ width: "100px" }} variant="outlined">Allowance</Button>
             </RowSpaceBetween>
         </PaddedDiv>
         <PaddedDiv>
-            <Display key="displayApprovalNFT" sx={{ top: "20%" }}>
+            <Display key="displayApprovalNFT" >
                 {props.approveForAllChecked ? props.isApprovedForAll : props.isTokenIdApproved}
             </Display>
         </PaddedDiv>
@@ -297,4 +288,21 @@ export function ApproveNFTElements(props: any) {
     </Box>
 }
 
-export const ResetCommitmentElements = () => <React.Fragment>Reset commitment elements</React.Fragment>
+export const ResetCommitmentElements = (props: any) =>
+    <Box>
+        <PaddedDiv>
+            <Typography component="p" variant="subtitle1">Commitment: {props.currentCommitment}</Typography>
+        </PaddedDiv>
+        <PaddedDiv>
+            <RowSpaceBetween>
+                <ScanNoteButton setData={props.setNewCommitment} handleError={props.displayError}></ScanNoteButton>
+                <TextField value={props.newCommitment} onChange={props.newCommitmentSetter} key="newCommitmentField" variant="filled" sx={{ width: "100%" }} label="New Commitment" disabled></TextField>
+                <Button onClick={props.resetCommitment} variant="contained">Reset</Button>
+            </RowSpaceBetween>
+        </PaddedDiv>
+        <PaddedDiv>
+            <RowSpaceBetween>
+                <Typography component={"p"} variant="subtitle1">Scan the Wallet Note Commitment from App to reset the commitment!</Typography>
+            </RowSpaceBetween>
+        </PaddedDiv>
+    </Box>
