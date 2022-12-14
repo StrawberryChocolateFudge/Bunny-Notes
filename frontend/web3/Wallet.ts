@@ -44,11 +44,3 @@ export async function getTokenBalance(contract: BunnyWallet, token: string) {
 export async function getOwner(contract: BunnyWallet) {
     return await contract.owner();
 }
-
-export async function getReceivedERC721DataIndex(contract: BunnyWallet) {
-    return await contract.receivedERC721DataIndex();
-}
-
-export async function getERC721ReceivedData(contract: BunnyWallet, index: any) {
-    return await contract.receivedERC721Data(index);
-}
