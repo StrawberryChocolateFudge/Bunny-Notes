@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "./ERC20Notes.sol";
 import "./ETHNotes.sol";
 import "./BunnyNotes.sol";
@@ -36,7 +36,7 @@ struct ERC721ReceivedData {
 }
 
 // A Bunny wallet that needs to be deployed per user!
-contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
+contract BunnyWallet is ReentrancyGuardUpgradeable, ERC721Holder {
     using SafeMath for uint256;
     // Users can deposit into the bunny wallet tokens, eth or interact with bunny notes
 
@@ -47,10 +47,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
     uint256 public totalWeiReceived;
 
     mapping(bytes32 => bool) public nullifierHashes;
-
-    // The NFT transfer history of the contract is pushed into this array!
-    mapping(uint256 => ERC721ReceivedData) public receivedERC721Data;
-    uint256 public receivedERC721DataIndex;
 
     event InitializedContract(
         address _ownerVerifier,
@@ -91,13 +87,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
         uint256 tokenId,
         bool forAll,
         bool approved
-    );
-
-    event ERC721Received(
-        address operator,
-        address from,
-        uint256 tokenId,
-        bytes data
     );
 
     event DepositBunnyNoteByOwner(
@@ -182,25 +171,6 @@ contract BunnyWallet is ReentrancyGuardUpgradeable, IERC721Receiver {
                 _transferAmount
             )
         );
-    }
-
-    function onERC721Received(
-        address operator,
-        address from,
-        uint256 tokenId,
-        bytes calldata data
-    ) external override returns (bytes4) {
-        emit ERC721Received(operator, from, tokenId, data);
-        ERC721ReceivedData memory tokenReceived = ERC721ReceivedData(
-            msg.sender,
-            tokenId
-        );
-        receivedERC721DataIndex += 1;
-        receivedERC721Data[receivedERC721DataIndex] = tokenReceived;
-        return
-            bytes4(
-                keccak256("onERC721Received(address,address,uint256,bytes)")
-            );
     }
 
     // The tokens are passed in per function, so I don't store all the available tokens
