@@ -10,6 +10,8 @@ cp abis/ETHNotes.json dist/ETHNotes.json
 cp abis/BunnyWallet.json dist/BunnyWallet.json
 cp abis/MOCKERC20.json dist/MOCKERC20.json
 cp abis/MOCKERC721.json dist/MOCKERC721.json
+cp abis/ERC20.json dist/ERC20.json
+cp abis/ERC721.json dist/ERC721.json
 
 rm -rf dist/imgs
 
