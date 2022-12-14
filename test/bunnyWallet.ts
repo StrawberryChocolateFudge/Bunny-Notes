@@ -408,12 +408,6 @@ describe("Bunny Wallet", async function () {
         expect(await NFT.balanceOf(bunnyWallet.address)).to.equal(4);
         expect(await NFT.balanceOf(alice.address)).to.equal(1);
 
-        // One was transferred with safe transfer so index is 1 
-        const index = await bunnyWallet.receivedERC721DataIndex();
-        expect(index).to.equal(1);
-        const receivedData = await bunnyWallet.receivedERC721Data(index);
-        expect(receivedData.tokenContract).to.equal(NFT.address);
-        expect(receivedData.tokenId).to.equal(0);
 
         // transferERC721Relayed
         const zkOwner = await prepareRelayProof(
