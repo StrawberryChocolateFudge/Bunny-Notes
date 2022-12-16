@@ -5,7 +5,8 @@ import { downloadPDF } from "../pdf";
 import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
 import { ethers } from "ethers";
-import { bunnyNotesCommitments, bunnyNotesDeposit, ERC20Approve, getChainId, getContract, getFee, netId, requestAccounts, USDTM100ADDRESS_DONAU, USDTMCONTRACTADDRESS_DONAU } from "../web3/web3";
+import { bunnyNotesCommitments, bunnyNotesDeposit, ERC20Approve, getChainId, getContract, getFee, getIsContract, netId, requestAccounts, USDTM100ADDRESS_DONAU, USDTMCONTRACTADDRESS_DONAU } from "../web3/web3";
+import { approveERC20SpendByOwner } from "../web3/Wallet";
 
 interface DownloadNoteProps {
     provider: any,
@@ -18,6 +19,8 @@ interface DownloadNoteProps {
     showApproval: boolean
     setShowApproval: (to: boolean) => void;
     setRenderDownloadPage: (to: boolean) => void;
+    checkForBunnyWallet: boolean;
+    myAddress: string;
 }
 
 
@@ -72,41 +75,19 @@ export function downloadNote(props: DownloadNoteProps) {
                         </Grid>
                     </Grid>
                 </Grid>
-                <Typography sx={{ fontSize: 8, overflow: "scroll" }} variant="subtitle2" component="small">
+                <Typography sx={{ fontSize: 5, overflow: "scroll" }} variant="subtitle2" component="small">
                     {noteString}
                 </Typography>
+
             </Paper>
         </Grid>
     }
 
-    const depositClick = async () => {
-
-        // if download was not clicked, render errror
-        if (!props.downloadClicked) {
-            props.displayError("You need to download the Note before you can make a deposit!");
-            return;
-        }
-
-        // Now Deposit the USDTM
-        // if the selected currency is not USDT, I render error
-        if (noteDetails[1].currency !== "USDTM") {
-            props.displayError("We are on testnet. Currently only USDTM deposits are allowed!");
-            return;
-        }
-
-        // Check if we are on the correct network!
-        const chainId = await getChainId(props.provider);
-
-        if (chainId !== netId) {
-
-            props.displayError("You are on the wrong network!")
-            return;
-        }
-
+    const depositWithOwnerAddress = async () => {
+        //TODO: NOTE CONTRACT IS NOW HARDCODED IN!
+        //TODO: IMPLEMENT ETH NOTES TOO
         if (props.showApproval) {
-
             // approve the spend, need to approve for the fee
-
             const contract = await getContract(props.provider, USDTM100ADDRESS_DONAU, "/ERC20Notes.json");
 
             const fee = await getFee(contract);
@@ -128,13 +109,11 @@ export function downloadNote(props: DownloadNoteProps) {
 
             const notesContract = await getContract(props.provider, USDTM100ADDRESS_DONAU, "/ERC20Notes.json");
 
-
             const address = await requestAccounts(props.provider);
 
             const isCashNote = props.cardType === "Cash Note" ? true : false;
 
             const deposit = noteDetails[1].deposit;
-
 
             // CHECK if the commitment exists already to stop the deposit!
 
@@ -146,6 +125,85 @@ export function downloadNote(props: DownloadNoteProps) {
             }
 
             await bunnyNotesDeposit(notesContract, toNoteHex(deposit.commitment), isCashNote, address);
+        }
+    }
+
+    const depositWithBunnyWallet = async () => {
+        const address = await requestAccounts(props.provider);
+
+        const bunnyWallet = await getContract(props.provider, props.myAddress, "/BunnyWallet.json");
+
+        const owner = await bunnyWallet.owner();
+
+        if (owner !== address) {
+            props.displayError("You don't own the Bunny Wallet");
+            return;
+        }
+
+        //TODO: Implement ETH NOTES TOO
+
+        if (props.showApproval) {
+            // approve the spend using the bunny wallet, you must be the owner of the wallet
+
+            const erc20Notes = await getContract(props.provider, USDTM100ADDRESS_DONAU, "/ERC20Notes.json");
+
+            const fee = await getFee(erc20Notes);
+            const formattedFee = ethers.utils.formatEther(fee);
+
+            const approveAmount = parseFloat(formattedFee) + parseFloat(noteDetails[1].amount);
+
+            props.setShowApproval(false);
+            //TODO: NOW USING HARDCODED USDTMADDRESS
+
+            const receipt = await approveERC20SpendByOwner(bunnyWallet, USDTMCONTRACTADDRESS_DONAU, USDTM100ADDRESS_DONAU, approveAmount.toString()).catch(err => {
+                props.setShowApproval(true);
+            });
+
+            //TODO: DO AN APPROVAL WITH THE BUNNY WALLET
+        } {
+            //TODO: DO A DEPOSIT WITH THE BUNNY WALLET
+
+
+        }
+
+    }
+
+
+    const depositClick = async () => {
+        let isContract = false;
+
+        if (props.checkForBunnyWallet) {
+            isContract = await getIsContract(props.provider, props.myAddress, props.displayError);
+        }
+
+        // if download was not clicked, render errror
+        if (!props.downloadClicked) {
+            props.displayError("You need to download the Note before you can make a deposit!");
+            return;
+        }
+
+        //TODO: This is for TESTNET ONLY!!
+        // if the selected currency is not USDT, I render error
+        if (noteDetails[1].currency !== "USDTM") {
+            props.displayError("We are on testnet. Currently only USDTM deposits are allowed!");
+            return;
+        }
+
+        // Check if we are on the correct network!
+        const chainId = await getChainId(props.provider);
+
+        if (chainId !== netId) {
+            //TODO: ADD SUPPORT FOR MULTIPLE NETWORK
+            //FOR EASY NETWORK PLUGGING
+            props.displayError("You are on the wrong network!")
+            return;
+        }
+
+        // BUNNY WALLET WILL HAVE A DIFFERENT APPROVAL AND DEPOSIT FUNCTION!!
+        if (!isContract) {
+            await depositWithOwnerAddress();
+        } else {
+            await depositWithBunnyWallet();
         }
     }
     const downloadClick = () => {
