@@ -23,6 +23,17 @@ export async function getChainId(provider): Promise<number> {
     return chainId
 }
 
+export async function getIsContract(provider: any, address: string, displayError: CallableFunction): Promise<boolean> {
+    try {
+        const code = await provider.getCode();
+        if (code !== "0x") return true;
+    } catch (err) {
+        displayError("Unable to determine address validity.");
+        return false;
+    }
+    return false;
+}
+
 export function doOnBoarding() {
     const onboarding = new MetaMaskOnboarding();
     onboarding.startOnboarding();
