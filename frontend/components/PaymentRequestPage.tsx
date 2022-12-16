@@ -15,17 +15,10 @@ import { getLoading } from "./LoadingIndicator";
 interface PaymentRequestPageProps extends Base {
 }
 
-const Column = styled("div")({
-    display: "flex",
-    flexDirection: "column"
+const IMG = styled("img")({
+    margin: "0 auto",
+    width: '150px'
 })
-
-const Row = styled("div")({
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-evenly"
-});
-
 
 export function PaymentRequestPage(props: PaymentRequestPageProps) {
     const { payTo, amount, currency } = useParams();
@@ -182,8 +175,8 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                     <Spacer></Spacer>
 
                     {loading ? getLoading() : (paymentDone ? <p>Done</p> : <Tooltip title="Pay with Cash Note">
-                        <Button onClick={paymentAction} variant="contained" sx={{ mr: 1 }}>
-                            Pay with Cash Note
+                        <Button onClick={paymentAction} sx={{ mr: 1 }}>
+                            <IMG src="/imgs/pay.svg" />
                         </Button>
                     </Tooltip>)}
                 </Box>
