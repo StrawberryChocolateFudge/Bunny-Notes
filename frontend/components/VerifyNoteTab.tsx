@@ -101,7 +101,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                                     <TextField autoComplete='off' value={props.noteString} onChange={noteStringSetter} fullWidth placeholder="Paste your Note Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                               </Grid>
                               <Grid item>
-                                    <ScanNoteButton setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
+                                    <ScanNoteButton dialogTitle='Scan a Bunny Note' setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
                               </Grid>
                         </Grid>
                   </Toolbar>
@@ -109,35 +109,39 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
             <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center" }}>
                   <Spacer></Spacer>
 
-                  {commitmentDetails === null ? (loading ? getLoading() : <Tooltip title="Verify the Note">
-                        <Button onClick={onVerify} sx={{ mr: 1 }}>
-                              <IMG src="/imgs/VerifyLogo.svg"/>
-                        </Button>
-                  </Tooltip>) : <React.Fragment>
-                        <Typography sx={{ textAlign: "center" }}>{commitmentDetails.validText}</Typography>
-                        <TableContainer component={Paper}>
-                              <Table sx={{ minWidth: 650 }} aria-label="Note details">
-                                    <TableBody>
-                                          <TableRow>
-                                                <TableCell align="left">Denomination:</TableCell>
-                                                <TableCell align="right">{commitmentDetails.denomination}</TableCell>
-                                          </TableRow>
-                                          <TableRow>
-                                                <TableCell align="left">Creator:</TableCell>
-                                                <TableCell align="right">{commitmentDetails.creator}</TableCell>
-                                          </TableRow>
-                                          <TableRow>
-                                                <TableCell align="left">recipient:</TableCell>
-                                                <TableCell align="right">{commitmentDetails.recipient}</TableCell>
-                                          </TableRow>
-                                          <TableRow>
-                                                <TableCell align="left">Note Type:</TableCell>
-                                                <TableCell align="right">{commitmentDetails.noteType ? "Cash Note" : "Gift Card"}</TableCell>
-                                          </TableRow>
-                                    </TableBody>
-                              </Table>
-                        </TableContainer>
-                  </React.Fragment>}
+                  {commitmentDetails === null ?
+                        (loading ? getLoading() : <React.Fragment>
+                              <Typography component="p" variant="subtitle1">Verify a Bunny Note. You can check if it's still valid and contains a balance!</Typography>
+                              <Tooltip title="Verify the Note">
+                                    <Button onClick={onVerify} sx={{ mr: 1 }}>
+                                          <IMG src="/imgs/VerifyLogo.svg" />
+                                    </Button>
+                              </Tooltip> </React.Fragment>)
+                        : <React.Fragment>
+                              <Typography sx={{ textAlign: "center" }}>{commitmentDetails.validText}</Typography>
+                              <TableContainer component={Paper}>
+                                    <Table sx={{ minWidth: 650 }} aria-label="Note details">
+                                          <TableBody>
+                                                <TableRow>
+                                                      <TableCell align="left">Denomination:</TableCell>
+                                                      <TableCell align="right">{commitmentDetails.denomination}</TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                      <TableCell align="left">Creator:</TableCell>
+                                                      <TableCell align="right">{commitmentDetails.creator}</TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                      <TableCell align="left">recipient:</TableCell>
+                                                      <TableCell align="right">{commitmentDetails.recipient}</TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                      <TableCell align="left">Note Type:</TableCell>
+                                                      <TableCell align="right">{commitmentDetails.noteType ? "Cash Note" : "Gift Card"}</TableCell>
+                                                </TableRow>
+                                          </TableBody>
+                                    </Table>
+                              </TableContainer>
+                        </React.Fragment>}
             </Box>
       </Paper>
 }
