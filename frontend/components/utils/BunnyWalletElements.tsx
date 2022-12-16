@@ -1,7 +1,6 @@
 import { styled, AppBar, Box, Button, Grid, Paper, TextField, Toolbar, Typography, FormControl, InputLabel, Select, SelectChangeEvent, MenuItem, FormHelperText, Autocomplete, createFilterOptions, CircularProgress, FormGroup, FormControlLabel, Checkbox, Switch } from "@mui/material";
 import * as React from "react";
 import { AvailableERC20Token, getAvailableERC20Tokens } from "../../web3/web3";
-import WalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import ScanNoteButton from "../QRScannerModal";
 
 const Img = styled('img')({
@@ -56,10 +55,10 @@ export function WalletNotConnected(props: any) {
             <Toolbar>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item>
-                        <WalletIcon color="inherit" sx={{ display: 'block' }} />
+                        <ScanNoteButton dialogTitle='Scan a Bunny Wallet Address' setData={props.setSmartContractWallet} handleError={props.displayError}></ScanNoteButton>
                     </Grid>
                     <Grid item xs>
-                        <TextField autoComplete='off' value={props.smartContractWallet} onChange={props.walletAddressSetter} fullWidth placeholder="Paste your Smart Contract Wallet Address Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
+                        <TextField autoComplete='off' value={props.smartContractWallet} onChange={props.walletAddressSetter} fullWidth placeholder="Paste your Bunny Wallet Address Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                     </Grid>
                     <Grid item>
                         <Button onClick={props.connectButtonAction} variant="contained">Connect</Button>
@@ -295,7 +294,7 @@ export const ResetCommitmentElements = (props: any) =>
         </PaddedDiv>
         <PaddedDiv>
             <RowSpaceBetween>
-                <ScanNoteButton setData={props.setNewCommitment} handleError={props.displayError}></ScanNoteButton>
+                <ScanNoteButton dialogTitle="Scan the Bunny Wallet Commitment" setData={props.setNewCommitment} handleError={props.displayError}></ScanNoteButton>
                 <TextField value={props.newCommitment} onChange={props.newCommitmentSetter} key="newCommitmentField" variant="filled" sx={{ width: "100%" }} label="New Commitment" disabled></TextField>
                 <Button onClick={props.resetCommitment} variant="contained">Reset</Button>
             </RowSpaceBetween>
