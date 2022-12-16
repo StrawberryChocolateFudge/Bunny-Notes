@@ -11,7 +11,7 @@ export default function HelpPage() {
 
     return <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <Header withTabs={false}></Header>
-        <Box component="main" sx={{ flex: 1, py: 6, px: 4, bgcolor: '#eaeff1', display: "flex", flexDirection: "column" }}>
+        <Box component="main" sx={{ flex: 1, bgcolor: '#eaeff1', display: "flex", flexDirection: "column" }}>
             {Img("/Bunny-Note.jpg", "200px")}
             <hr />
             {Title("Help")}
