@@ -142,9 +142,8 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
 
     return <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Header withTabs={false} />
-        <Box component="main" sx={{ flex: 1, py: 6, px: 4, bgcolor: '#eaeff1' }}>
-            <Spacer></Spacer>
-            <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
+        <Box component="main" sx={{ flex: 1 }}>
+            <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden', marginTop: "30px" }}>
                 <AppBar
                     position="static"
                     color="default"
@@ -160,7 +159,7 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                                 <TextField autoComplete="off" value={note} onChange={noteSetter} fullWidth placeholder="Paste your Note Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                             </Grid>
                             <Grid item>
-                                <ScanNoteButton setData={setData} handleError={props.displayError}></ScanNoteButton>
+                                <ScanNoteButton dialogTitle="Scan a Cash Note" setData={setData} handleError={props.displayError}></ScanNoteButton>
                             </Grid>
                         </Grid>
                     </Toolbar>
@@ -189,9 +188,10 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                     </Tooltip>)}
                 </Box>
             </Paper >
+            <Box component="footer" sx={{ p: 2 }}>
+                <Copyright />
+            </Box>
         </Box>
-        <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
-            <Copyright />
-        </Box>
+
     </Box>
 }
