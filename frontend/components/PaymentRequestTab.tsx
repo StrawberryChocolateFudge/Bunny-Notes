@@ -14,6 +14,7 @@ import { Base } from "./Base";
 import { useNavigate } from "react-router-dom";
 import { onBoardOrGetProvider, requestAccounts } from "../web3/web3";
 import { ethers } from "ethers";
+import ScanNoteButton from "./QRScannerModal";
 
 export type PaymentRequest = {
     price: string,
@@ -39,6 +40,10 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
         props.setPaymentRequest({ ...props.paymentRequest, payTo: event.target.value })
     }
 
+    const scanPayToAddress = (d: string) => {
+        props.setPaymentRequest({ ...props.paymentRequest, payTo: d });
+    }
+    
     const importAddress = async () => {
         if (props.provider === null) {
             const provider = await onBoardOrGetProvider(props.displayError);
@@ -79,7 +84,7 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
             <Toolbar>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item>
-                        <WalletIcon color="inherit" sx={{ display: 'block' }} />
+                        <ScanNoteButton dialogTitle='Scan a Wallet Address' setData={scanPayToAddress} handleError={props.displayError}></ScanNoteButton>
                     </Grid>
                     <Grid item xs>
                         <TextField autoComplete="off" type="text" value={props.paymentRequest.payTo} onChange={setPayToAddress} fullWidth placeholder="Paste your Address Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
