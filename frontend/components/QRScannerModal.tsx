@@ -56,6 +56,7 @@ export interface ScanNoteDialogProps {
     onClose: () => void;
     setData: (d: string) => void;
     handleError: (msg: string) => void;
+    dialogTitle: string;
 }
 
 function ScanNoteDialog(props: ScanNoteDialogProps) {
@@ -67,7 +68,7 @@ function ScanNoteDialog(props: ScanNoteDialogProps) {
 
     return (
         <Dialog onClose={handleClose} open={open}>
-            <DialogTitle>Scan a Bunny Note</DialogTitle>
+            <DialogTitle>{props.dialogTitle}</DialogTitle>
             <QRReader handleClose={handleClose} setData={props.setData} handleError={props.handleError}></QRReader>
         </Dialog>
     );
@@ -76,6 +77,7 @@ function ScanNoteDialog(props: ScanNoteDialogProps) {
 interface ScanNoteButtonProps {
     setData: (d: string) => void;
     handleError: (msg: string) => void;
+    dialogTitle: string;
 }
 
 export default function ScanNoteButton(props: ScanNoteButtonProps) {
@@ -101,6 +103,7 @@ export default function ScanNoteButton(props: ScanNoteButtonProps) {
                 onClose={handleClose}
                 setData={props.setData}
                 handleError={props.handleError}
+                dialogTitle={props.dialogTitle}
             />
         </div>
     );
