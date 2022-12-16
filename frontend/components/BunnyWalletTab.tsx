@@ -748,6 +748,7 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         return <WalletNotConnected
             smartContractWallet={smartContractWallet}
             walletAddressSetter={walletAddressSetter}
+            setSmartContractWallet={setSmartContractWallet}
             connectButtonAction={connectButtonAction}
         ></WalletNotConnected>
     }
