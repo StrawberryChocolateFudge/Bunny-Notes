@@ -4,13 +4,10 @@ import { styled } from "@mui/material";
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import PurchaseGiftCardTab from './PurchaseGiftCardTab';
 import Header from './Header';
-import PurchaseCashNote from './PurchaseCashNote';
 import VerifyNoteTab from './VerifyNoteTab';
 import CashOutGiftCardTab from './CashOutGiftCardTab';
 import PaymentRequestTab from './PaymentRequestTab';
-import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from '@mui/material/Snackbar';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
@@ -21,11 +18,11 @@ import {
     Routes,
     Route,
 } from "react-router-dom";
-import { TestnetInfo } from './TestnetInfo';
 import { PaymentRequestPage } from './PaymentRequestPage';
 import { NotFoundPage } from './404page';
 import HelpPage from './HelpPage';
 import BunnyWalletTab from './BunnyWalletTab';
+import BunnyNotesTab from './BunnyNotesTab';
 
 
 export interface Base {
@@ -89,9 +86,6 @@ export default function Base() {
         setSelectedTab(newValue);
     };
 
-
-
-
     const genericProps = {
         displayError: openSnackbar,
         provider,
@@ -113,16 +107,14 @@ export default function Base() {
     const getTabContent = () => {
         switch (selectedTab) {
             case 0:
-                return <PurchaseGiftCardTab {...genericProps} />
+                return <BunnyNotesTab {...genericProps} />
             case 1:
-                return <PurchaseCashNote {...genericProps} />
-            case 2:
                 return <VerifyNoteTab {...genericProps} {...noteStringProps} />
-            case 3:
+            case 2:
                 return <CashOutGiftCardTab {...genericProps} {...noteStringProps}></CashOutGiftCardTab>
-            case 4:
+            case 3:
                 return <PaymentRequestTab {...genericProps} {...paymentRequestProps}></PaymentRequestTab>;
-            case 5:
+            case 4:
                 return <BunnyWalletTab {...genericProps}></BunnyWalletTab>
             default:
                 break;
@@ -131,9 +123,7 @@ export default function Base() {
 
     const mainRoute = () => <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Header withTabs={true} selectedTab={selectedTab} onTabToggle={onTabToggle} />
-        <Box component="main" sx={{ flex: 1, py: 6, px: 4 }}>
-            {/* <TestnetInfo {...genericProps}></TestnetInfo> */}
-            <Spacer></Spacer>
+        <Box component="main" sx={{ flex: 1,}}>
             {getTabContent()}
         </Box>
         <Box component="footer" sx={{ p: 2 }}>
