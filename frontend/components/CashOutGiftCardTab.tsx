@@ -13,14 +13,14 @@ import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { generateZKProof, packSolidityProof } from '../zkp/generateProof';
 import { bunnyNotesWithdrawGiftCard, getChainId, getContract, getContractAddressFromCurrencyDenomination, netId, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
-import { styled } from '@mui/material';
+import { styled, Typography } from '@mui/material';
 interface CashOutGiftCardTabProps extends Base {
     noteString: string
     setMyNoteString: (newValue: string) => void;
 }
 const IMG = styled("img")({
-      margin: "0 auto",
-      width: "200px"
+    margin: "0 auto",
+    width: "200px"
 })
 
 export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
@@ -87,15 +87,16 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
                         <TextField autoComplete='off' value={props.noteString} onChange={noteStringSetter} fullWidth placeholder="Paste your Note Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                     </Grid>
                     <Grid item>
-                        <ScanNoteButton setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
+                        <ScanNoteButton dialogTitle="Scan a Gift Card" setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
                     </Grid>
                 </Grid>
             </Toolbar>
         </AppBar>
         <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center" }}>
+            <Typography component="p" variant="subtitle1">You can withdraw a Gift Card's balance to your wallet.</Typography>
             <Tooltip title="Cash out the Gift Card">
                 <Button onClick={cashOutAction} sx={{ mr: 1 }}>
-                    <IMG src="/imgs/CashOut.svg"/>
+                    <IMG src="/imgs/CashOut.svg" />
                 </Button>
             </Tooltip>
         </Box>
