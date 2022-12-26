@@ -44,6 +44,8 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
 
     const [noteDetails, setNoteDetails] = React.useState<NoteDetails | undefined>(undefined);
 
+    const [noteAddresses, setNoteAddresses] = React.useState<[string, string]>(["erc20", "noteContract"]);
+
     const [qrCodeDataUrl, setQRCodeDataUrl] = React.useState("");
 
     const [downloadClicked, setDownloadClicked] = React.useState(false);
@@ -105,21 +107,23 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
         }
     }
 
-    const handleSelectGiftCard = async (denomination: string, currency: string, cardType: CardType) => {
+    const handleSelectGiftCard = async (denomination: string, currency: string, cardType: CardType, addresses: [string, string]) => {
         const res = await handleCardSelectWithProvider(props, denomination, currency, cardType)
 
         if (res !== false) {
             setRenderDownloadPage(true);
             setNoteDetails(res);
+            setNoteAddresses(addresses);
         }
     }
 
-    const handleSelectCashNote = async (denomination: string, currency: string, cardType: CardType) => {
+    const handleSelectCashNote = async (denomination: string, currency: string, cardType: CardType, addresses: [string, string]) => {
         const res = await handleCardSelectWithProvider(props, denomination, currency, cardType)
 
         if (res !== false) {
             setRenderDownloadPage(true);
             setNoteDetails(res);
+            setNoteAddresses(addresses);
         }
     }
 
@@ -128,7 +132,11 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
     }
 
     if (renderDownloadPage) {
-        return downloadNote({ myAddress: props.myAddress, checkForBunnyWallet, setRenderDownloadPage, showApproval, setShowApproval, cardType, noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError, provider: props.provider })
+        return downloadNote({ selectedNetwork: props.selectedNetwork, noteAddresses, myAddress: props.myAddress, checkForBunnyWallet, setRenderDownloadPage, showApproval, setShowApproval, cardType, noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError, provider: props.provider })
+    }
+
+    if (props.selectedNetwork === "") {
+        return <React.Fragment></React.Fragment>
     }
 
     return (
@@ -168,8 +176,6 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
                     </Grid>
                 </Toolbar>
             </AppBar>
-
-
             <Center>
                 <Stack justifyContent={"center"} direction="row" spacing={1} alignItems={"center"}>
                     <GiftCardIMG sx={{
