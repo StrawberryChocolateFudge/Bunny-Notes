@@ -2,7 +2,7 @@ import MetaMaskOnboarding from "@metamask/onboarding";
 import { ethers } from "ethers";
 
 export const MAXCASHNOTESIZE = 100;
-export const netId = 0x405;
+// export const netId = 0x405;
 
 export const USDTMCONTRACTADDRESS_DONAU = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7";
 export const USDTM100ADDRESS_DONAU = "0xa756b2b52Ba893a6109561bC86138Cbb897Fb2e0";
