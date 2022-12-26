@@ -12,7 +12,7 @@ import { Base } from './Base';
 import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { generateZKProof, packSolidityProof } from '../zkp/generateProof';
-import { bunnyNotesWithdrawGiftCard, getChainId, getContract, getContractAddressFromCurrencyDenomination, netId, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
+import { bunnyNotesWithdrawGiftCard, getChainId, getContract, getContractAddressFromCurrencyDenomination,  onBoardOrGetProvider, requestAccounts } from '../web3/web3';
 import { styled, Typography } from '@mui/material';
 interface CashOutGiftCardTabProps extends Base {
     noteString: string
@@ -53,7 +53,7 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
         // Check if we are on the correct network!
         const chainId = await getChainId(props.provider);
 
-        if (chainId !== netId) {
+        if (chainId !== parseInt(props.selectedNetwork)) {
             props.displayError("You are on the wrong network!")
             return;
         }
@@ -81,14 +81,12 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
             <Toolbar>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item>
-                        <VerifyIcon color="inherit" sx={{ display: 'block' }} />
+                        <ScanNoteButton dialogTitle="Scan a Gift Card" setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
                     </Grid>
                     <Grid item xs>
                         <TextField autoComplete='off' value={props.noteString} onChange={noteStringSetter} fullWidth placeholder="Paste your Note Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                     </Grid>
-                    <Grid item>
-                        <ScanNoteButton dialogTitle="Scan a Gift Card" setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
-                    </Grid>
+
                 </Grid>
             </Toolbar>
         </AppBar>
