@@ -3,11 +3,17 @@ import * as React from "react";
 import { AvailableERC20Token, getAvailableERC20Tokens } from "../../web3/web3";
 import ScanNoteButton from "../QRScannerModal";
 
-const Img = styled('img')({
+const PlayStoreImg = styled('img')({
     margin: 'auto',
     display: 'block',
-    width: "200px"
+    width: "100px"
 });
+
+const ConnectIMG = styled("img")({
+    margin: "0 auto",
+    width: '150px',
+    marginTop: "10px"
+})
 
 const Center = styled('div')({
     margin: '0 auto',
@@ -60,16 +66,18 @@ export function WalletNotConnected(props: any) {
                     <Grid item xs>
                         <TextField autoComplete='off' value={props.smartContractWallet} onChange={props.walletAddressSetter} fullWidth placeholder="Paste your Bunny Wallet Address Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                     </Grid>
-                    <Grid item>
-                        <Button onClick={props.connectButtonAction} variant="contained">Connect</Button>
-                    </Grid>
+
                 </Grid>
             </Toolbar>
         </AppBar>
         <Box>
-            <Typography sx={{ padding: "5px", textAlign: "center" }} component={"h5"} variant="h5">Connect to the Bunny Wallet created with the Mobile App</Typography>
             <Center>
-                <Button sx={{ margin: "0 auto" }}><Img src="/imgs/get-it-on-google-play-badge.png" /></Button>
+                <Button onClick={props.connectButtonAction}><ConnectIMG src="/imgs/connect.svg" alt="Connect"></ConnectIMG></Button>
+
+            </Center>
+            <Typography sx={{ padding: "5px", textAlign: "center" }} component={"p"} variant="subtitle2">Connect to the Bunny Wallet created with the Mobile App</Typography>
+            <Center>
+                <Button sx={{ margin: "0 auto" }}><PlayStoreImg src="/imgs/get-it-on-google-play-badge.png" /></Button>
             </Center>
         </Box>
     </Paper>
