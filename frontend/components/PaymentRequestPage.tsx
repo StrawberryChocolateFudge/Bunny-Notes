@@ -176,7 +176,7 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
 
                     {loading ? getLoading() : (paymentDone ? <p>Done</p> : <Tooltip title="Pay with Cash Note">
                         <Button onClick={paymentAction} sx={{ mr: 1 }}>
-                            <IMG src="/imgs/pay.svg" />
+                            <IMG src="/imgs/pay.svg" alt="Pay" />
                         </Button>
                     </Tooltip>)}
                 </Box>
