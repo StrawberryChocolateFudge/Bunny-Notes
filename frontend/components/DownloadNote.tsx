@@ -5,7 +5,7 @@ import { downloadPDF } from "../pdf";
 import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
 import { ethers } from "ethers";
-import { bunnyNotesCommitments, bunnyNotesDeposit, ERC20Approve, getChainId, getContract, getFee, getIsContract, netId, requestAccounts, USDTM100ADDRESS_DONAU, USDTMCONTRACTADDRESS_DONAU } from "../web3/web3";
+import { bunnyNotesCommitments, bunnyNotesDeposit, ERC20Approve, getChainId, getContract, getFee, getIsContract, requestAccounts } from "../web3/web3";
 import { approveERC20SpendByOwner } from "../web3/Wallet";
 
 interface DownloadNoteProps {
@@ -21,6 +21,8 @@ interface DownloadNoteProps {
     setRenderDownloadPage: (to: boolean) => void;
     checkForBunnyWallet: boolean;
     myAddress: string;
+    noteAddresses: [string, string];
+    selectedNetwork: string;
 }
 
 
@@ -30,6 +32,9 @@ export function downloadNote(props: DownloadNoteProps) {
     const denomination = `${noteDetails[1].amount} ${noteDetails[1].currency}`
 
     const noteString = noteDetails[0];
+
+    const erc20Address = props.noteAddresses[0];
+    const noteAddress = props.noteAddresses[1];
 
     const Img = styled('img')({
         margin: 'auto',
@@ -88,26 +93,26 @@ export function downloadNote(props: DownloadNoteProps) {
         //TODO: IMPLEMENT ETH NOTES TOO
         if (props.showApproval) {
             // approve the spend, need to approve for the fee
-            const contract = await getContract(props.provider, USDTM100ADDRESS_DONAU, "/ERC20Notes.json");
+            const contract = await getContract(props.provider, noteAddress, "/ERC20Notes.json");
 
             const fee = await getFee(contract);
             const formattedFee = ethers.utils.formatEther(fee);
 
             const approveAmount = parseFloat(formattedFee) + parseFloat(noteDetails[1].amount);
 
-            const ERC20Contract = await getContract(props.provider, USDTMCONTRACTADDRESS_DONAU, "/ERC20.json");
+            const ERC20Contract = await getContract(props.provider, erc20Address, "/ERC20.json");
 
             const convertedApproveAmount = ethers.utils.parseEther(approveAmount.toString());
             props.setShowApproval(false);
 
-            await ERC20Approve(ERC20Contract, USDTM100ADDRESS_DONAU, convertedApproveAmount).catch((err) => {
+            await ERC20Approve(ERC20Contract, noteAddress, convertedApproveAmount).catch((err) => {
                 props.setShowApproval(true);
             });
 
         } else {
             // after succesful approval  I can prompt the user to deposit the tokens to add value to the note
 
-            const notesContract = await getContract(props.provider, USDTM100ADDRESS_DONAU, "/ERC20Notes.json");
+            const notesContract = await getContract(props.provider, noteAddress, "/ERC20Notes.json");
 
             const address = await requestAccounts(props.provider);
 
@@ -145,7 +150,7 @@ export function downloadNote(props: DownloadNoteProps) {
         if (props.showApproval) {
             // approve the spend using the bunny wallet, you must be the owner of the wallet
 
-            const erc20Notes = await getContract(props.provider, USDTM100ADDRESS_DONAU, "/ERC20Notes.json");
+            const erc20Notes = await getContract(props.provider, noteAddress, "/ERC20Notes.json");
 
             const fee = await getFee(erc20Notes);
             const formattedFee = ethers.utils.formatEther(fee);
@@ -155,7 +160,7 @@ export function downloadNote(props: DownloadNoteProps) {
             props.setShowApproval(false);
             //TODO: NOW USING HARDCODED USDTMADDRESS
 
-            const receipt = await approveERC20SpendByOwner(bunnyWallet, USDTMCONTRACTADDRESS_DONAU, USDTM100ADDRESS_DONAU, approveAmount.toString()).catch(err => {
+            const receipt = await approveERC20SpendByOwner(bunnyWallet, erc20Address, erc20Address, approveAmount.toString()).catch(err => {
                 props.setShowApproval(true);
             });
 
@@ -192,9 +197,7 @@ export function downloadNote(props: DownloadNoteProps) {
         // Check if we are on the correct network!
         const chainId = await getChainId(props.provider);
 
-        if (chainId !== netId) {
-            //TODO: ADD SUPPORT FOR MULTIPLE NETWORK
-            //FOR EASY NETWORK PLUGGING
+        if (chainId !== parseInt(props.selectedNetwork)) {
             props.displayError("You are on the wrong network!")
             return;
         }
