@@ -95,14 +95,12 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                   <Toolbar>
                         <Grid container spacing={2} alignItems="center">
                               <Grid item>
-                                    <VerifyIcon color="inherit" sx={{ display: 'block' }} />
+                                    <ScanNoteButton dialogTitle='Scan a Bunny Note' setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
                               </Grid>
                               <Grid item xs>
                                     <TextField autoComplete='off' value={props.noteString} onChange={noteStringSetter} fullWidth placeholder="Paste your Note Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                               </Grid>
-                              <Grid item>
-                                    <ScanNoteButton dialogTitle='Scan a Bunny Note' setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
-                              </Grid>
+
                         </Grid>
                   </Toolbar>
             </AppBar>
