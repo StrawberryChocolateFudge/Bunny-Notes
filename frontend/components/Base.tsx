@@ -23,7 +23,7 @@ import { NotFoundPage } from './404page';
 import HelpPage from './HelpPage';
 import BunnyWalletTab from './BunnyWalletTab';
 import BunnyNotesTab from './BunnyNotesTab';
-
+import { SelectNetworkDialog } from './utils/NetworkSelector';
 
 export interface Base {
     myAddress: string,
@@ -31,6 +31,8 @@ export interface Base {
     provider: any,
     setProvider: any,
     displayError: any,
+    selectedNetwork: string,
+    setSelectedNetwork: (n: string) => void;
 }
 
 export function Copyright() {
@@ -54,6 +56,11 @@ export const Spacer = styled("div")({
 })
 
 export default function Base() {
+
+    const [showNetworkSelect, setShowNetworkSelect] = React.useState(true);
+
+    const [selectedNetwork, setSelectedNetwork] = React.useState("");
+
     const [snackbarOpen, setSnackbarOpen] = React.useState(false);
 
     const [snackbarMessage, setSnackbarMessage] = React.useState("");
@@ -91,7 +98,9 @@ export default function Base() {
         provider,
         setProvider,
         setMyAddress,
-        myAddress
+        myAddress,
+        selectedNetwork,
+        setSelectedNetwork
     }
 
     const noteStringProps = {
@@ -102,6 +111,13 @@ export default function Base() {
     const paymentRequestProps = {
         paymentRequest,
         setPaymentRequest
+    }
+
+    const networkSelectProps = {
+        selectedNetwork,
+        setSelectedNetwork,
+        showNetworkSelect,
+        setShowNetworkSelect
     }
 
     const getTabContent = () => {
@@ -121,15 +137,19 @@ export default function Base() {
         }
     }
 
-    const mainRoute = () => <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Header withTabs={true} selectedTab={selectedTab} onTabToggle={onTabToggle} />
-        <Box component="main" sx={{ flex: 1,}}>
-            {getTabContent()}
-        </Box>
-        <Box component="footer" sx={{ p: 2 }}>
-            <Copyright />
-        </Box>
-    </Box>
+
+
+    function mainRoute() {
+        return <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Header withTabs={true} selectedTab={selectedTab} onTabToggle={onTabToggle} />
+            <Box component="main" sx={{ flex: 1, }}>
+                {getTabContent()}
+            </Box>
+            <Box component="footer" sx={{ p: 2 }}>
+                <Copyright />
+            </Box>
+        </Box>;
+    }
 
     const getRoutes = () => {
         return (<BrowserRouter>
@@ -169,6 +189,7 @@ export default function Base() {
                 message={snackbarMessage}
                 action={snackBarAction}
             />
+            <SelectNetworkDialog {...networkSelectProps}></SelectNetworkDialog>
         </ThemeProvider>
     );
 }   
