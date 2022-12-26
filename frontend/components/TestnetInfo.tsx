@@ -2,7 +2,7 @@ import { Button, Paper, Typography } from "@mui/material";
 import React from "react";
 import { Base, Spacer } from "./Base";
 import { ethers } from "ethers";
-import { getChainId, getContract, netId, onBoardOrGetProvider, onboardOrSwitchNetwork, requestAccounts, switchToDonauTestnet, TESTNETMINTERC20, USDTMCONTRACTADDRESS_DONAU, watchAsset } from "../web3/web3";
+import { getChainId, getContract, onBoardOrGetProvider, onboardOrSwitchNetwork, requestAccounts, switchToDonauTestnet, TESTNETMINTERC20, USDTMCONTRACTADDRESS_DONAU, watchAsset } from "../web3/web3";
 interface TestnetInfoProps extends Base {
 }
 
@@ -13,7 +13,7 @@ export function TestnetInfo(props: TestnetInfoProps) {
         // Check if we are on the correct network!
         const chainId = await getChainId(provider);
 
-        if (chainId !== netId) {
+        if (chainId !== parseInt(props.selectedNetwork)) {
 
             props.displayError("You are on the wrong network!")
             return;
