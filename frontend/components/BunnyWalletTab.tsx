@@ -643,8 +643,15 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
             return;
         }
 
-        setConnected(true);
         const chainId = await getChainId(provider);
+
+        if (chainId !== parseInt(props.selectedNetwork)) {
+            props.displayError("You are on the wrong network!");
+            return;
+        }
+
+
+        setConnected(true);
         setNetId(chainId);
         const walletCurrency = getWalletCurrency(chainId)
         setWalletCurrency(walletCurrency);
