@@ -26,7 +26,7 @@ export async function handleCardSelectWithProvider(props: any, denomination: str
     }
 
     if (props.provider === null && provider === null) {
-        props.displayError("Unableto connect to wallet!");
+        props.displayError("Unable to connect to wallet!");
         return false;
     }
 
