@@ -170,23 +170,20 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
                                 <Button onClick={importAddress} variant="contained" sx={{ mr: 1 }}>
                                     Import Address                                </Button>
                             </Tooltip>
-
                         </Grid>
-
                     </Grid>
                 </Toolbar>
             </AppBar>
             <Center>
                 <Stack justifyContent={"center"} direction="row" spacing={1} alignItems={"center"}>
                     <GiftCardIMG sx={{
-                        boxShadow: cardType === "Cash Note" ? "none" : "rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px",
+                        opacity: cardType === "Cash Note" ? "0.3" : "1"
                     }} alt="Gift Card" src="/imgs/giftCard.svg" onClick={handleClickImage("Gift Card")} />
                     <Switch checked={cardType === "Cash Note"} onChange={handleChecked}></Switch>
                     <CashNoteIMG sx={{
-                        boxShadow: cardType === "Gift Card" ? "none" : "rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px",
+                        opacity: cardType === "Gift Card" ? "0.3" : 1
                     }} alt="Cash Note" src="/imgs/cashNote.svg" onClick={handleClickImage("Cash Note")} />
                 </Stack>
-
             </Center>{cardType === "Cash Note" ? <CardGrid handleSelect={handleSelectCashNote} cardProps={getCardPropsData("Cash Note")} ></CardGrid>
                 : <CardGrid handleSelect={handleSelectGiftCard} cardProps={getCardPropsData("Gift Card")} ></CardGrid>
             }
