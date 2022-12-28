@@ -1,4 +1,4 @@
-import { Button, Card, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, styled, TextField, Typography } from "@mui/material";
+import { Button, Card, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, styled, TextField, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { Center } from "../BunnyNotesTab";
 
@@ -52,7 +52,7 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
 
 
     return <Dialog open={props.showNetworkSelect} onClose={handleClose}>
-        <DialogTitle><IMG src="/imgs/BunnyNotes.svg" /></DialogTitle>
+        <DialogTitle><IMG alt="Bunny Notes Title" src="/imgs/BunnyNotes.svg" /></DialogTitle>
         <DialogContent>
             <DialogContentText sx={{ textAlign: "center" }}>
                 A Gift Card and Cash Note Protocol
@@ -67,10 +67,11 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
 
 export function NetworkCardButtons(props: any) {
     //Single button, hardcoded to select BTTC Chain for now
-    return <Button onClick={props.networkSelected("0x405")}>
-        <Card sx={{ padding: "5px" }}>
-            <img src="/imgs/bttLogo.svg" />
-            <Typography gutterBottom variant="subtitle1" component="div" >Bittorrent Chain</Typography>
-        </Card>
-    </Button>
+    return <Tooltip title="Select Bittorrent Chain">
+        <Button onClick={props.networkSelected("0x405")}>
+            <Card sx={{ padding: "5px" }}>
+                <img alt="Bittorrent Chain" src="/imgs/bttLogo.svg" />
+                <Typography gutterBottom variant="subtitle1" component="div" >Bittorrent Chain</Typography>
+            </Card>
+        </Button></Tooltip>
 }

@@ -1,4 +1,4 @@
-import { styled, AppBar, Box, Button, Grid, Paper, TextField, Toolbar, Typography, FormControl, InputLabel, Select, SelectChangeEvent, MenuItem, FormHelperText, Autocomplete, createFilterOptions, CircularProgress, FormGroup, FormControlLabel, Checkbox, Switch } from "@mui/material";
+import { styled, AppBar, Box, Button, Grid, Paper, TextField, Toolbar, Typography, FormControl, InputLabel, Select, SelectChangeEvent, MenuItem, FormHelperText, Autocomplete, createFilterOptions, CircularProgress, FormGroup, FormControlLabel, Checkbox, Switch, Tooltip } from "@mui/material";
 import * as React from "react";
 import { AvailableERC20Token, getAvailableERC20Tokens } from "../../web3/web3";
 import ScanNoteButton from "../QRScannerModal";
@@ -72,12 +72,13 @@ export function WalletNotConnected(props: any) {
         </AppBar>
         <Box>
             <Center>
-                <Button onClick={props.connectButtonAction}><ConnectIMG src="/imgs/connect.svg" alt="Connect"></ConnectIMG></Button>
-
+                <Tooltip title="Connect to a Smart Contract Wallet">
+                    <Button onClick={props.connectButtonAction}><ConnectIMG src="/imgs/connect.svg" alt="Connect to Smart Contract Wallet"></ConnectIMG></Button>
+                </Tooltip>
             </Center>
             <Typography sx={{ padding: "5px", textAlign: "center" }} component={"p"} variant="subtitle2">Connect to the Bunny Wallet created with the Mobile App</Typography>
             <Center>
-                <Button sx={{ margin: "0 auto" }}><PlayStoreImg src="/imgs/get-it-on-google-play-badge.png" /></Button>
+                <Button sx={{ margin: "0 auto" }}><PlayStoreImg alt="Navigate to Google Play Store" src="/imgs/get-it-on-google-play-badge.png" /></Button>
             </Center>
         </Box>
     </Paper>
@@ -93,26 +94,28 @@ export function WalletConnected(props: any) {
             </Typography>
         </Box>
         <Box>
-            <ActionSelector>
-                <FormControl sx={{ minWidth: "100px" }}>
-                    <InputLabel id="contract-actions-label">Actions</InputLabel>
-                    <Select
-                        labelId="contract-actions-label"
-                        id="contract-actions-select"
-                        value={props.selectedAction}
-                        onChange={props.actionSelector}
-                        label="Actions"
-                    >
-                        <MenuItem value="transferEth">Transfer {props.walletCurrency}</MenuItem>
-                        <MenuItem value="transferERC20">Transfer Token</MenuItem>
-                        <MenuItem value="approveERC20">Approve Token Spend</MenuItem>
-                        <MenuItem value="transferERC721">Transfer NFT</MenuItem>
-                        <MenuItem value="approveERC721">Approve NFT</MenuItem>
-                        <MenuItem value="resetCommitment">Reset Commitment</MenuItem>
-                    </Select>
-                    <FormHelperText>{props.formHelperText}</FormHelperText>
-                </FormControl>
-            </ActionSelector>
+            <Tooltip placement="top" title="Select the functions you want to access">
+                <ActionSelector>
+                    <FormControl sx={{ minWidth: "100px" }}>
+                        <InputLabel id="contract-actions-label">Actions</InputLabel>
+                        <Select
+                            labelId="contract-actions-label"
+                            id="contract-actions-select"
+                            value={props.selectedAction}
+                            onChange={props.actionSelector}
+                            label="Actions"
+                        >
+                            <MenuItem value="transferEth">Transfer {props.walletCurrency}</MenuItem>
+                            <MenuItem value="transferERC20">Transfer Token</MenuItem>
+                            <MenuItem value="approveERC20">Approve Token Spend</MenuItem>
+                            <MenuItem value="transferERC721">Transfer NFT</MenuItem>
+                            <MenuItem value="approveERC721">Approve NFT</MenuItem>
+                            <MenuItem value="resetCommitment">Reset Commitment</MenuItem>
+                        </Select>
+                        <FormHelperText>{props.formHelperText}</FormHelperText>
+                    </FormControl>
+                </ActionSelector>
+            </Tooltip>
         </Box>
         <Box>{props.renderSelectedAction()}</Box>
     </Paper>
@@ -127,9 +130,13 @@ export function TransferETHElements(props: any) {
             <RowSpaceBetween>
                 <div>
                     <TextField key="transferETHAmountKey" value={props.transferEtAmount} onChange={props.transferEthAmountSetter} type={"number"} label="Transfer Amount" variant="filled"></TextField>
-                    <Button onClick={props.setTransferETHAmountMax} sx={{ top: "20%" }} variant="text">Max</Button>
+                    <Tooltip title="Set the amount to Max">
+                        <Button onClick={props.setTransferETHAmountMax} sx={{ top: "20%" }} variant="text">Max</Button>
+                    </Tooltip>
                 </div>
-                <Button onClick={props.transferETH} variant="contained">Transfer</Button>
+                <Tooltip title="Submit the transaction to the network">
+                    <Button onClick={props.transferETH} variant="contained">Transfer</Button>
+                </Tooltip>
             </RowSpaceBetween>
         </PaddedDiv>
     </Box>
@@ -149,10 +156,13 @@ export function TransferERC20Elements(props: any) {
         <PaddedDiv>
             <RowSpaceBetween>
                 <TextField key="transferERC20AmountKey" value={props.transferERC20Amount} onChange={props.transferERC20AmountSetter} type={"number"} label="Transfer Amount" variant="filled"></TextField>
-                <Button onClick={props.setTransferERC20AmountMax} sx={{ top: "20%" }} variant="text">Max</Button>
-
+                <Tooltip title="Set the amount to Max">
+                    <Button onClick={props.setTransferERC20AmountMax} sx={{ top: "20%" }} variant="text">Max</Button>
+                </Tooltip>
                 <Display>{props.formattedERC20Balance}</Display>
-                <Button onClick={props.transferERC20} variant="contained">Transfer</Button>
+                <Tooltip title="Submit the transaction to the network">
+                    <Button onClick={props.transferERC20} variant="contained">Transfer</Button>
+                </Tooltip>
             </RowSpaceBetween>
         </PaddedDiv>
     </Box >
@@ -221,14 +231,18 @@ export function ApproveERC20Elements(props: any) {
         <PaddedDiv>
             <RowSpaceBetween>
                 <TextField value={props.approveERC20To} onChange={props.approveERC20ToSetter} key="approveERC20Token" variant="filled" sx={{ marginBottom: "20p", width: "100%" }} label="Spender"></TextField>
-                <Button onClick={props.getERC20Allowance} sx={{ width: "100px" }} variant="outlined">Allowance</Button>
+                <Tooltip title="Check the Allowence of the Spender">
+                    <Button onClick={props.getERC20Allowance} sx={{ width: "100px" }} variant="outlined">Allowance</Button>
+                </Tooltip>
             </RowSpaceBetween>
         </PaddedDiv>
         <PaddedDiv>
             <RowSpaceBetween>
                 <TextField key="approveERC20AmountKey" value={props.approveERC20Amount} onChange={props.approveERC20AmountSetter} type="number" label="Approve Amount" variant="filled"></TextField>
                 <Display>{props.erc20Allowance}</Display>
-                <Button sx={{ width: "93px" }} onClick={props.approveERC20} variant="contained">Approve</Button>
+                <Tooltip title="Submit the Approve transaction">
+                    <Button sx={{ width: "93px" }} onClick={props.approveERC20} variant="contained">Approve</Button>
+                </Tooltip>
             </RowSpaceBetween>
         </PaddedDiv>
     </Box>
@@ -239,7 +253,9 @@ export function NftTransferElements(props: any) {
         <PaddedDiv>
             <RowSpaceBetween>
                 <TextField value={props.erc721Address} onChange={props.erc721ContractAddressSetter} key="ERC721ContractAddress" variant="filled" sx={{ marginBottom: "20p", width: "100%" }} label="NFT Contract Address" ></TextField>
-                <Button onClick={props.getERC721Balance} sx={{ width: "100px" }} variant="outlined">Balance</Button>
+                <Tooltip title="Get my token balance">
+                    <Button onClick={props.getERC721Balance} sx={{ width: "100px" }} variant="outlined">Balance</Button>
+                </Tooltip>
             </RowSpaceBetween>
         </PaddedDiv>
         <PaddedDiv>
@@ -253,7 +269,9 @@ export function NftTransferElements(props: any) {
         <PaddedDiv>
             <RowSpaceBetween>
                 <TextField key="transferERC721TokenId" value={props.transferERC721TokenId} onChange={props.transferERC721TokenIdSetter} type="number" label="Token Id" variant="filled"></TextField>
-                <Button onClick={props.transferERC721} variant="contained">Transfer</Button>
+                <Tooltip title="Submit the transaction to the network">
+                    <Button onClick={props.transferERC721} variant="contained">Transfer</Button>
+                </Tooltip>
             </RowSpaceBetween>
         </PaddedDiv>
     </Box>
@@ -263,7 +281,9 @@ export function ApproveNFTElements(props: any) {
         <PaddedDiv>
             <RowSpaceBetween>
                 <TextField value={props.erc721Address} onChange={props.erc721ContractAddressSetter} key="ERC721ContractAddress" variant="filled" sx={{ marginBottom: "20p", width: "100%" }} label="NFT Contract Address" ></TextField>
-                <Button onClick={props.getERC721Balance} sx={{ width: "100px" }} variant="outlined">Balance</Button>
+                <Tooltip title="Get my token balance ">
+                    <Button onClick={props.getERC721Balance} sx={{ width: "100px" }} variant="outlined">Balance</Button>
+                </Tooltip>
             </RowSpaceBetween>
         </PaddedDiv>
         <PaddedDiv>
@@ -274,7 +294,9 @@ export function ApproveNFTElements(props: any) {
         <PaddedDiv>
             <RowSpaceBetween>
                 <TextField value={props.approveERC721To} onChange={props.approveERC721ToSetter} key="approveERC721TokenTo" variant="filled" sx={{ marginBottom: "20px", width: "100%" }} label="Spender" ></TextField>
-                <Button onClick={props.getERC721Allowance} sx={{ width: "100px" }} variant="outlined">Allowance</Button>
+                <Tooltip title="Check the allowance of the spender">
+                    <Button onClick={props.getERC721Allowance} sx={{ width: "100px" }} variant="outlined">Allowance</Button>
+                </Tooltip>
             </RowSpaceBetween>
         </PaddedDiv>
         <PaddedDiv>
@@ -286,10 +308,12 @@ export function ApproveNFTElements(props: any) {
             <RowSpaceBetween>
                 <TextField disabled={props.approveForAllChecked} key="ERC721TokenId" value={props.approveERC721TokenId} onChange={props.approveERC721TokenIdSetter} type="number" label="Token Id" variant="filled"></TextField>
                 <FormGroup>
-                    <FormControlLabel control={<Switch checked={props.approveAllowance} onChange={props.approveAllowanceSetter} />} label={"Approve"} />
-                    <FormControlLabel control={<Switch checked={props.approveForAllChecked} onChange={props.approveForAllCheckedSetter} />} label="For All" />
+                    <FormControlLabel control={<Tooltip title="Allow or Disallow spend"><Switch checked={props.approveAllowance} onChange={props.approveAllowanceSetter} /></Tooltip>} label={"Approve"} />
+                    <FormControlLabel control={<Tooltip title="Approve for all token balance or only for token Id"><Switch checked={props.approveForAllChecked} onChange={props.approveForAllCheckedSetter} /></Tooltip>} label="For All" />
                 </FormGroup>
-                <Button onClick={props.approveERC721} variant="contained">Submit</Button>
+                <Tooltip title="Submit the transaction to the network">
+                    <Button onClick={props.approveERC721} variant="contained">Submit</Button>
+                </Tooltip>
             </RowSpaceBetween>
         </PaddedDiv>
     </Box>
@@ -304,7 +328,9 @@ export const ResetCommitmentElements = (props: any) =>
             <RowSpaceBetween>
                 <ScanNoteButton dialogTitle="Scan the Bunny Wallet Commitment" setData={props.setNewCommitment} handleError={props.displayError}></ScanNoteButton>
                 <TextField value={props.newCommitment} onChange={props.newCommitmentSetter} key="newCommitmentField" variant="filled" sx={{ width: "100%" }} label="New Commitment" disabled></TextField>
-                <Button onClick={props.resetCommitment} variant="contained">Reset</Button>
+                <Tooltip title="Submit the transaction to the network">
+                    <Button onClick={props.resetCommitment} variant="contained">Reset</Button>
+                </Tooltip>
             </RowSpaceBetween>
         </PaddedDiv>
         <PaddedDiv>

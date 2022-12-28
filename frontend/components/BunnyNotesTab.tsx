@@ -176,13 +176,19 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
             </AppBar>
             <Center>
                 <Stack justifyContent={"center"} direction="row" spacing={1} alignItems={"center"}>
-                    <GiftCardIMG sx={{
-                        opacity: cardType === "Cash Note" ? "0.3" : "1"
-                    }} alt="Gift Card" src="/imgs/giftCard.svg" onClick={handleClickImage("Gift Card")} />
-                    <Switch checked={cardType === "Cash Note"} onChange={handleChecked}></Switch>
-                    <CashNoteIMG sx={{
-                        opacity: cardType === "Gift Card" ? "0.3" : 1
-                    }} alt="Cash Note" src="/imgs/cashNote.svg" onClick={handleClickImage("Cash Note")} />
+                    <Tooltip title="Select Gift Cards">
+                        <GiftCardIMG sx={{
+                            opacity: cardType === "Cash Note" ? "0.3" : "1"
+                        }} alt="Gift Card" src="/imgs/giftCard.svg" onClick={handleClickImage("Gift Card")} />
+                    </Tooltip>
+                    <Tooltip title="Switch between Gift Card and Cash Note">
+                        <Switch checked={cardType === "Cash Note"} onChange={handleChecked}></Switch>
+                    </Tooltip>
+                    <Tooltip title="Select Cash Notes">
+                        <CashNoteIMG sx={{
+                            opacity: cardType === "Gift Card" ? "0.3" : 1
+                        }} alt="Cash Note" src="/imgs/cashNote.svg" onClick={handleClickImage("Cash Note")} />
+                    </Tooltip>
                 </Stack>
             </Center>{cardType === "Cash Note" ? <CardGrid handleSelect={handleSelectCashNote} cardProps={getCardPropsData("Cash Note")} ></CardGrid>
                 : <CardGrid handleSelect={handleSelectGiftCard} cardProps={getCardPropsData("Gift Card")} ></CardGrid>
