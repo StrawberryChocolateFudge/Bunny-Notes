@@ -62,7 +62,7 @@ export function downloadNote(props: DownloadNoteProps) {
                 <Grid container spacing={2}>
                     <Grid item>
                         <ButtonBase sx={{ width: 128, height: 128 }}>
-                            <Img alt="complex" src={props.qrCodeDataUrl} />
+                            <Img alt="Bunny Note QR Code" src={props.qrCodeDataUrl} />
                         </ButtonBase>
                     </Grid>
 

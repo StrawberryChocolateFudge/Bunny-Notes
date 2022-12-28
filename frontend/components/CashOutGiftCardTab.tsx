@@ -6,7 +6,6 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import VerifyIcon from "@mui/icons-material/Note"
 import Box from "@mui/material/Box"
 import { Base } from './Base';
 import ScanNoteButton from './QRScannerModal';
@@ -20,7 +19,7 @@ interface CashOutGiftCardTabProps extends Base {
 }
 const IMG = styled("img")({
     margin: "0 auto",
-    width: "200px"
+    width: "130px"
 })
 
 export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
@@ -94,7 +93,7 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
             <Typography component="p" variant="subtitle1">You can withdraw a Gift Card's balance to your wallet.</Typography>
             <Tooltip title="Cash out the Gift Card">
                 <Button onClick={cashOutAction} sx={{ mr: 1 }}>
-                    <IMG src="/imgs/CashOut.svg" />
+                    <IMG alt="Cash out a Gift Card" src="/imgs/CashOut.svg" />
                 </Button>
             </Tooltip>
         </Box>

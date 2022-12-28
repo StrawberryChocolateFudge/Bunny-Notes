@@ -6,7 +6,6 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import VerifyIcon from "@mui/icons-material/Note"
 import Box from "@mui/material/Box"
 import { Base, Spacer } from './Base';
 import ScanNoteButton from './QRScannerModal';
@@ -30,7 +29,7 @@ export type Commitment = {
 
 const IMG = styled("img")({
       margin: "0 auto",
-      width: '150px'
+      width: '100px'
 })
 
 export default function VerifyNoteTab(props: VerifyNoteTabProps) {
@@ -112,7 +111,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                               <Typography component="p" variant="subtitle1">Verify a Bunny Note. You can check if it's still valid and contains a balance!</Typography>
                               <Tooltip title="Verify the Note">
                                     <Button onClick={onVerify} sx={{ mr: 1 }}>
-                                          <IMG src="/imgs/VerifyLogo.svg" />
+                                          <IMG alt="Verify a Note" src="/imgs/VerifyLogo.svg" />
                                     </Button>
                               </Tooltip> </React.Fragment>)
                         : <React.Fragment>
