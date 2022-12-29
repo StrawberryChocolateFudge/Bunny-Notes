@@ -108,7 +108,7 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
     }
 
     const handleSelectGiftCard = async (denomination: string, currency: string, cardType: CardType, addresses: [string, string]) => {
-        const res = await handleCardSelectWithProvider(props, denomination, currency, cardType)
+        const res = await handleCardSelectWithProvider(props, denomination, currency, cardType, props.selectedNetwork)
 
         if (res !== false) {
             setRenderDownloadPage(true);
@@ -118,7 +118,7 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
     }
 
     const handleSelectCashNote = async (denomination: string, currency: string, cardType: CardType, addresses: [string, string]) => {
-        const res = await handleCardSelectWithProvider(props, denomination, currency, cardType)
+        const res = await handleCardSelectWithProvider(props, denomination, currency, cardType, props.selectedNetwork)
 
         if (res !== false) {
             setRenderDownloadPage(true);
@@ -190,8 +190,8 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
                         }} alt="Cash Note" src="/imgs/cashNote.svg" onClick={handleClickImage("Cash Note")} />
                     </Tooltip>
                 </Stack>
-            </Center>{cardType === "Cash Note" ? <CardGrid handleSelect={handleSelectCashNote} cardProps={getCardPropsData("Cash Note")} ></CardGrid>
-                : <CardGrid handleSelect={handleSelectGiftCard} cardProps={getCardPropsData("Gift Card")} ></CardGrid>
+            </Center>{cardType === "Cash Note" ? <CardGrid handleSelect={handleSelectCashNote} cardProps={getCardPropsData("Cash Note", props.selectedNetwork)} ></CardGrid>
+                : <CardGrid handleSelect={handleSelectGiftCard} cardProps={getCardPropsData("Gift Card", props.selectedNetwork)} ></CardGrid>
             }
         </Paper>
     );
