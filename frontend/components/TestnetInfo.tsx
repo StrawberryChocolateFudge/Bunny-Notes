@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 import { getChainId, getContract, onBoardOrGetProvider, onboardOrSwitchNetwork, requestAccounts, switchToDonauTestnet, TESTNETMINTERC20, USDTMCONTRACTADDRESS_DONAU, watchAsset } from "../web3/web3";
 interface TestnetInfoProps extends Base {
 }
-
+// TODO: REMOVE THIS FILE, IT WAS FOR HACKATHON POC ONLY
 
 export function TestnetInfo(props: TestnetInfoProps) {
 
@@ -52,7 +52,7 @@ export function TestnetInfo(props: TestnetInfoProps) {
     }
 
     const switchNetwork = async () => {
-        await onboardOrSwitchNetwork(props.displayError)
+        // await onboardOrSwitchNetwork(props.displayError)
     }
 
 
