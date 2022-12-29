@@ -1,5 +1,7 @@
-import { Button, Card, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, styled, TextField, Tooltip, Typography } from "@mui/material";
+import { Button, Card, Dialog, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, styled, TextField, Tooltip, Typography } from "@mui/material";
 import React from "react";
+import { setSelectedNToSS } from "../../storage/session";
+import { BTTCTESTNETID, handleNetworkSelect } from "../../web3/web3";
 import { Center } from "../BunnyNotesTab";
 
 interface SelectNetworkProps {
@@ -7,6 +9,8 @@ interface SelectNetworkProps {
     selectedNetwork: string;
     showNetworkSelect: boolean;
     setShowNetworkSelect: (s: boolean) => void;
+    displayError: (err: string) => void;
+    setProvider: (provider: any) => void;
 }
 
 const IMG = styled("img")({
@@ -27,7 +31,7 @@ export function SelectNetwork(props: SelectNetworkProps) {
                 label="Network"
                 onChange={handleNetworkChange}
             >
-                <MenuItem value={"0x405"}>Bittorrent Chain</MenuItem>
+                <MenuItem value={BTTCTESTNETID}>Bittorrent Chain</MenuItem>
             </Select>
         </FormControl>
     </Stack>;
@@ -45,9 +49,16 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
         }
     };
 
-    const networkSelected = (networkId: string) => () => {
-        props.setSelectedNetwork(networkId)
-        props.setShowNetworkSelect(false);
+    const networkSelected = (networkId: string) => async () => {
+        setSelectedNToSS(networkId);
+        // Connect to metamask, switch or add the network
+        // add the provider or not don't matter if it works!
+        const provider = await handleNetworkSelect(networkId, props.displayError);
+        if (provider) {
+            props.setProvider(provider);
+            props.setSelectedNetwork(networkId)
+            props.setShowNetworkSelect(false);
+        }
     }
 
 
