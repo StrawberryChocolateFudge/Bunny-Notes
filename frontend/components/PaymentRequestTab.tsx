@@ -6,7 +6,6 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import WalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import MoneyIcon from "@mui/icons-material/Money";
 import { getCardPropsData } from "./utils/cardPropsData";
 import CardGrid, { CardType } from "./CardGrid";
@@ -43,7 +42,7 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
     const scanPayToAddress = (d: string) => {
         props.setPaymentRequest({ ...props.paymentRequest, payTo: d });
     }
-    
+
     const importAddress = async () => {
         if (props.provider === null) {
             const provider = await onBoardOrGetProvider(props.displayError);
@@ -67,7 +66,7 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
         // For verification I use a temporary tronweb instance, just to call isAddress
         // the props.tronWeb might be null at this point if the user manually copies the address.
         if (ethers.utils.isAddress(props.paymentRequest.payTo)) {
-            navigate(`/paymentRequest/${props.paymentRequest.payTo}/${parseFloat(props.paymentRequest.price)}/${currency}`)
+            navigate(`/paymentRequest/${props.paymentRequest.payTo}/${parseFloat(props.paymentRequest.price)}/${currency}/${props.selectedNetwork}`)
         } else {
             props.displayError(`Invalid wallet address!`);
             return;
@@ -116,6 +115,6 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
                 </Grid>
             </Toolbar>
         </AppBar>
-        <CardGrid handleSelect={handleSelectPaymentRequest} cardProps={getCardPropsData("Payment Request")}></CardGrid>
+        <CardGrid handleSelect={handleSelectPaymentRequest} cardProps={getCardPropsData("Payment Request", props.selectedNetwork)}></CardGrid>
     </Paper >
 }
