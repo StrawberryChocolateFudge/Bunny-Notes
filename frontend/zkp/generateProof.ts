@@ -2,7 +2,6 @@ import { Deposit, FullProof } from "../../lib/types";
 import { generateNoteWithdrawProof } from "../../lib/generateProof";
 import { deposit, parseNote } from "../../lib/BunnyNote";
 import packToSolidityProof from "../../lib/packToSolidityProof";
-import { netId } from "../web3/web3";
 const urlBASE = "https://bunnynotes.finance"
 
 
@@ -15,8 +14,11 @@ export type NoteDetails = [
 
 export type ParsedNote = { currency: string, amount: string, netId: number, deposit: Deposit }
 
-export async function createNote(currency, amount): Promise<NoteDetails> {
-    const noteString = await deposit({ currency, amount, netId })
+export async function createNote(currency, amount, netId: string): Promise<NoteDetails> {
+    console.log(netId);
+    console.log(currency);
+    console.log(amount);
+    const noteString = await deposit({ currency, amount, netId:parseInt(netId) })
     const parsedNote = await parseNote(noteString) as ParsedNote;
 
     return [noteString, parsedNote];
