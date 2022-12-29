@@ -17,11 +17,11 @@ interface PaymentRequestPageProps extends Base {
 
 const IMG = styled("img")({
     margin: "0 auto",
-    width: '150px'
+    width: '80px'
 })
 
 export function PaymentRequestPage(props: PaymentRequestPageProps) {
-    const { payTo, amount, currency } = useParams();
+    const { payTo, amount, currency, network } = useParams();
 
     const [note, setNote] = useState("");
     const [loading, setLoading] = useState(false);
@@ -36,7 +36,18 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
     }
 
     const paymentAction = async () => {
-        const provider = getJsonRpcProvider();
+
+        if (network === undefined) {
+            props.displayError("Invalid Network In Link");
+            return;
+        }
+
+        const provider = getJsonRpcProvider(network);
+
+        if (provider === undefined) {
+            props.displayError("Unable to find Network");
+            return;
+        }
         await doPay(provider);
     }
 
@@ -117,7 +128,7 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
         //PAYMENTS ARE RELAYED!!
         try {
             // Need to send the proof and the publicSignals, why? the relayer will verify the ZKP off-chain before submitting it to the network!
-            const res = await relayCashNotePayment({ proof: zkp.proof, publicSignals: zkp.publicSignals, recipient: payTo, currency: parsedNote.currency, denomination: parsedNote.amount, type: "Cash Note" });
+            const res = await relayCashNotePayment({ proof: zkp.proof, publicSignals: zkp.publicSignals, recipient: payTo, currency: parsedNote.currency, denomination: parsedNote.amount, type: "Cash Note", network });
 
             if (res.status === 200) {
                 setPaymentDone(true);
