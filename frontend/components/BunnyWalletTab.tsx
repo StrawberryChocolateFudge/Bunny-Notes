@@ -1,7 +1,7 @@
 import { SelectChangeEvent, styled } from "@mui/material";
 import * as React from "react";
 import { Base } from "./Base";
-import { AvailableERC20Token, getChainId, getContract, getWalletCurrency, onBoardOrGetProvider, requestAccounts } from "../web3/web3";
+import { AvailableERC20Token, getChainId, getContract, getWalletCurrencyFromFetchedChainId, onBoardOrGetProvider, requestAccounts } from "../web3/web3";
 import { approveERC20SpendByOwner, approveERC721ByOwner, getOwner, resetCommitment, transferERC721ByOwner, transferETHByOwner, transferTokenByOwner } from "../web3/Wallet";
 import { utils } from "ethers";
 import { BunnyWallet } from "../../typechain/BunnyWallet";
@@ -653,7 +653,7 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
 
         setConnected(true);
         setNetId(chainId);
-        const walletCurrency = getWalletCurrency(chainId)
+        const walletCurrency = getWalletCurrencyFromFetchedChainId(chainId)
         setWalletCurrency(walletCurrency);
 
         const balance = await provider.getBalance(smartContractWallet);
