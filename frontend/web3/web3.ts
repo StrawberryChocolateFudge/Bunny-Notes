@@ -1,13 +1,15 @@
 import MetaMaskOnboarding from "@metamask/onboarding";
 import { ethers } from "ethers";
+import { setCurrentNToSS } from "../storage/session";
 
 export const MAXCASHNOTESIZE = 100;
-// export const netId = 0x405;
+
+export const BTTCTESTNETID = "0x405";
 
 export const USDTMCONTRACTADDRESS_DONAU = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7";
 export const USDTM100ADDRESS_DONAU = "0xa756b2b52Ba893a6109561bC86138Cbb897Fb2e0";
 export const RELAYERURL = "https://relayer.bunnynotes.finance"
-export const RPCURL = "https://pre-rpc.bt.io/";
+export const BTTCTESTNETNETWORKURL = "https://pre-rpc.bt.io/";
 
 export function web3Injected(): boolean {
     //@ts-ignore
@@ -40,8 +42,19 @@ export function doOnBoarding() {
 }
 
 
-export function getWalletCurrency(netId: number): string {
-    switch (netId) {
+export async function handleNetworkSelect(networkId, handleError) {
+    const onboardSuccess = await onboardOrSwitchNetwork(networkId, handleError);
+    if (!onboardSuccess) {
+        return false;
+    } else {
+        const provider = getWeb3Provider();
+
+        return provider;
+    }
+}
+
+export function getWalletCurrencyFromFetchedChainId(chainId: number): string {
+    switch (chainId) {
         case 1:
             return "ETH"
         case 0x405:
@@ -51,27 +64,40 @@ export function getWalletCurrency(netId: number): string {
     }
 }
 
+function getWeb3Provider() {
+    //@ts-ignore
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    //@ts-ignore
+    window.ethereum.on('chainChanged', (chainId) => {
+        // Handle the new chain.
+        // Correctly handling chain changes can be complicated.
+        // We recommend reloading the page unless you have good reason not to.
+        setCurrentNToSS(chainId);
+        window.location.reload();
+    });
+    return provider;
+}
+
 export function onBoardOrGetProvider(handleError): any {
     if (!web3Injected()) {
         handleError("You need to install metamask!");
         doOnBoarding();
         return false;
     } else {
-        //@ts-ignore
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        //@ts-ignore
-        window.ethereum.on('chainChanged', (chainId) => {
-            // Handle the new chain.
-            // Correctly handling chain changes can be complicated.
-            // We recommend reloading the page unless you have good reason not to.
-            window.location.reload();
-        });
-        return provider;
+        return getWeb3Provider()
     }
 }
 
-export function getJsonRpcProvider(): any {
-    return new ethers.providers.JsonRpcProvider(RPCURL)
+export function getJsonRpcProvider(network: string): any {
+
+    switch (network) {
+        case BTTCTESTNETID:
+            return new ethers.providers.JsonRpcProvider(BTTCTESTNETNETWORKURL)
+        default:
+            return undefined;
+    }
+
+
 }
 
 export async function requestAccounts(provider: any) {
@@ -102,12 +128,19 @@ export async function watchAsset(erc20Params: any, onError: any) {
         .catch(console.error);
 }
 
-export async function onboardOrSwitchNetwork(handleError) {
+export async function onboardOrSwitchNetwork(networkId, handleError) {
     if (!web3Injected()) {
         handleError("You need to install metamask!");
         await doOnBoarding();
+        return false;
     }
-    await switchToDonauTestnet()
+    switch (networkId) {
+        case BTTCTESTNETID:
+            await switchToDonauTestnet();
+            return true;
+        default:
+            return false;
+    }
 }
 
 export async function switchToDonauTestnet() {
