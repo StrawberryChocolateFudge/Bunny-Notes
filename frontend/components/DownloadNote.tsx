@@ -26,6 +26,8 @@ interface DownloadNoteProps {
     selectedNetwork: string;
     noteFee: string;
     navigateToVerifyPage: (noteDetails: NoteDetails) => void;
+    depositButtonDisabled: boolean;
+    setDepositButtonDisabled: (to: boolean) => void;
 }
 
 
@@ -117,6 +119,7 @@ export function downloadNote(props: DownloadNoteProps) {
                 props.setShowApproval(true);
             });
         } else {
+            props.setDepositButtonDisabled(true);
             // after succesful approval  I can prompt the user to deposit the tokens to add value to the note
             const notesContract = await getContract(props.provider, noteAddress, "/BunnyNotes.json");
             const address = await requestAccounts(props.provider);
@@ -126,6 +129,7 @@ export function downloadNote(props: DownloadNoteProps) {
             const commitments = await bunnyNotesCommitments(notesContract, toNoteHex(deposit.commitment));
             if (commitments.used) {
                 props.displayError("Invalid commitment. Deposit already exists!");
+                props.setDepositButtonDisabled(false);
                 return;
             }
 
@@ -137,26 +141,39 @@ export function downloadNote(props: DownloadNoteProps) {
                 // A quick check to make sure the note is correct denomination
                 if (denomination._hex !== parseEther(noteDetails[1].amount)._hex) {
                     props.displayError("Note has invalid Denomination!");
+                    props.setDepositButtonDisabled(false);
+
                     return;
                 }
 
                 const tx = await ethNotesDeposit(notesContract, toNoteHex(deposit.commitment), isCashNote, address, fee.add(denomination)).catch(err => {
-                    props.displayError("Unable to deposit  Note")
+                    props.displayError("Unable to deposit  Note");
+                    props.setDepositButtonDisabled(false);
+
                 });
-                await tx.wait().then((receipt) => {
-                    if (receipt.status === 1) {
-                        props.navigateToVerifyPage(noteDetails)
-                    }
-                })
+
+                if (tx !== undefined) {
+                    await tx.wait().then((receipt) => {
+                        if (receipt.status === 1) {
+                            props.navigateToVerifyPage(noteDetails)
+                        }
+                    })
+                }
+
             } else {
                 const tx = await bunnyNotesDeposit(notesContract, toNoteHex(deposit.commitment), isCashNote, address).catch(err => {
-                    props.displayError("Unable to deposit ERC20 Note")
+                    props.displayError("Unable to deposit ERC20 Note");
+                    props.setDepositButtonDisabled(false);
                 });
-                await tx.wait().then((receipt) => {
-                    if (receipt.status === 1) {
-                        props.navigateToVerifyPage(noteDetails)
-                    }
-                })
+
+                if (tx !== undefined) {
+                    await tx.wait().then((receipt) => {
+                        if (receipt.status === 1) {
+                            props.navigateToVerifyPage(noteDetails)
+                        }
+                    })
+                }
+
             }
         }
     }
@@ -188,6 +205,7 @@ export function downloadNote(props: DownloadNoteProps) {
             });
 
         } {
+            props.setDepositButtonDisabled(true);
             // Deposit with bunny wallet
             const bunnyNote = await getContract(props.provider, noteAddress, "/BunnyNotes.json");
             const isCashNote = getIsCashNote();
@@ -196,10 +214,13 @@ export function downloadNote(props: DownloadNoteProps) {
             const commitments = await bunnyNotesCommitments(bunnyNote, toNoteHex(deposit.commitment));
             if (commitments.used) {
                 props.displayError("Invalid commitment. Deposit already used!");
+                props.setDepositButtonDisabled(false)
                 return;
             }
             await depositToBunnyNoteByOwner(bunnyWallet, noteAddress, erc20Address, toNoteHex(deposit.commitment), isCashNote, !isNativeToken).catch(err => {
                 props.displayError("Unable to create a Bunny Note with the Smart Contract Wallet!")
+                props.setDepositButtonDisabled(false)
+
             });
         }
 
@@ -243,6 +264,12 @@ export function downloadNote(props: DownloadNoteProps) {
         props.setDownloadClicked(true);
     }
 
+    const backButtonClicked = () => {
+        props.setRenderDownloadPage(false);
+        props.setDepositButtonDisabled(false);
+    }
+
+
     return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
         <AppBar
             position="static"
@@ -254,7 +281,7 @@ export function downloadNote(props: DownloadNoteProps) {
                 <Grid container spacing={2} alignItems="center" sx={{ paddingTop: "20px" }}>
                     <Grid item>
                         <Tooltip title="Go back">
-                            <Button onClick={() => props.setRenderDownloadPage(false)}>Back</Button>
+                            <Button onClick={backButtonClicked}>Back</Button>
                         </Tooltip>
                     </Grid>
                     <Grid item>
@@ -262,7 +289,7 @@ export function downloadNote(props: DownloadNoteProps) {
                             <Button onClick={downloadClick} variant="contained" sx={{ mr: 1 }}>Download</Button>
                         </Tooltip>
                     </Grid>
-                    
+
                     <Grid item sx={{ margin: "0 auto" }}>
                         {noteDisplay()}
                         <Grid item sx={{ textAlign: "center" }}>
@@ -276,7 +303,7 @@ export function downloadNote(props: DownloadNoteProps) {
 
                             {props.showApproval && !isNativeToken ? <Tooltip title={"Approve spending " + denomination + ` (plus ${displayedFee} fee)`}>
                                 <Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend</Button></Tooltip> : <Tooltip title={"Deposit " + denomination + ` (plus ${displayedFee} fee)`}>
-                                <Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Deposit</Button></Tooltip>}
+                                <Button disabled={props.depositButtonDisabled} onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Deposit</Button></Tooltip>}
                         </Grid>
                     </Grid>
                 </Grid>

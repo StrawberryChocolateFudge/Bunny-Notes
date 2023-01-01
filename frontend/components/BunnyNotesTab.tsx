@@ -133,6 +133,8 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
 
     if (renderDownloadPage) {
         return downloadNote({
+            depositButtonDisabled: props.depositButtonDisabled,
+            setDepositButtonDisabled: props.setDepositButtonDisabled,
             navigateToVerifyPage: props.navigateToVerifyPage,
             noteFee,
             selectedNetwork: props.selectedNetwork,

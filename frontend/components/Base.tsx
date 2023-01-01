@@ -36,6 +36,8 @@ export interface Base {
     selectedNetwork: string,
     setSelectedNetwork: (n: string) => void;
     navigateToVerifyPage: (note: NoteDetails) => void;
+    depositButtonDisabled: boolean;
+    setDepositButtonDisabled: (to: boolean) => void;
 }
 
 export function Copyright() {
@@ -89,6 +91,9 @@ export default function Base() {
 
     const [provider, setProvider] = React.useState(null);
 
+    // Track if the deposit button is disabled with state stored here
+    const [depositButtonDisabled, setDepositButtonDisabled] = React.useState(false);
+
     const openSnackbar = (msg: string) => {
         setSnackbarOpen(true);
         setSnackbarMessage(msg);
@@ -105,6 +110,7 @@ export default function Base() {
 
     const onTabToggle = (event: React.SyntheticEvent, newValue: number) => {
         setSelectedTab(newValue);
+        setDepositButtonDisabled(false);
     };
 
     function navigateToVerifyPage(note: NoteDetails) {
@@ -127,7 +133,9 @@ export default function Base() {
         myAddress,
         selectedNetwork,
         setSelectedNetwork,
-        navigateToVerifyPage
+        navigateToVerifyPage,
+        depositButtonDisabled,
+        setDepositButtonDisabled
     }
 
     const noteStringProps = {
