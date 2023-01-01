@@ -1,5 +1,5 @@
 import MetaMaskOnboarding from "@metamask/onboarding";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { setCurrentNToSS } from "../storage/session";
 
 export const MAXCASHNOTESIZE = 100;
@@ -7,8 +7,40 @@ export const MAXCASHNOTESIZE = 100;
 export const BTTCTESTNETID = "0x405";
 
 export const USDTMCONTRACTADDRESS_DONAU = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7";
-export const USDTM100ADDRESS_DONAU = "0xa756b2b52Ba893a6109561bC86138Cbb897Fb2e0";
-export const RELAYERURL = "https://relayer.bunnynotes.finance"
+export const USDTM100ADDRESS_DONAU = "0x94D1f7e4667f2aE54494C2a99A18C8B4aED9B22A";
+
+export const BTT_NATIVE_DONAU = "0x2D524Ee2669b7F521B9d903A56002ba565cc50ba";
+
+export const ZEROADDRESS = "0x0000000000000000000000000000000000000000"
+
+// Update this when new note contracts are added!!
+export function getContractAddressFromCurrencyDenomination(denomination: string, currency: string, networkId: string): string {
+
+    switch (networkId) {
+        case BTTCTESTNETID:
+            if (denomination === "100" && currency === "USDTM") {
+                console.log("returning Donau USDTM 100 ", USDTM100ADDRESS_DONAU)
+                return USDTM100ADDRESS_DONAU;
+            } else if (denomination === "1" && currency === "BTT") {
+                console.log("returning BTT native donau : ", BTT_NATIVE_DONAU)
+                return BTT_NATIVE_DONAU
+            } else {
+                console.log("returning nothing")
+                return ""
+            }
+        default:
+            console.log("returning default")
+            return ""
+    }
+}
+
+
+let RELAYERURL = "https://relayer.bunnynotes.finance"
+
+if (process.env.NODE_ENV === "development") {
+    RELAYERURL = "http://localhost:3000"
+}
+
 export const BTTCTESTNETNETWORKURL = "https://pre-rpc.bt.io/";
 
 export function web3Injected(): boolean {
@@ -30,7 +62,6 @@ export async function getIsContract(provider: any, address: string, displayError
         const code = await provider.getCode();
         if (code !== "0x") return true;
     } catch (err) {
-        displayError("Unable to determine address validity.");
         return false;
     }
     return false;
@@ -218,6 +249,10 @@ export async function bunnyNotesDeposit(contract: any, commitment: string, isCas
     return await contract.deposit(commitment, isCashNote, depositFor);
 }
 
+export async function ethNotesDeposit(contract: any, commitment: string, isCashNote: boolean, depositFor: string, value: BigNumber) {
+    return await contract.deposit(commitment, isCashNote, depositFor, { value });
+}
+
 export async function bunnyNotesWithdrawGiftCard(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recipient: string, change: string) {
     return await contract.withdrawGiftCard(solidityProof, nullifierHash, commitment, recipient, change);
 }
@@ -248,11 +283,6 @@ export async function getFee(contract: any) {
     return await contract.fee();
 }
 
-export function getContractAddressFromCurrencyDenomination(denomination: string, currency: string): string {
-    if (denomination === "100" && currency === "USDTM") {
-        return USDTM100ADDRESS_DONAU;
-    } else return ""
-}
 
 export async function getAllowance(contract: any, owner: string, spender: string) {
     return await contract.allowance(owner, spender).call();
