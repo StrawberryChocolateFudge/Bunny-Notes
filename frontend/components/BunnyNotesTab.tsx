@@ -19,7 +19,6 @@ import ScanNoteButton from './QRScannerModal';
 
 
 interface BunnyNotesPageProps extends Base {
-
 }
 
 export const Center = styled("div")({
@@ -43,6 +42,8 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
     const [renderDownloadPage, setRenderDownloadPage] = React.useState(false);
 
     const [noteDetails, setNoteDetails] = React.useState<NoteDetails | undefined>(undefined);
+
+    const [noteFee, setNoteFee] = React.useState("");
 
     const [noteAddresses, setNoteAddresses] = React.useState<[string, string]>(["erc20", "noteContract"]);
 
@@ -108,22 +109,22 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
     }
 
     const handleSelectGiftCard = async (denomination: string, currency: string, cardType: CardType, addresses: [string, string]) => {
-        const res = await handleCardSelectWithProvider(props, denomination, currency, cardType, props.selectedNetwork)
-
+        const res = await handleCardSelectWithProvider(props, denomination, currency, cardType, props.selectedNetwork, addresses[1])
         if (res !== false) {
             setRenderDownloadPage(true);
-            setNoteDetails(res);
+            setNoteDetails(res.noteDetails);
             setNoteAddresses(addresses);
+            setNoteFee(res.formattedFee);
         }
     }
 
     const handleSelectCashNote = async (denomination: string, currency: string, cardType: CardType, addresses: [string, string]) => {
-        const res = await handleCardSelectWithProvider(props, denomination, currency, cardType, props.selectedNetwork)
-
+        const res = await handleCardSelectWithProvider(props, denomination, currency, cardType, props.selectedNetwork, addresses[1])
         if (res !== false) {
             setRenderDownloadPage(true);
-            setNoteDetails(res);
+            setNoteDetails(res.noteDetails);
             setNoteAddresses(addresses);
+            setNoteFee(res.formattedFee);
         }
     }
 
@@ -132,7 +133,7 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
     }
 
     if (renderDownloadPage) {
-        return downloadNote({ selectedNetwork: props.selectedNetwork, noteAddresses, myAddress: props.myAddress, checkForBunnyWallet, setRenderDownloadPage, showApproval, setShowApproval, cardType, noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError, provider: props.provider })
+        return downloadNote({ noteFee, selectedNetwork: props.selectedNetwork, noteAddresses, myAddress: props.myAddress, checkForBunnyWallet, setRenderDownloadPage, showApproval, setShowApproval, cardType, noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError, provider: props.provider })
     }
 
     if (props.selectedNetwork === "") {
@@ -153,17 +154,19 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
                             <ScanNoteButton dialogTitle='Scan a Wallet Address' setData={setScannedAddress} handleError={props.displayError}></ScanNoteButton>
                         </Grid>
                         <Grid item xs>
-                            <TextField
-                                fullWidth
-                                value={props.myAddress}
-                                onChange={addressSetter}
-                                placeholder="Enter Your Wallet Address"
-                                InputProps={{
-                                    disableUnderline: true,
-                                    sx: { fontSize: 'default' },
-                                }}
-                                variant="standard"
-                            />
+                            <Tooltip title="You can use your Bunny Wallet address here to deposit with it!">
+                                <TextField
+                                    fullWidth
+                                    value={props.myAddress}
+                                    onChange={addressSetter}
+                                    placeholder="Enter Your Wallet Address"
+                                    InputProps={{
+                                        disableUnderline: true,
+                                        sx: { fontSize: 'default' },
+                                    }}
+                                    variant="standard"
+                                />
+                            </Tooltip>
                         </Grid>
                         <Grid item>
                             <Tooltip title="Import Address From Wallet Extension">
