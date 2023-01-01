@@ -82,7 +82,7 @@ export function NetworkCardButtons(props: any) {
         <Button onClick={props.networkSelected("0x405")}>
             <Card sx={{ padding: "5px" }}>
                 <img alt="Bittorrent Chain" src="/imgs/bttLogo.svg" />
-                <Typography gutterBottom variant="subtitle1" component="div" >Bittorrent Chain</Typography>
+                <Typography gutterBottom variant="subtitle1" component="div" >BTTC Donau Testnet</Typography>
             </Card>
         </Button></Tooltip>
 }
