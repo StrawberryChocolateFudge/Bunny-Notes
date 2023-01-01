@@ -20,13 +20,10 @@ export interface SelectableCardsParams {
 }
 
 export interface SelectableCardsProps extends SelectableCardsParams {
-  handleSelect: (denomination: string, currency: string, cardType: CardType,addresses: [string,string]) => void
+  handleSelect: (denomination: string, currency: string, cardType: CardType, addresses: [string, string]) => void
 }
 
 
-const IMGWithMargin = styled("img")({
-  marginTop: "20px"
-})
 
 const OverlayImgs = styled("div")({
   display: "flex",
@@ -38,7 +35,7 @@ const OverlayImgs = styled("div")({
 export function SelectableCards(props: SelectableCardsProps) {
 
   const purchaseSelected = () => {
-    props.handleSelect(props.denomination, props.currency, props.cardType,[props.erc20Address,props.noteContractAddress])
+    props.handleSelect(props.denomination, props.currency, props.cardType, [props.erc20Address, props.noteContractAddress])
   }
 
   const OverlayedImage = () => <OverlayImgs>
