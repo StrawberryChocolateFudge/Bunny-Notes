@@ -8,6 +8,7 @@ import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import "./BunnyWallet.sol";
 
 //TODO: TEST THIS CONTRACT!!
+// FRONT END IS NOT IMPLEMENTED!
 // Implemented based on https://docs.uniswap.org/contracts/v3/guides/swaps/single-swaps
 
 contract SwapTokens is ReentrancyGuard {
