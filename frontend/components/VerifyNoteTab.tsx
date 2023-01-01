@@ -45,8 +45,6 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
             await fetchCommitment(provider)
       }
 
-
-
       const fetchCommitment = async (provider: any) => {
             let parsedNote;
 
@@ -110,7 +108,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                         (loading ? getLoading() : <React.Fragment>
                               <Typography component="p" variant="subtitle1">Verify a Bunny Note. You can check if it's still valid and contains a balance!</Typography>
                               <Tooltip title="Verify the Note">
-                                    <Button onClick={onVerify} sx={{ mr: 1 }}>
+                                    <Button id="verifyNoteButton" onClick={onVerify} sx={{ mr: 1 }}>
                                           <IMG alt="Verify a Note" src="/imgs/VerifyLogo.svg" />
                                     </Button>
                               </Tooltip> </React.Fragment>)
