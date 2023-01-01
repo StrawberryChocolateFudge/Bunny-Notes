@@ -95,7 +95,7 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
         const nullifierHash = toNoteHex(parsedNote.deposit.nullifierHash);
         const commitment = toNoteHex(parsedNote.deposit.commitment);
 
-        const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency);
+        const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency, `${network}`);
         const contract = await getRpcContract(provider, contractAddress, "/ERC20Notes.json");
         // check if the note is valid or if it has been spent already
         const isSpent = await bunnyNoteIsSpent(contract, nullifierHash);
