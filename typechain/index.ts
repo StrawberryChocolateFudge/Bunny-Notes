@@ -34,8 +34,6 @@ export type { IUniswapV3PoolState } from "./IUniswapV3PoolState";
 export type { ISwapRouter } from "./ISwapRouter";
 export type { BunnyNotes } from "./BunnyNotes";
 export type { IVerifier } from "./IVerifier";
-export type { BunnyProxy } from "./BunnyProxy";
-export type { BunnyProxyAdmin } from "./BunnyProxyAdmin";
 export type { BunnyToken } from "./BunnyToken";
 export type { BunnyWallet } from "./BunnyWallet";
 export type { IOwnerVerifier } from "./IOwnerVerifier";
@@ -79,8 +77,6 @@ export { IUniswapV3PoolState__factory } from "./factories/IUniswapV3PoolState__f
 export { ISwapRouter__factory } from "./factories/ISwapRouter__factory";
 export { BunnyNotes__factory } from "./factories/BunnyNotes__factory";
 export { IVerifier__factory } from "./factories/IVerifier__factory";
-export { BunnyProxy__factory } from "./factories/BunnyProxy__factory";
-export { BunnyProxyAdmin__factory } from "./factories/BunnyProxyAdmin__factory";
 export { BunnyToken__factory } from "./factories/BunnyToken__factory";
 export { BunnyWallet__factory } from "./factories/BunnyWallet__factory";
 export { IOwnerVerifier__factory } from "./factories/IOwnerVerifier__factory";

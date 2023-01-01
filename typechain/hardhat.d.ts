@@ -149,14 +149,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVerifier__factory>;
     getContractFactory(
-      name: "BunnyProxy",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.BunnyProxy__factory>;
-    getContractFactory(
-      name: "BunnyProxyAdmin",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.BunnyProxyAdmin__factory>;
-    getContractFactory(
       name: "BunnyToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.BunnyToken__factory>;
@@ -367,16 +359,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IVerifier>;
-    getContractAt(
-      name: "BunnyProxy",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.BunnyProxy>;
-    getContractAt(
-      name: "BunnyProxyAdmin",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.BunnyProxyAdmin>;
     getContractAt(
       name: "BunnyToken",
       address: string,
