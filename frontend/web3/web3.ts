@@ -19,17 +19,13 @@ export function getContractAddressFromCurrencyDenomination(denomination: string,
     switch (networkId) {
         case BTTCTESTNETID:
             if (denomination === "100" && currency === "USDTM") {
-                console.log("returning Donau USDTM 100 ", USDTM100ADDRESS_DONAU)
                 return USDTM100ADDRESS_DONAU;
             } else if (denomination === "1" && currency === "BTT") {
-                console.log("returning BTT native donau : ", BTT_NATIVE_DONAU)
                 return BTT_NATIVE_DONAU
             } else {
-                console.log("returning nothing")
                 return ""
             }
         default:
-            console.log("returning default")
             return ""
     }
 }
@@ -42,6 +38,19 @@ if (process.env.NODE_ENV === "development") {
 }
 
 export const BTTCTESTNETNETWORKURL = "https://pre-rpc.bt.io/";
+
+export function getExplorer(txId: string, network: string | undefined): string {
+    if (!network) {
+        return "";
+    }
+    switch (network) {
+        case BTTCTESTNETID:
+            return `http://testscan.bt.io/#/transaction/${txId}`
+        default:
+            return "";
+    }
+}
+
 
 export function web3Injected(): boolean {
     //@ts-ignore
