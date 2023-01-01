@@ -3,10 +3,10 @@
 import { ethers } from "ethers";
 import { CardType } from "../components/CardGrid";
 import { createNote } from "../zkp/generateProof";
-import { onBoardOrGetProvider } from "./web3";
+import { getContract, getFee, onBoardOrGetProvider } from "./web3";
 
 
-export async function handleCardSelectWithProvider(props: any, denomination: string, currency: string, cardType: CardType, netId: string) {
+export async function handleCardSelectWithProvider(props: any, denomination: string, currency: string, cardType: CardType, netId: string, noteAddress: string) {
     let provider = null;
     if (props.provider === null) {
         provider = await onBoardOrGetProvider(props.displayError);
@@ -28,9 +28,14 @@ export async function handleCardSelectWithProvider(props: any, denomination: str
         props.displayError("Unable to connect to wallet!");
         return false;
     }
+
+    const erc20Notes = await getContract(props.provider, noteAddress, "/ERC20Notes.json");
+    const fee = await getFee(erc20Notes);
+    const formattedFee = ethers.utils.formatEther(fee);
+
     const noteDetails = await createNote(currency, parseInt(denomination), netId);
 
-    return noteDetails;
+    return { noteDetails, formattedFee };
 
 }
 
