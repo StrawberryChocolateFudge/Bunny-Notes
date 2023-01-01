@@ -41,7 +41,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
       }
 
       const onVerify = async () => {
-            const provider = getJsonRpcProvider();
+            const provider = getJsonRpcProvider(props.selectedNetwork);
             await fetchCommitment(provider)
       }
 
@@ -57,7 +57,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                   return;
             }
             setLoading(true);
-            const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency);
+            const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency, props.selectedNetwork);
             const contract = await getRpcContract(provider, contractAddress, "/ERC20Notes.json");
             const commitmentBigInt = parsedNote.deposit.commitment;
             const nullifierHash = parsedNote.deposit.nullifierHash
@@ -128,7 +128,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                                                       <TableCell align="right">{commitmentDetails.creator}</TableCell>
                                                 </TableRow>
                                                 <TableRow>
-                                                      <TableCell align="left">recipient:</TableCell>
+                                                      <TableCell align="left">Recipient:</TableCell>
                                                       <TableCell align="right">{commitmentDetails.recipient}</TableCell>
                                                 </TableRow>
                                                 <TableRow>
