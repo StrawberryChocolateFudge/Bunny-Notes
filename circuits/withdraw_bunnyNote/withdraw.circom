@@ -15,7 +15,6 @@ template Withdraw(){
 
    // hidden signals to make sure the recipient and fee cannot be tampered with later
    signal recipientSquare;
-   signal feeSquare;
    signal changeSquare;
 
   // Hashing the commitment and the nullifier
