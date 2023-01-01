@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
 const ERC20ADDRESS = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7";
-const VERIFIERADDRESS = "0xD98F9B6AB4fbA9b7173Cfe92Ae1Eb9A3F3F91751";
+const VERIFIERADDRESS = "0xe5f45dAA32B40742E625a3Ebd1cDf6f343614AdE";
 const DENOMINATION = ethers.utils.parseEther("100");
 const FEEDIVIDER = 10;
 const RELAYERADDRESS = "0xaaCb9bf503Dfb3A8a77BB5c459f45f495B7ad392"; //New external relayer address
@@ -15,8 +15,7 @@ async function main() {
 
 
   console.log("Bunny Notes ERC20 has been deployed to", ERC20Notes.address);
-  // Bunny Notes ERC20 has been deployed to 0xa756b2b52Ba893a6109561bC86138Cbb897Fb2e0
-  
+// Bunny Notes ERC20 has been deployed to 0x94D1f7e4667f2aE54494C2a99A18C8B4aED9B22A  
 }
 
 // main().catch((error) => {
