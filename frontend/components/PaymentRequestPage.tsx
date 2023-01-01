@@ -1,4 +1,4 @@
-import { AppBar, Box, Button, Grid, Paper, styled, Table, TableBody, TableCell, TableContainer, TableRow, Toolbar, Tooltip } from "@mui/material";
+import { AppBar, Box, Button, Grid, Link, Paper, Stack, styled, Table, TableBody, TableCell, TableContainer, TableRow, Toolbar, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Base, Copyright, Spacer } from "./Base";
@@ -6,7 +6,7 @@ import Header from "./Header";
 import VerifyIcon from "@mui/icons-material/Note"
 import TextField from '@mui/material/TextField';
 import ScanNoteButton from './QRScannerModal';
-import { bunnyNoteIsSpent, bunnyNotesCommitments, bunnyNotesWithdrawCashNote, getContract, getContractAddressFromCurrencyDenomination, getJsonRpcProvider, getRpcContract, MAXCASHNOTESIZE, onBoardOrGetProvider, relayCashNotePayment, requestAccounts } from "../web3/web3";
+import { bunnyNoteIsSpent, bunnyNotesCommitments, bunnyNotesWithdrawCashNote, getContract, getContractAddressFromCurrencyDenomination, getExplorer, getJsonRpcProvider, getRpcContract, MAXCASHNOTESIZE, onBoardOrGetProvider, relayCashNotePayment, requestAccounts } from "../web3/web3";
 import { parseNote, toNoteHex } from "../../lib/BunnyNote";
 import { ethers } from "ethers";
 import { generateZKProof } from "../zkp/generateProof";
@@ -26,6 +26,8 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
     const [note, setNote] = useState("");
     const [loading, setLoading] = useState(false);
     const [paymentDone, setPaymentDone] = useState(false);
+    const [txHash, setTxHash] = useState("");
+    const [txHashLink, setTxHashLink] = useState("");
 
     const noteSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         setNote(event.target.value);
@@ -131,6 +133,12 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
             const res = await relayCashNotePayment({ proof: zkp.proof, publicSignals: zkp.publicSignals, recipient: payTo, currency: parsedNote.currency, denomination: parsedNote.amount, type: "Cash Note", network });
 
             if (res.status === 200) {
+                const json = await res.json();
+
+                const txId = json.txId;
+                setTxHash(txId);
+                const link = getExplorer(txId, network);
+                setTxHashLink(link);
                 setPaymentDone(true);
             } else {
                 const json = await res.json();
@@ -185,17 +193,22 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                     </TableContainer>
                     <Spacer></Spacer>
 
-                    {loading ? getLoading() : (paymentDone ? <p>Done</p> : <Tooltip title="Pay with Cash Note">
-                        <Button onClick={paymentAction} sx={{ mr: 1 }}>
-                            <IMG src="/imgs/pay.svg" alt="Pay" />
-                        </Button>
-                    </Tooltip>)}
+                    {loading ? getLoading() : (
+                        paymentDone ?
+                            <Stack direction={"column"} justifyContent="center" alignItems={"center"} spacing={1}>
+                                <p>Done</p>
+                                <Link target="_blank" rel="noopener" href={txHashLink}>Transaction: {txHash}</Link>
+                            </Stack> :
+                            <Tooltip title="Pay with Cash Note">
+                                <Button onClick={paymentAction} sx={{ mr: 1 }}>
+                                    <IMG src="/imgs/pay.svg" alt="Pay" />
+                                </Button>
+                            </Tooltip>)}
                 </Box>
             </Paper >
             <Box component="footer" sx={{ p: 2 }}>
                 <Copyright />
             </Box>
         </Box>
-
     </Box>
 }
