@@ -68,7 +68,7 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
         const zkp = await generateZKProof(parsedNote.deposit, myAddress, change);
         const solidityProof = packSolidityProof(zkp.proof);
         await bunnyNotesWithdrawGiftCard(contract, solidityProof, nullifierHash, commitment, myAddress, change).catch(err => {
-            props.displayError("Unable to Withdraw Gift Card");
+            props.displayError("Unable to Withdraw");
             console.error(err);
         });
     }
