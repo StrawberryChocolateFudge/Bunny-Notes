@@ -25,6 +25,7 @@ import BunnyWalletTab from './BunnyWalletTab';
 import BunnyNotesTab from './BunnyNotesTab';
 import { SelectNetworkDialog } from './utils/NetworkSelector';
 import { getCurrenttNetworkFromSS, getSelectedNFromSS } from '../storage/session';
+import { NoteDetails } from '../zkp/generateProof';
 
 export interface Base {
     myAddress: string,
@@ -34,6 +35,7 @@ export interface Base {
     displayError: any,
     selectedNetwork: string,
     setSelectedNetwork: (n: string) => void;
+    navigateToVerifyPage: (note: NoteDetails) => void;
 }
 
 export function Copyright() {
@@ -105,6 +107,18 @@ export default function Base() {
         setSelectedTab(newValue);
     };
 
+    function navigateToVerifyPage(note: NoteDetails) {
+        setMyNoteString(note[0])
+        setSelectedTab(1);
+
+        const clickButton = () => {
+            const button = document.getElementById("verifyNoteButton");
+            button?.click();
+        }
+        // Wait 1 second for the page to render then click the verify automaticly!
+        setTimeout(clickButton, 1000);
+    }
+
     const genericProps = {
         displayError: openSnackbar,
         provider,
@@ -112,7 +126,8 @@ export default function Base() {
         setMyAddress,
         myAddress,
         selectedNetwork,
-        setSelectedNetwork
+        setSelectedNetwork,
+        navigateToVerifyPage
     }
 
     const noteStringProps = {

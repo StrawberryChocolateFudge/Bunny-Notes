@@ -7,7 +7,7 @@ import { CardType } from "./CardGrid";
 import { BigNumber, ethers } from "ethers";
 import { bunnyNotesCommitments, bunnyNotesDeposit, ERC20Approve, ethNotesDeposit, getChainId, getContract, getFee, getIsContract, requestAccounts, ZEROADDRESS } from "../web3/web3";
 import { approveERC20SpendByOwner, depositToBunnyNoteByOwner } from "../web3/Wallet";
-import {  parseEther } from "ethers/lib/utils";
+import { parseEther } from "ethers/lib/utils";
 
 interface DownloadNoteProps {
     provider: any,
@@ -25,6 +25,7 @@ interface DownloadNoteProps {
     noteAddresses: [string, string];
     selectedNetwork: string;
     noteFee: string;
+    navigateToVerifyPage: (noteDetails: NoteDetails) => void;
 }
 
 
@@ -116,7 +117,6 @@ export function downloadNote(props: DownloadNoteProps) {
                 props.setShowApproval(true);
             });
         } else {
-            console.log("depositing with owner address")
             // after succesful approval  I can prompt the user to deposit the tokens to add value to the note
             const notesContract = await getContract(props.provider, noteAddress, "/BunnyNotes.json");
             const address = await requestAccounts(props.provider);
@@ -140,16 +140,24 @@ export function downloadNote(props: DownloadNoteProps) {
                     return;
                 }
 
-                await ethNotesDeposit(notesContract, toNoteHex(deposit.commitment), isCashNote, address, fee.add(denomination)).catch(err => {
+                const tx = await ethNotesDeposit(notesContract, toNoteHex(deposit.commitment), isCashNote, address, fee.add(denomination)).catch(err => {
                     props.displayError("Unable to deposit  Note")
+                });
+                await tx.wait().then((receipt) => {
+                    if (receipt.status === 1) {
+                        props.navigateToVerifyPage(noteDetails)
+                    }
                 })
             } else {
-                await bunnyNotesDeposit(notesContract, toNoteHex(deposit.commitment), isCashNote, address).catch(err => {
+                const tx = await bunnyNotesDeposit(notesContract, toNoteHex(deposit.commitment), isCashNote, address).catch(err => {
                     props.displayError("Unable to deposit ERC20 Note")
                 });
+                await tx.wait().then((receipt) => {
+                    if (receipt.status === 1) {
+                        props.navigateToVerifyPage(noteDetails)
+                    }
+                })
             }
-
-
         }
     }
 
@@ -254,8 +262,9 @@ export function downloadNote(props: DownloadNoteProps) {
                             <Button onClick={downloadClick} variant="contained" sx={{ mr: 1 }}>Download</Button>
                         </Tooltip>
                     </Grid>
-                    {noteDisplay()}
+                    
                     <Grid item sx={{ margin: "0 auto" }}>
+                        {noteDisplay()}
                         <Grid item sx={{ textAlign: "center" }}>
                             <Typography variant="subtitle1" component="div">
                                 Make sure you download the note before making a deposit!

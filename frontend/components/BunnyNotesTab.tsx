@@ -64,7 +64,6 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
         } else {
             setCardType("Gift Card")
         }
-
     }
 
     React.useEffect(() => {
@@ -133,7 +132,24 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
     }
 
     if (renderDownloadPage) {
-        return downloadNote({ noteFee, selectedNetwork: props.selectedNetwork, noteAddresses, myAddress: props.myAddress, checkForBunnyWallet, setRenderDownloadPage, showApproval, setShowApproval, cardType, noteDetails, qrCodeDataUrl, downloadClicked, setDownloadClicked, displayError: props.displayError, provider: props.provider })
+        return downloadNote({
+            navigateToVerifyPage: props.navigateToVerifyPage,
+            noteFee,
+            selectedNetwork: props.selectedNetwork,
+            noteAddresses,
+            myAddress: props.myAddress,
+            checkForBunnyWallet,
+            setRenderDownloadPage,
+            showApproval,
+            setShowApproval,
+            cardType,
+            noteDetails,
+            qrCodeDataUrl,
+            downloadClicked,
+            setDownloadClicked,
+            displayError: props.displayError,
+            provider: props.provider
+        })
     }
 
     if (props.selectedNetwork === "") {
