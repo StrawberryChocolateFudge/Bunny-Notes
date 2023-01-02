@@ -129,7 +129,7 @@ export function TransferETHElements(props: any) {
         <PaddedDiv>
             <RowSpaceBetween>
                 <div>
-                    <TextField key="transferETHAmountKey" value={props.transferEtAmount} onChange={props.transferEthAmountSetter} type={"number"} label="Transfer Amount" variant="filled"></TextField>
+                    <TextField key="transferETHAmountKey" value={props.transferEthAmount} onChange={props.transferEthAmountSetter} type={"number"} label="Transfer Amount" variant="filled"></TextField>
                     <Tooltip title="Set the amount to Max">
                         <Button onClick={props.setTransferETHAmountMax} sx={{ top: "20%" }} variant="text">Max</Button>
                     </Tooltip>
