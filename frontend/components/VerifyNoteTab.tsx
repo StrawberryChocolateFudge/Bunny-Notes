@@ -82,6 +82,10 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
             setLoading(false);
       }
 
+      const resetVerifyPage = () => {
+            setCommitmentDetails(null);
+      }
+
       return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
             <AppBar
                   position="static"
@@ -97,6 +101,10 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                               <Grid item xs>
                                     <TextField autoComplete='off' value={props.noteString} onChange={noteStringSetter} fullWidth placeholder="Paste your Note Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                               </Grid>
+
+                              {commitmentDetails !== null ? <Grid item>
+                                    <Button variant="contained" onClick={resetVerifyPage}>Reset</Button>
+                              </Grid> : null}
 
                         </Grid>
                   </Toolbar>
