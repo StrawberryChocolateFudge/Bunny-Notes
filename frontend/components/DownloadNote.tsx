@@ -105,6 +105,30 @@ export function downloadNote(props: DownloadNoteProps) {
 
     const getIsCashNote = () => props.cardType === "Cash Note" ? true : false;
 
+    const handleDepositTx = async (tx) => {
+        if (tx !== undefined) {
+            await tx.wait().then((receipt) => {
+                if (receipt.status === 1) {
+                    props.navigateToVerifyPage(noteDetails)
+                } else {
+                    // If the deposit transaction fails the deposit button will be reenabled
+                    // This can happen if the deposit was dispatched too fast and the approval didn't succeed, yet
+                    props.setDepositButtonDisabled(false);
+                }
+            })
+        }
+    }
+
+    const handleApprovalTx = async (tx) => {
+        if (tx !== undefined) {
+            await tx.wait().then((receipt) => {
+                if (receipt.status === 1) {
+                    props.setDepositButtonDisabled(false);
+                }
+            })
+        }
+    }
+
     const depositWithOwnerAddress = async () => {
         if (props.showApproval && !isNativeToken) {
             // approve the spend, need to approve for the fee
@@ -114,10 +138,14 @@ export function downloadNote(props: DownloadNoteProps) {
             const approveAmount = parseFloat(formattedFee) + parseFloat(noteDetails[1].amount);
             const ERC20Contract = await getContract(props.provider, erc20Address, "/ERC20.json");
             const convertedApproveAmount = ethers.utils.parseEther(approveAmount.toString());
+            props.setDepositButtonDisabled(true);
             props.setShowApproval(false);
-            await ERC20Approve(ERC20Contract, noteAddress, convertedApproveAmount).catch((err) => {
+            const tx = await ERC20Approve(ERC20Contract, noteAddress, convertedApproveAmount).catch((err) => {
                 props.setShowApproval(true);
             });
+
+            await handleApprovalTx(tx);
+            return;
         } else {
             props.setDepositButtonDisabled(true);
             // after succesful approval  I can prompt the user to deposit the tokens to add value to the note
@@ -151,29 +179,15 @@ export function downloadNote(props: DownloadNoteProps) {
                     props.setDepositButtonDisabled(false);
 
                 });
-
-                if (tx !== undefined) {
-                    await tx.wait().then((receipt) => {
-                        if (receipt.status === 1) {
-                            props.navigateToVerifyPage(noteDetails)
-                        }
-                    })
-                }
-
+                await handleDepositTx(tx);
+                return;
             } else {
                 const tx = await bunnyNotesDeposit(notesContract, toNoteHex(deposit.commitment), isCashNote, address).catch(err => {
                     props.displayError("Unable to deposit ERC20 Note");
                     props.setDepositButtonDisabled(false);
                 });
-
-                if (tx !== undefined) {
-                    await tx.wait().then((receipt) => {
-                        if (receipt.status === 1) {
-                            props.navigateToVerifyPage(noteDetails)
-                        }
-                    })
-                }
-
+                await handleDepositTx(tx);
+                return;
             }
         }
     }
@@ -181,17 +195,15 @@ export function downloadNote(props: DownloadNoteProps) {
 
 
     const depositWithBunnyWallet = async () => {
-        const address = await requestAccounts(props.provider);
+        const address: string = await requestAccounts(props.provider);
 
         const bunnyWallet = await getContract(props.provider, props.myAddress, "/BunnyWallet.json");
 
-        const owner = await bunnyWallet.owner();
-
-        if (owner !== address) {
+        const owner: string = await bunnyWallet.owner();
+        if (owner.toLowerCase() !== address.toLowerCase()) {
             props.displayError("You don't own the Bunny Wallet");
             return;
         }
-
 
         if (props.showApproval && !isNativeToken) {
             // approve the spend using the bunny wallet, you must be the owner of the wallet
@@ -199,16 +211,22 @@ export function downloadNote(props: DownloadNoteProps) {
             const fee = await getFee(erc20Notes);
             const formattedFee = ethers.utils.formatEther(fee);
             const approveAmount = parseFloat(formattedFee) + parseFloat(noteDetails[1].amount);
+            props.setDepositButtonDisabled(true);
             props.setShowApproval(false);
-            const receipt = await approveERC20SpendByOwner(bunnyWallet, erc20Address, erc20Address, approveAmount.toString()).catch(err => {
+            const tx = await approveERC20SpendByOwner(bunnyWallet, erc20Address, erc20Address, approveAmount.toString()).catch(err => {
+                props.displayError("Unable to Approve the spend with the Smart Contract Wallet!")
                 props.setShowApproval(true);
             });
-
+            await handleApprovalTx(tx);
+            return;
         } {
             props.setDepositButtonDisabled(true);
             // Deposit with bunny wallet
             const bunnyNote = await getContract(props.provider, noteAddress, "/BunnyNotes.json");
+
             const isCashNote = getIsCashNote();
+
+
             const deposit = noteDetails[1].deposit;
             // Check if the commitment exists already
             const commitments = await bunnyNotesCommitments(bunnyNote, toNoteHex(deposit.commitment));
@@ -217,13 +235,15 @@ export function downloadNote(props: DownloadNoteProps) {
                 props.setDepositButtonDisabled(false)
                 return;
             }
-            await depositToBunnyNoteByOwner(bunnyWallet, noteAddress, erc20Address, toNoteHex(deposit.commitment), isCashNote, !isNativeToken).catch(err => {
+
+            const tx = await depositToBunnyNoteByOwner(bunnyWallet, noteAddress, erc20Address, toNoteHex(deposit.commitment), isCashNote, !isNativeToken).catch(err => {
                 props.displayError("Unable to create a Bunny Note with the Smart Contract Wallet!")
                 props.setDepositButtonDisabled(false)
 
             });
+            await handleDepositTx(tx);
+            return;
         }
-
     }
 
 
@@ -246,7 +266,6 @@ export function downloadNote(props: DownloadNoteProps) {
         if (props.checkForBunnyWallet) {
             isContract = await getIsContract(props.provider, props.myAddress, props.displayError);
         }
-
         // If the provided address is a contract, it's assumed the user wants to use his Bunny Wallet!
         if (!isContract) {
             await depositWithOwnerAddress();
@@ -302,8 +321,8 @@ export function downloadNote(props: DownloadNoteProps) {
                             </Typography>
 
                             {props.showApproval && !isNativeToken ? <Tooltip title={"Approve spending " + denomination + ` (plus ${displayedFee} fee)`}>
-                                <Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend</Button></Tooltip> : <Tooltip title={"Deposit " + denomination + ` (plus ${displayedFee} fee)`}>
-                                <Button disabled={props.depositButtonDisabled} onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Deposit</Button></Tooltip>}
+                                <span><Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend</Button></span></Tooltip> : <Tooltip title={"Deposit " + denomination + ` (plus ${displayedFee} fee)`}>
+                                <span><Button disabled={props.depositButtonDisabled} onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Deposit</Button></span></Tooltip>}
                         </Grid>
                     </Grid>
                 </Grid>
