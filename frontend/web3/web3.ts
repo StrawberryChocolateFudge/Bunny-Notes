@@ -68,7 +68,7 @@ export async function getChainId(provider): Promise<number> {
 
 export async function getIsContract(provider: any, address: string, displayError: CallableFunction): Promise<boolean> {
     try {
-        const code = await provider.getCode();
+        const code = await provider.getCode(address);
         if (code !== "0x") return true;
     } catch (err) {
         return false;
