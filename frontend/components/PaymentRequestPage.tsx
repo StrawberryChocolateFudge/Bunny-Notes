@@ -15,9 +15,15 @@ import { getLoading } from "./LoadingIndicator";
 interface PaymentRequestPageProps extends Base {
 }
 
-const IMG = styled("img")({
+const PayIMG = styled("img")({
     margin: "0 auto",
     width: '80px'
+})
+
+
+const BunnyNotesImg = styled("img")({
+    width: "400px",
+    padding: "10px",
 })
 
 export function PaymentRequestPage(props: PaymentRequestPageProps) {
@@ -154,6 +160,9 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
 
     return <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Header withTabs={false} />
+        {/* <Stack display={"flex"} flexDirection="row" justifyContent="center" alignContent={"center"}>
+            <BunnyNotesImg src="/imgs/BunnyNotes.svg" alt="Bunny Notes Title" />
+        </Stack> */}
         <Box component="main" sx={{ flex: 1 }}>
             <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden', marginTop: "30px" }}>
                 <AppBar
@@ -201,7 +210,7 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                             </Stack> :
                             <Tooltip title="Pay with Cash Note">
                                 <Button onClick={paymentAction} sx={{ mr: 1 }}>
-                                    <IMG src="/imgs/pay.svg" alt="Pay" />
+                                    <PayIMG src="/imgs/pay.svg" alt="Pay" />
                                 </Button>
                             </Tooltip>)}
                 </Box>
