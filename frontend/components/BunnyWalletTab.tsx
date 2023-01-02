@@ -168,7 +168,6 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
         }
     }
 
-    // TODO: THIS SETTER DON"T WORK!!
     const setTransferETHAmountMax = () => {
         setTransferEthAmount(walletBalance);
     }
@@ -638,7 +637,7 @@ export default function BunnyWalletTab(props: BunnyWalletTabProps) {
             return;
         }
 
-        if (owner !== userWalletAddress) {
+        if (owner.toLowerCase() !== userWalletAddress.toLowerCase()) {
             props.displayError("You are not the owner of this smart contract!");
             return;
         }
