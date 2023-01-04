@@ -11,7 +11,7 @@ import { Base, Spacer } from './Base';
 import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { styled, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
-import { bunnyNoteIsSpent, bunnyNotesCommitments, getContractAddressFromCurrencyDenomination, getJsonRpcProvider, getRpcContract } from '../web3/web3';
+import { bunnyNoteIsSpent, bunnyNotesCommitments, getContractAddressFromCurrencyDenomination, getErc20NoteToken, getJsonRpcProvider, getRpcContract } from '../web3/web3';
 import { getLoading } from './LoadingIndicator';
 interface VerifyNoteTabProps extends Base {
       noteString: string
@@ -24,7 +24,9 @@ export type Commitment = {
       noteType: boolean
       creator: string
       recipient: string
-      denomination: string
+      denomination: string,
+      erc20Address: string,
+      noteAddress: string
 }
 
 const IMG = styled("img")({
@@ -72,12 +74,24 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
             }
 
             const recipient = !isSpent ? "Not Spent" : commitments.recipient;
+
+            //Try to get the token, if it throws then it must be an ETH note
+            let erc20Address = "Native Token";
+            try {
+                  erc20Address = await getErc20NoteToken(contract);
+            } catch (err) {
+            }
+
+
             setCommitmentDetails({
                   validText: !isSpent ? "Valid!" : "The Note has been spent!",
                   noteType: commitments.cashNote,
                   creator: commitments.creator,
                   recipient: recipient,
-                  denomination: `${parsedNote.amount} ${parsedNote.currency}`
+                  denomination: `${parsedNote.amount} ${parsedNote.currency}`,
+                  noteAddress: contractAddress,
+                  erc20Address
+
             })
             setLoading(false);
       }
@@ -85,6 +99,8 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
       const resetVerifyPage = () => {
             setCommitmentDetails(null);
       }
+
+      const shortenAddress = (address: string) => <Tooltip title={address}><div>{address.substring(0, 6)}...{address.substring(address.length - 6)}</div></Tooltip>
 
       return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
             <AppBar
@@ -105,7 +121,6 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                               {commitmentDetails !== null ? <Grid item>
                                     <Button variant="contained" onClick={resetVerifyPage}>Reset</Button>
                               </Grid> : null}
-
                         </Grid>
                   </Toolbar>
             </AppBar>
@@ -115,7 +130,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                   {commitmentDetails === null ?
                         (loading ? getLoading() : <React.Fragment>
                               <Typography component="p" variant="subtitle1">Verify a Bunny Note. You can check if it's still valid and contains a balance!</Typography>
-                              <Tooltip title="Verify the Note">
+                              <Tooltip arrow title="Verify the Note">
                                     <Button id="verifyNoteButton" onClick={onVerify} sx={{ mr: 1 }}>
                                           <IMG alt="Verify a Note" src="/imgs/VerifyLogo.svg" />
                                     </Button>
@@ -123,15 +138,15 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                         : <React.Fragment>
                               <Typography sx={{ textAlign: "center" }}>{commitmentDetails.validText}</Typography>
                               <TableContainer component={Paper}>
-                                    <Table sx={{ minWidth: 650 }} aria-label="Note details">
+                                    <Table aria-label="Note details">
                                           <TableBody>
                                                 <TableRow>
                                                       <TableCell align="left">Denomination:</TableCell>
-                                                      <TableCell align="right">{commitmentDetails.denomination}</TableCell>
+                                                      <TableCell size='small' align="right">{commitmentDetails.denomination}</TableCell>
                                                 </TableRow>
                                                 <TableRow>
                                                       <TableCell align="left">Creator:</TableCell>
-                                                      <TableCell align="right">{commitmentDetails.creator}</TableCell>
+                                                      <TableCell align="right">{shortenAddress(commitmentDetails.creator)}</TableCell>
                                                 </TableRow>
                                                 <TableRow>
                                                       <TableCell align="left">Recipient:</TableCell>
@@ -140,6 +155,14 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                                                 <TableRow>
                                                       <TableCell align="left">Note Type:</TableCell>
                                                       <TableCell align="right">{commitmentDetails.noteType ? "Cash Note" : "Gift Card"}</TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                      <TableCell align="left">Note Contract Address:</TableCell>
+                                                      <TableCell size="small" align="right">{shortenAddress(commitmentDetails.noteAddress)}</TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                      <TableCell align="left">Token Address:</TableCell>
+                                                      <TableCell size="small" align="right">{commitmentDetails.erc20Address === "Native Token" ? null : shortenAddress(commitmentDetails.erc20Address)}</TableCell>
                                                 </TableRow>
                                           </TableBody>
                                     </Table>
