@@ -67,6 +67,7 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
         const change = "0";
         const zkp = await generateZKProof(parsedNote.deposit, myAddress, change);
         const solidityProof = packSolidityProof(zkp.proof);
+
         await bunnyNotesWithdrawGiftCard(contract, solidityProof, nullifierHash, commitment, myAddress, change).catch(err => {
             props.displayError("Unable to Withdraw");
             console.error(err);
@@ -94,7 +95,7 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
         </AppBar>
         <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center" }}>
             <Typography component="p" variant="subtitle1">You can withdraw a Gift Card's balance to your wallet.</Typography>
-            <Tooltip title="Cash out the Gift Card">
+            <Tooltip arrow title="Cash out the Gift Card">
                 <Button onClick={cashOutAction} sx={{ mr: 1 }}>
                     <IMG alt="Cash out a Gift Card" src="/imgs/CashOut.svg" />
                 </Button>

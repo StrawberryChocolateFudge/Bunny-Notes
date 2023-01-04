@@ -172,7 +172,7 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
                             <ScanNoteButton dialogTitle='Scan a Wallet Address' setData={setScannedAddress} handleError={props.displayError}></ScanNoteButton>
                         </Grid>
                         <Grid item xs>
-                            <Tooltip title="You can use your Bunny Wallet address here to deposit with it!">
+                            <Tooltip arrow title="You can use your Bunny Wallet address here to deposit with it!">
                                 <TextField
                                     fullWidth
                                     value={props.myAddress}
@@ -187,7 +187,7 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
                             </Tooltip>
                         </Grid>
                         <Grid item>
-                            <Tooltip title="Import Address From Wallet Extension">
+                            <Tooltip arrow title="Import Address From Wallet Extension">
                                 <Button onClick={importAddress} variant="contained" sx={{ mr: 1 }}>
                                     Import Address                                </Button>
                             </Tooltip>
@@ -197,15 +197,15 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
             </AppBar>
             <Center>
                 <Stack justifyContent={"center"} direction="row" spacing={1} alignItems={"center"}>
-                    <Tooltip title="Select Gift Cards">
+                    <Tooltip arrow title="Select Gift Cards">
                         <GiftCardIMG sx={{
                             opacity: cardType === "Cash Note" ? "0.3" : "1"
                         }} alt="Gift Card" src="/imgs/giftCard.svg" onClick={handleClickImage("Gift Card")} />
                     </Tooltip>
-                    <Tooltip title="Switch between Gift Card and Cash Note">
+                    <Tooltip arrow title="Switch between Gift Card and Cash Note">
                         <Switch checked={cardType === "Cash Note"} onChange={handleChecked}></Switch>
                     </Tooltip>
-                    <Tooltip title="Select Cash Notes">
+                    <Tooltip arrow title="Select Cash Notes">
                         <CashNoteIMG sx={{
                             opacity: cardType === "Gift Card" ? "0.3" : 1
                         }} alt="Cash Note" src="/imgs/cashNote.svg" onClick={handleClickImage("Cash Note")} />

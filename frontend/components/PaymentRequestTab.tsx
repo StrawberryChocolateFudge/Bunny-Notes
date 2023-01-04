@@ -89,7 +89,7 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
                         <TextField autoComplete="off" type="text" value={props.paymentRequest.payTo} onChange={setPayToAddress} fullWidth placeholder="Paste your Address Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                     </Grid>
                     <Grid item>
-                        <Tooltip title="Import Address From Wallet Extension">
+                        <Tooltip arrow title="Import Address From Wallet Extension">
                             <Button onClick={importAddress} variant="contained" sx={{ mr: 1 }}>
                                 Import Address
                             </Button>

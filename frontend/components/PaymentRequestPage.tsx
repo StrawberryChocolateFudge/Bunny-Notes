@@ -6,7 +6,7 @@ import Header from "./Header";
 import VerifyIcon from "@mui/icons-material/Note"
 import TextField from '@mui/material/TextField';
 import ScanNoteButton from './QRScannerModal';
-import { bunnyNoteIsSpent, bunnyNotesCommitments, bunnyNotesWithdrawCashNote, getContract, getContractAddressFromCurrencyDenomination, getExplorer, getJsonRpcProvider, getRpcContract, MAXCASHNOTESIZE, onBoardOrGetProvider, relayCashNotePayment, requestAccounts } from "../web3/web3";
+import { bunnyNoteIsSpent, bunnyNotesCommitments, bunnyNotesWithdrawCashNote, getContract, getContractAddressFromCurrencyDenomination, getExplorer, getJsonRpcProvider, getRpcContract, MAXCASHNOTESIZE, onBoardOrGetProvider, relayCashNotePayment, requestAccounts, web3Injected } from "../web3/web3";
 import { parseNote, toNoteHex } from "../../lib/BunnyNote";
 import { ethers } from "ethers";
 import { generateZKProof } from "../zkp/generateProof";
@@ -208,10 +208,10 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                                 <p>Done</p>
                                 <Link target="_blank" rel="noopener" href={txHashLink}>Transaction: {txHash}</Link>
                             </Stack> :
-                            <Tooltip title="Pay with Cash Note">
+                            <Tooltip arrow title="Pay with Cash Note">
                                 <Button onClick={paymentAction} sx={{ mr: 1 }}>
                                     <PayIMG src="/imgs/pay.svg" alt="Pay" />
-                                </Button>
+                             </Button>
                             </Tooltip>)}
                 </Box>
             </Paper >

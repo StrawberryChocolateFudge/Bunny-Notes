@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import Button from "@mui/material/Button";
 import { styled } from "@mui/system";
 import { CardType } from './CardGrid';
-import { Avatar, CardHeader } from '@mui/material';
+import { Tooltip } from '@mui/material';
 
 export interface SelectableCardsParams {
   networkLogo: string;
@@ -55,13 +55,15 @@ export function SelectableCards(props: SelectableCardsProps) {
     }
   }
   return (
-    <Button sx={{ height: 150 }} onClick={purchaseSelected} >
-      <Card sx={{ width: 200, height: 150 }}>
-        <OverlayedImage></OverlayedImage>
-        <CardContent>
-          {getContent()}
-        </CardContent>
-      </Card>
-    </Button>
+    <Tooltip arrow title={props.erc20Address === "0x0000000000000000000000000000000000000000" ? "Native Token" : props.erc20Address}>
+      <Button sx={{ height: 150 }} onClick={purchaseSelected} >
+        <Card sx={{ width: 200, height: 150 }}>
+          <OverlayedImage></OverlayedImage>
+          <CardContent>
+            {getContent()}
+          </CardContent>
+        </Card>
+      </Button>
+    </Tooltip>
   );
 }

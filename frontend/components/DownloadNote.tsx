@@ -8,6 +8,7 @@ import { BigNumber, ethers } from "ethers";
 import { bunnyNotesCommitments, bunnyNotesDeposit, ERC20Approve, ethNotesDeposit, getChainId, getContract, getFee, getIsContract, requestAccounts, ZEROADDRESS } from "../web3/web3";
 import { approveERC20SpendByOwner, depositToBunnyNoteByOwner } from "../web3/Wallet";
 import { parseEther } from "ethers/lib/utils";
+import { DisplayAddresses } from "./utils/DisplayAddresses";
 
 interface DownloadNoteProps {
     provider: any,
@@ -299,12 +300,12 @@ export function downloadNote(props: DownloadNoteProps) {
             <Toolbar>
                 <Grid container spacing={2} alignItems="center" sx={{ paddingTop: "20px" }}>
                     <Grid item>
-                        <Tooltip title="Go back">
+                        <Tooltip arrow title="Go back">
                             <Button onClick={backButtonClicked}>Back</Button>
                         </Tooltip>
                     </Grid>
                     <Grid item>
-                        <Tooltip title="Download the Note">
+                        <Tooltip arrow title="Download the Note">
                             <Button onClick={downloadClick} variant="contained" sx={{ mr: 1 }}>Download</Button>
                         </Tooltip>
                     </Grid>
@@ -320,8 +321,8 @@ export function downloadNote(props: DownloadNoteProps) {
                                 If you loose the note we cannot recover the deposit for you!
                             </Typography>
 
-                            {props.showApproval && !isNativeToken ? <Tooltip title={"Approve spending " + denomination + ` (plus ${displayedFee} fee)`}>
-                                <span><Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend</Button></span></Tooltip> : <Tooltip title={"Deposit " + denomination + ` (plus ${displayedFee} fee)`}>
+                            {props.showApproval && !isNativeToken ? <Tooltip arrow title={"Approve spending " + denomination + ` (plus ${displayedFee} fee)`}>
+                                <span><Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend</Button></span></Tooltip> : <Tooltip arrow title={"Deposit " + denomination + ` (plus ${displayedFee} fee)`}>
                                 <span><Button disabled={props.depositButtonDisabled} onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Deposit</Button></span></Tooltip>}
                         </Grid>
                     </Grid>
