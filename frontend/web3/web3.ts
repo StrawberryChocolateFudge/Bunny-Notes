@@ -30,6 +30,26 @@ export function getContractAddressFromCurrencyDenomination(denomination: string,
     }
 }
 
+export function getCurrencyAddressFromNetworkId(currency: string| undefined, netId: string | undefined): string {
+    switch (netId) {
+        case BTTCTESTNETID:
+            return getCurrencyAddressOnBTTCDonau(currency);
+        default:
+            return "INVALID";
+    }
+}
+
+export function getCurrencyAddressOnBTTCDonau(currency: string | undefined) {
+    switch (currency) {
+        case "USDTM":
+            return USDTMCONTRACTADDRESS_DONAU;
+        case "BTT":
+            return "Native Token";
+        default:
+            return "INVALID";
+    }
+}
+
 
 let RELAYERURL = "https://relayer.bunnynotes.finance"
 
@@ -48,6 +68,15 @@ export function getExplorer(txId: string, network: string | undefined): string {
             return `http://testscan.bt.io/#/transaction/${txId}`
         default:
             return "";
+    }
+}
+
+export function getNetworkNameFromId(netId): string {
+    switch (netId) {
+        case BTTCTESTNETID:
+            return "BTTC Donau Testnet"
+        default:
+            return "INVALID"
     }
 }
 
@@ -288,7 +317,7 @@ export async function bunnyNoteIsSpentArray(contract: any, nullifierHashesArray:
     return await contract.isSpent(nullifierHashesArray);
 }
 
-export async function getErc20NoteToken(contract: any){
+export async function getErc20NoteToken(contract: any) {
     return await contract.token();
 }
 
