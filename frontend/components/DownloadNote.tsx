@@ -8,7 +8,6 @@ import { BigNumber, ethers } from "ethers";
 import { bunnyNotesCommitments, bunnyNotesDeposit, ERC20Approve, ethNotesDeposit, getChainId, getContract, getFee, getIsContract, requestAccounts, ZEROADDRESS } from "../web3/web3";
 import { approveERC20SpendByOwner, depositToBunnyNoteByOwner } from "../web3/Wallet";
 import { parseEther } from "ethers/lib/utils";
-import { DisplayAddresses } from "./utils/DisplayAddresses";
 
 interface DownloadNoteProps {
     provider: any,
