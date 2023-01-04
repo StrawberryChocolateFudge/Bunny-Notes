@@ -6,11 +6,14 @@ import Header from "./Header";
 import VerifyIcon from "@mui/icons-material/Note"
 import TextField from '@mui/material/TextField';
 import ScanNoteButton from './QRScannerModal';
-import { bunnyNoteIsSpent, bunnyNotesCommitments, bunnyNotesWithdrawCashNote, getContract, getContractAddressFromCurrencyDenomination, getExplorer, getJsonRpcProvider, getRpcContract, MAXCASHNOTESIZE, onBoardOrGetProvider, relayCashNotePayment, requestAccounts, web3Injected } from "../web3/web3";
+import { bunnyNoteIsSpent, bunnyNotesCommitments, bunnyNotesWithdrawCashNote, getContract, getContractAddressFromCurrencyDenomination, getCurrencyAddressFromNetworkId, getExplorer, getJsonRpcProvider, getNetworkNameFromId, getRpcContract, MAXCASHNOTESIZE, onBoardOrGetProvider, relayCashNotePayment, requestAccounts, web3Injected } from "../web3/web3";
 import { parseNote, toNoteHex } from "../../lib/BunnyNote";
 import { ethers } from "ethers";
 import { generateZKProof } from "../zkp/generateProof";
 import { getLoading } from "./LoadingIndicator";
+import { getTermsAcceptedInit, TermsCheckbox } from "./utils/TermsCheckbox";
+import { setTermsAcceptedToLS } from "../storage/local";
+import { shortenAddress } from "./VerifyNoteTab";
 
 interface PaymentRequestPageProps extends Base {
 }
@@ -34,6 +37,8 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
     const [paymentDone, setPaymentDone] = useState(false);
     const [txHash, setTxHash] = useState("");
     const [txHashLink, setTxHashLink] = useState("");
+
+    const [termsAccepted, setTermsAccepted] = useState(getTermsAcceptedInit());
 
     const noteSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         setNote(event.target.value);
@@ -155,8 +160,15 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
         } finally {
             setLoading(false);
         }
-
     }
+
+    const onTermsChecked = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setTermsAccepted(event.target.checked);
+        setTermsAcceptedToLS(event.target.checked.toString());
+    }
+
+    const tokenAddress = getCurrencyAddressFromNetworkId(currency,network);
+
 
     return <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Header withTabs={false} />
@@ -197,11 +209,19 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                                     <TableCell align="left">Amount:</TableCell>
                                     <TableCell align="right">{amount} {currency}</TableCell>
                                 </TableRow>
+                                <TableRow>
+                                    <TableCell align="left">Network:</TableCell>
+                                    <TableCell align="right">{getNetworkNameFromId(network)}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell align="left">Token Address:</TableCell>
+                                    <TableCell align="right">{tokenAddress}</TableCell>
+                                </TableRow>
                             </TableBody>
                         </Table>
                     </TableContainer>
                     <Spacer></Spacer>
-
+                    <TermsCheckbox termsAccepted={termsAccepted} onTermsChecked={onTermsChecked}></TermsCheckbox>
                     {loading ? getLoading() : (
                         paymentDone ?
                             <Stack direction={"column"} justifyContent="center" alignItems={"center"} spacing={1}>
@@ -211,7 +231,7 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                             <Tooltip arrow title="Pay with Cash Note">
                                 <Button onClick={paymentAction} sx={{ mr: 1 }}>
                                     <PayIMG src="/imgs/pay.svg" alt="Pay" />
-                             </Button>
+                                </Button>
                             </Tooltip>)}
                 </Box>
             </Paper >
