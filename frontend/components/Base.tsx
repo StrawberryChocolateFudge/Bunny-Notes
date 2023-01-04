@@ -205,7 +205,6 @@ export default function Base() {
                 <Route path="/" element={mainRoute()}></Route>
                 <Route path="/paymentRequest/:payTo/:amount/:currency/:network" element={<PaymentRequestPage {...genericProps}></PaymentRequestPage>}></Route>
                 <Route path="*" element={<NotFoundPage></NotFoundPage>} />
-                <Route path="/help" element={<HelpPage></HelpPage>}></Route>
                 <Route path="/terms" element={<TermsPage></TermsPage>}></Route>
             </Routes>
         </BrowserRouter>)
