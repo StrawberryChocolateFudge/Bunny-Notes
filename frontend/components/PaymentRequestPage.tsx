@@ -14,6 +14,7 @@ import { getLoading } from "./LoadingIndicator";
 import { getTermsAcceptedInit, TermsCheckbox } from "./utils/TermsCheckbox";
 import { setTermsAcceptedToLS } from "../storage/local";
 import { shortenAddress } from "./VerifyNoteTab";
+import { CheckWebsiteURLWarning } from "./utils/CheckWebsiteURLWarning";
 
 interface PaymentRequestPageProps extends Base {
 }
@@ -167,14 +168,10 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
         setTermsAcceptedToLS(event.target.checked.toString());
     }
 
-    const tokenAddress = getCurrencyAddressFromNetworkId(currency,network);
+    const tokenAddress = getCurrencyAddressFromNetworkId(currency, network);
 
 
     return <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Header withTabs={false} />
-        {/* <Stack display={"flex"} flexDirection="row" justifyContent="center" alignContent={"center"}>
-            <BunnyNotesImg src="/imgs/BunnyNotes.svg" alt="Bunny Notes Title" />
-        </Stack> */}
         <Box component="main" sx={{ flex: 1 }}>
             <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden', marginTop: "30px" }}>
                 <AppBar
@@ -183,6 +180,8 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
                     elevation={0}
                     sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
                 >
+                    <CheckWebsiteURLWarning />
+
                     <Toolbar>
                         <Grid container spacing={2} alignItems="center">
                             <Grid item>

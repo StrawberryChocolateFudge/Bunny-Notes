@@ -1,10 +1,10 @@
-import { CheckBox } from "@mui/icons-material";
 import { Button, Card, Checkbox, Dialog, DialogContent, DialogContentText, DialogTitle, Divider, FormControl, InputLabel, Link, MenuItem, Select, SelectChangeEvent, Stack, styled, TextField, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { setTermsAcceptedToLS } from "../../storage/local";
 import { setSelectedNToSS } from "../../storage/session";
 import { BTTCTESTNETID, handleNetworkSelect } from "../../web3/web3";
 import { Center } from "../BunnyNotesTab";
+import { CheckWebsiteURLWarning } from "./CheckWebsiteURLWarning";
 import { TermsCheckbox } from "./TermsCheckbox";
 
 interface SelectNetworkProps {
@@ -20,9 +20,7 @@ interface SelectNetworkProps {
 
 const IMG = styled("img")({
     width: "300px",
-    paddingLeft: "10px",
-    paddingRight: "10px",
-    paddingTop: "10px",
+    alignSelf: 'center'
 })
 
 export function SelectNetwork(props: SelectNetworkProps) {
@@ -88,7 +86,9 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
     }
 
     return <Dialog open={props.showNetworkSelect} onClose={handleClose}>
-        <DialogTitle sx={{ paddingBottom: "0", marginBottom: "0" }}><IMG alt="Bunny Notes Title" src="/imgs/BunnyNotes.svg" /></DialogTitle>
+        <CheckWebsiteURLWarning />
+
+        <DialogTitle sx={{ paddingBottom: "0", marginBottom: "0", display: "flex", justifyContent: "center" }}><IMG alt="Bunny Notes Title" src="/imgs/BunnyNotes.svg" /></DialogTitle>
         <DialogContent>
             <DialogContentText sx={{ textAlign: "center" }}>
                 A Gift Card and Cash Note Protocol
@@ -100,7 +100,9 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
             <Divider light />
             <TermsCheckbox termsAccepted={props.termsAccepted} onTermsChecked={onTermsChecked}></TermsCheckbox>
             {availableWallets()}
+
         </DialogContent>
+
     </Dialog>
 }
 
