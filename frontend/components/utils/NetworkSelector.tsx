@@ -78,6 +78,14 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
         setTermsAcceptedToLS(event.target.checked.toString());
     }
 
+    const availableWallets = () => {
+
+        return <Stack justifyContent={"space-around"} flexDirection="row">
+            <img width="35px" src="/imgs/metamaskFox.svg" />
+            <img width="60px" src="/imgs/trustWalletLogo.svg" />
+            <img width="30px" src="/imgs/braveLogo.svg" />
+        </Stack>
+    }
 
     return <Dialog open={props.showNetworkSelect} onClose={handleClose}>
         <DialogTitle sx={{ paddingBottom: "0", marginBottom: "0" }}><IMG alt="Bunny Notes Title" src="/imgs/BunnyNotes.svg" /></DialogTitle>
@@ -86,12 +94,12 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
                 A Gift Card and Cash Note Protocol
             </DialogContentText>
             <Divider light />
-            <Typography sx={{ textAlign: "center" }} variant="h5" component="div">Select Network</Typography>
             <Center>
                 {NetworkCardButtons({ networkSelected })}
             </Center>
             <Divider light />
             <TermsCheckbox termsAccepted={props.termsAccepted} onTermsChecked={onTermsChecked}></TermsCheckbox>
+            {availableWallets()}
         </DialogContent>
     </Dialog>
 }
