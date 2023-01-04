@@ -34,6 +34,9 @@ const IMG = styled("img")({
       width: '100px'
 })
 
+export const shortenAddress = (address: string) => <Tooltip title={address}><div>{address.substring(0, 6)}...{address.substring(address.length - 6)}</div></Tooltip>
+
+
 export default function VerifyNoteTab(props: VerifyNoteTabProps) {
 
       const [commitmentDetails, setCommitmentDetails] = React.useState<null | Commitment>(null)
@@ -100,7 +103,6 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
             setCommitmentDetails(null);
       }
 
-      const shortenAddress = (address: string) => <Tooltip title={address}><div>{address.substring(0, 6)}...{address.substring(address.length - 6)}</div></Tooltip>
 
       return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
             <AppBar
