@@ -152,7 +152,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                                                 </TableRow>
                                                 <TableRow>
                                                       <TableCell align="left">Recipient:</TableCell>
-                                                      <TableCell align="right">{commitmentDetails.recipient}</TableCell>
+                                                      <TableCell align="right">{shortenAddress(commitmentDetails.recipient)}</TableCell>
                                                 </TableRow>
                                                 <TableRow>
                                                       <TableCell align="left">Note Type:</TableCell>
@@ -164,7 +164,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                                                 </TableRow>
                                                 <TableRow>
                                                       <TableCell align="left">Token Address:</TableCell>
-                                                      <TableCell size="small" align="right">{commitmentDetails.erc20Address === "Native Token" ? null : shortenAddress(commitmentDetails.erc20Address)}</TableCell>
+                                                      <TableCell size="small" align="right">{commitmentDetails.erc20Address === "Native Token" ? commitmentDetails.erc20Address : shortenAddress(commitmentDetails.erc20Address)}</TableCell>
                                                 </TableRow>
                                           </TableBody>
                                     </Table>
