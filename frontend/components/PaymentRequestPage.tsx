@@ -66,6 +66,12 @@ export function PaymentRequestPage(props: PaymentRequestPageProps) {
     }
 
     const doPay = async (provider: any) => {
+        if(termsAccepted === false){
+            props.displayError("You need to accept the terms and conditions!");
+            return;
+        }
+
+
         if (payTo === undefined) {
             props.displayError("Invalid Payment Address")
             return;
