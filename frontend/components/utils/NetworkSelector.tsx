@@ -1,8 +1,11 @@
-import { Button, Card, Dialog, DialogContent, DialogContentText, DialogTitle, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, styled, TextField, Tooltip, Typography } from "@mui/material";
+import { CheckBox } from "@mui/icons-material";
+import { Button, Card, Checkbox, Dialog, DialogContent, DialogContentText, DialogTitle, Divider, FormControl, InputLabel, Link, MenuItem, Select, SelectChangeEvent, Stack, styled, TextField, Tooltip, Typography } from "@mui/material";
 import React from "react";
+import { setTermsAcceptedToLS } from "../../storage/local";
 import { setSelectedNToSS } from "../../storage/session";
 import { BTTCTESTNETID, handleNetworkSelect } from "../../web3/web3";
 import { Center } from "../BunnyNotesTab";
+import { TermsCheckbox } from "./TermsCheckbox";
 
 interface SelectNetworkProps {
     setSelectedNetwork: (n: string) => void;
@@ -11,6 +14,8 @@ interface SelectNetworkProps {
     setShowNetworkSelect: (s: boolean) => void;
     displayError: (err: string) => void;
     setProvider: (provider: any) => void;
+    termsAccepted: boolean;
+    setTermsAccepted: (to: boolean) => void;
 }
 
 const IMG = styled("img")({
@@ -52,6 +57,11 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
     };
 
     const networkSelected = (networkId: string) => async () => {
+        if (!props.termsAccepted) {
+            props.displayError("Please accept the terms and conditions!")
+            return;
+        }
+
         setSelectedNToSS(networkId);
         // Connect to metamask, switch or add the network
         // add the provider or not don't matter if it works!
@@ -63,6 +73,11 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
         }
     }
 
+    const onTermsChecked = (event: React.ChangeEvent<HTMLInputElement>) => {
+        props.setTermsAccepted(event.target.checked);
+        setTermsAcceptedToLS(event.target.checked.toString());
+    }
+
 
     return <Dialog open={props.showNetworkSelect} onClose={handleClose}>
         <DialogTitle sx={{ paddingBottom: "0", marginBottom: "0" }}><IMG alt="Bunny Notes Title" src="/imgs/BunnyNotes.svg" /></DialogTitle>
@@ -70,10 +85,13 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
             <DialogContentText sx={{ textAlign: "center" }}>
                 A Gift Card and Cash Note Protocol
             </DialogContentText>
+            <Divider light />
+            <Typography sx={{ textAlign: "center" }} variant="h5" component="div">Select Network</Typography>
             <Center>
                 {NetworkCardButtons({ networkSelected })}
             </Center>
-            <Typography sx={{ textAlign: "center" }} variant="subtitle2" component="div">Select Network</Typography>
+            <Divider light />
+            <TermsCheckbox termsAccepted={props.termsAccepted} onTermsChecked={onTermsChecked}></TermsCheckbox>
         </DialogContent>
     </Dialog>
 }

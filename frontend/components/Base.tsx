@@ -26,6 +26,8 @@ import BunnyNotesTab from './BunnyNotesTab';
 import { SelectNetworkDialog } from './utils/NetworkSelector';
 import { getCurrenttNetworkFromSS, getSelectedNFromSS } from '../storage/session';
 import { NoteDetails } from '../zkp/generateProof';
+import { TermsPage } from './TermsPage';
+import { getTermsAcceptedInit } from './utils/TermsCheckbox';
 
 export interface Base {
     myAddress: string,
@@ -94,6 +96,10 @@ export default function Base() {
     // Track if the deposit button is disabled with state stored here
     const [depositButtonDisabled, setDepositButtonDisabled] = React.useState(false);
 
+    // Initialize the terms accepted from local storage
+
+    const [termsAccepted, setTermsAccepted] = React.useState(getTermsAcceptedInit());
+
     const openSnackbar = (msg: string) => {
         setSnackbarOpen(true);
         setSnackbarMessage(msg);
@@ -154,7 +160,9 @@ export default function Base() {
         setSelectedNetwork,
         showNetworkSelect,
         setShowNetworkSelect,
-        setProvider
+        setProvider,
+        termsAccepted,
+        setTermsAccepted
     }
 
     const getTabContent = () => {
@@ -198,6 +206,7 @@ export default function Base() {
                 <Route path="/paymentRequest/:payTo/:amount/:currency/:network" element={<PaymentRequestPage {...genericProps}></PaymentRequestPage>}></Route>
                 <Route path="*" element={<NotFoundPage></NotFoundPage>} />
                 <Route path="/help" element={<HelpPage></HelpPage>}></Route>
+                <Route path="/terms" element={<TermsPage></TermsPage>}></Route>
             </Routes>
         </BrowserRouter>)
     }
