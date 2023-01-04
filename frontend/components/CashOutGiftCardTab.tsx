@@ -68,10 +68,20 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
         const zkp = await generateZKProof(parsedNote.deposit, myAddress, change);
         const solidityProof = packSolidityProof(zkp.proof);
 
-        await bunnyNotesWithdrawGiftCard(contract, solidityProof, nullifierHash, commitment, myAddress, change).catch(err => {
+        const tx = await bunnyNotesWithdrawGiftCard(contract, solidityProof, nullifierHash, commitment, myAddress, change).catch(err => {
             props.displayError("Unable to Withdraw");
             console.error(err);
         });
+
+        if (tx !== undefined) {
+            await tx.wait().then((receipt) => {
+                if (receipt.status === 1) {
+                    props.navigateToVerifyPage([props.noteString, parsedNote])
+                }
+            })
+        }
+
+
     }
 
     return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
