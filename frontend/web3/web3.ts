@@ -288,6 +288,11 @@ export async function bunnyNoteIsSpentArray(contract: any, nullifierHashesArray:
     return await contract.isSpent(nullifierHashesArray);
 }
 
+export async function getErc20NoteToken(contract: any){
+    return await contract.token();
+}
+
+
 export async function getFee(contract: any) {
     return await contract.fee();
 }
