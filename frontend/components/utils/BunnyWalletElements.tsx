@@ -71,6 +71,7 @@ export function WalletNotConnected(props: any) {
             </Toolbar>
         </AppBar>
         <Box>
+            <h2 style={{textAlign: "center"}}>COMING SOON! UNDER DEVELOPMENT</h2>
             <Center>
                 <Tooltip arrow title="Connect to a Smart Contract Wallet">
                     <Button onClick={props.connectButtonAction}><ConnectIMG src="/imgs/connect.svg" alt="Connect to Smart Contract Wallet"></ConnectIMG></Button>
