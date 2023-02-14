@@ -8,7 +8,6 @@ import "hardhat-gas-reporter";
 import "solidity-coverage";
 import "@uniswap/hardhat-v3-deploy";
 import "hardhat-contract-sizer";
-import '@openzeppelin/hardhat-upgrades';
 
 dotenv.config();
 

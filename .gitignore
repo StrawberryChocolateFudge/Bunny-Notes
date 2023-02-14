@@ -12,3 +12,4 @@ dist
 .parcel-cache
 build
 .openzeppelin
+.cache
