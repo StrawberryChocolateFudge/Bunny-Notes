@@ -50,7 +50,7 @@ export function SelectableCards(props: SelectableCardsProps) {
       </Typography>
     } else {
       return <Typography gutterBottom variant="subtitle1" component="div">
-        {props.denomination} {props.currency} {props.cardType}
+        {props.denomination} {props.currency} 
       </Typography>
     }
   }
