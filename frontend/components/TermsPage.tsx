@@ -33,7 +33,7 @@ export function TermsPage() {
 
             <h2><strong>Cookies</strong></h2>
 
-            <p>We do not use cookies but might use them in the future. By accessing bunnynotes.finance, you agreed to use cookies in agreement with the bunnynotes.finance's Privacy Policy. </p>
+            <p>We do not use cookies but might use them in the future. By accessing bunnynotes.finance, you agreed to use cookies in agreement with the bunnynotes.finance's Privacy Policy, see below. </p>
 
             <h2><strong>iFrames</strong></h2>
 
@@ -47,7 +47,7 @@ export function TermsPage() {
 
             <h3>Log Files</h3>
 
-            <p>bunnynotes.finance follows a standard procedure of using log files. These files log visitors when they visit websites. All hosting companies do this and a part of hosting services' analytics. The information collected by log files include internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of the information is for analyzing trends, administering the site, tracking users' movement on the website, and gathering demographic information. Our Privacy Policy was created with the help of the <a href="https://www.privacypolicygenerator.org">Privacy Policy Generator</a>.</p>
+            <p>bunnynotes.finance follows a standard procedure of using log files. These files log visitors when they visit websites. All hosting companies do this and a part of hosting services' analytics. The information collected by log files include internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of the information is for analyzing trends, administering the site, tracking users' movement on the website, and gathering demographic information.</p>
 
 
             <h3>Children's Information</h3>
@@ -66,7 +66,7 @@ export function TermsPage() {
 
             <h2><strong>Reservation of Rights</strong></h2>
 
-            <p>We reserve the right to request that you remove all links or any particular link to our Website. You approve to immediately remove all links to our Website upon request. We also reserve the right to amen these terms and conditions and it’s linking policy at any time. By continuously linking to our Website, you agree to be bound to and follow these linking terms and conditions.</p>
+            <p>We reserve the right to request that you remove all links or any particular link to our Website. You approve to immediately remove all links to our Website upon request. We also reserve the right to amend these terms and conditions and it’s linking policy at any time. By continuously linking to our Website, you agree to be bound to and follow these linking terms and conditions.</p>
 
             <h2><strong>Disclaimer</strong></h2>
 
