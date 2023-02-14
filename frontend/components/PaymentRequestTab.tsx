@@ -6,7 +6,6 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import WalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import MoneyIcon from "@mui/icons-material/Money";
 import { getCardPropsData } from "./utils/cardPropsData";
 import CardGrid, { CardType } from "./CardGrid";
@@ -14,6 +13,7 @@ import { Base } from "./Base";
 import { useNavigate } from "react-router-dom";
 import { onBoardOrGetProvider, requestAccounts } from "../web3/web3";
 import { ethers } from "ethers";
+import ScanNoteButton from "./QRScannerModal";
 
 export type PaymentRequest = {
     price: string,
@@ -39,6 +39,10 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
         props.setPaymentRequest({ ...props.paymentRequest, payTo: event.target.value })
     }
 
+    const scanPayToAddress = (d: string) => {
+        props.setPaymentRequest({ ...props.paymentRequest, payTo: d });
+    }
+
     const importAddress = async () => {
         if (props.provider === null) {
             const provider = await onBoardOrGetProvider(props.displayError);
@@ -62,7 +66,7 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
         // For verification I use a temporary tronweb instance, just to call isAddress
         // the props.tronWeb might be null at this point if the user manually copies the address.
         if (ethers.utils.isAddress(props.paymentRequest.payTo)) {
-            navigate(`/paymentRequest/${props.paymentRequest.payTo}/${parseFloat(props.paymentRequest.price)}/${currency}`)
+            navigate(`/paymentRequest/${props.paymentRequest.payTo}/${parseFloat(props.paymentRequest.price)}/${currency}/${props.selectedNetwork}`)
         } else {
             props.displayError(`Invalid wallet address!`);
             return;
@@ -79,13 +83,13 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
             <Toolbar>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item>
-                        <WalletIcon color="inherit" sx={{ display: 'block' }} />
+                        <ScanNoteButton dialogTitle='Scan a Wallet Address' setData={scanPayToAddress} handleError={props.displayError}></ScanNoteButton>
                     </Grid>
                     <Grid item xs>
                         <TextField autoComplete="off" type="text" value={props.paymentRequest.payTo} onChange={setPayToAddress} fullWidth placeholder="Paste your Address Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                     </Grid>
                     <Grid item>
-                        <Tooltip title="Import Address From Wallet Extension">
+                        <Tooltip arrow title="Import Address From Wallet Extension">
                             <Button onClick={importAddress} variant="contained" sx={{ mr: 1 }}>
                                 Import Address
                             </Button>
@@ -111,6 +115,6 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
                 </Grid>
             </Toolbar>
         </AppBar>
-        <CardGrid handleSelect={handleSelectPaymentRequest} cardProps={getCardPropsData("Payment Request")}></CardGrid>
+        <CardGrid handleSelect={handleSelectPaymentRequest} cardProps={getCardPropsData("Payment Request", props.selectedNetwork)}></CardGrid>
     </Paper >
 }

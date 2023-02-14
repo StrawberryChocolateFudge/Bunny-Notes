@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import Button from "@mui/material/Button";
 import { styled } from "@mui/system";
 import { CardType } from './CardGrid';
-import { Avatar, CardHeader } from '@mui/material';
+import { Tooltip } from '@mui/material';
 
 export interface SelectableCardsParams {
   networkLogo: string;
@@ -15,16 +15,15 @@ export interface SelectableCardsParams {
   denomination: string;
   currency: string;
   cardType: CardType,
+  erc20Address: string,
+  noteContractAddress: string
 }
 
 export interface SelectableCardsProps extends SelectableCardsParams {
-  handleSelect: (denomination: string, currency: string, cardType: CardType) => void
+  handleSelect: (denomination: string, currency: string, cardType: CardType, addresses: [string, string]) => void
 }
 
 
-const IMGWithMargin = styled("img")({
-  marginTop: "20px"
-})
 
 const OverlayImgs = styled("div")({
   display: "flex",
@@ -36,7 +35,7 @@ const OverlayImgs = styled("div")({
 export function SelectableCards(props: SelectableCardsProps) {
 
   const purchaseSelected = () => {
-    props.handleSelect(props.denomination, props.currency, props.cardType)
+    props.handleSelect(props.denomination, props.currency, props.cardType, [props.erc20Address, props.noteContractAddress])
   }
 
   const OverlayedImage = () => <OverlayImgs>
@@ -51,18 +50,20 @@ export function SelectableCards(props: SelectableCardsProps) {
       </Typography>
     } else {
       return <Typography gutterBottom variant="subtitle1" component="div">
-        {props.denomination} {props.currency} {props.cardType}
+        {props.denomination} {props.currency} 
       </Typography>
     }
   }
   return (
-    <Button sx={{ height: 150 }} onClick={purchaseSelected} >
-      <Card sx={{ width: 200, height: 150 }}>
-        <OverlayedImage></OverlayedImage>
-        <CardContent>
-          {getContent()}
-        </CardContent>
-      </Card>
-    </Button>
+    <Tooltip arrow title={props.erc20Address === "0x0000000000000000000000000000000000000000" ? "Native Token" : props.erc20Address}>
+      <Button sx={{ height: 150 }} onClick={purchaseSelected} >
+        <Card sx={{ width: 200, height: 150 }}>
+          <OverlayedImage></OverlayedImage>
+          <CardContent>
+            {getContent()}
+          </CardContent>
+        </Card>
+      </Button>
+    </Tooltip>
   );
 }

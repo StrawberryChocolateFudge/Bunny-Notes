@@ -1,5 +1,8 @@
 import { jsPDF } from "jspdf";
 import { CardType } from "../components/CardGrid";
+
+// separate PDF for bunny note or bunny wallet!
+//TODO: ADD BUNNY WALLET GRAFFITI STYLE TO THIS :) 
 export function downloadPDF(bearerText: string, denomination: string, commitment: string, cardType: CardType, dataUrl, noteString: string) {
     var doc = new jsPDF("l", "px", "credit-card");
     doc.setFontSize(6)

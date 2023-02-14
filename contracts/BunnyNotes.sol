@@ -1,4 +1,4 @@
-// SPDX-License-Identifire: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -16,7 +16,7 @@ interface IVerifier {
 struct CommitmentStore {
     bool used;
     address creator;
-    address recepient;
+    address recipient;
     bool cashNote;
     uint256 createdDate;
     uint256 spentDate;
@@ -32,7 +32,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
 
     address public relayer;
 
-    uint256 public fee; 
+    uint256 public fee;
 
     mapping(bytes32 => bool) public nullifierHashes;
     // We store all the commitments to make sure there are no accidental deposits twice and this allows us to query for transaction details later
@@ -63,7 +63,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
         @param _verifier is the address of SNARK verifier contract
         @param _denomination transfer amount for each deposit
         @param _feeDivider The amount to divide the denomination to calculate the fee
-        @param _relayer The relayer can make deposits on behalf of other accounts!
+        @param _relayer The relayer can make deposits on behalf of other accounts! It's used in the child contracts
         
     */
 
@@ -110,7 +110,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
         uint256[8] calldata _proof,
         bytes32 _nullifierHash,
         bytes32 _commitment,
-        address _recepient,
+        address _recipient,
         uint256 _change
     ) external nonReentrant {
         require(
@@ -129,7 +129,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
                 [
                     uint256(_nullifierHash),
                     uint256(_commitment),
-                    uint256(uint160(_recepient)),
+                    uint256(uint160(_recipient)),
                     uint256(_change)
                 ]
             ),
@@ -137,18 +137,18 @@ abstract contract BunnyNotes is ReentrancyGuard {
         );
 
         nullifierHashes[_nullifierHash] = true;
-        commitments[_commitment].recepient = _recepient;
+        commitments[_commitment].recipient = _recipient;
         commitments[_commitment].spentDate = block.timestamp;
-        _processWithdrawGiftCard(payable(_recepient));
+        _processWithdrawGiftCard(payable(_recipient));
     }
 
     function withdrawCashNote(
         uint256[8] calldata _proof,
         bytes32 _nullifierHash,
         bytes32 _commitment,
-        address _recepient,
+        address _recipient,
         uint256 _change
-    ) external payable {
+    ) external payable nonReentrant {
         require(
             !nullifierHashes[_nullifierHash],
             "The note has already been spent"
@@ -173,7 +173,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
                 [
                     uint256(_nullifierHash),
                     uint256(_commitment),
-                    uint256(uint160(_recepient)),
+                    uint256(uint160(_recipient)),
                     uint256(_change)
                 ]
             ),
@@ -181,10 +181,10 @@ abstract contract BunnyNotes is ReentrancyGuard {
         );
 
         nullifierHashes[_nullifierHash] = true;
-        commitments[_commitment].recepient = _recepient;
+        commitments[_commitment].recipient = _recipient;
         commitments[_commitment].spentDate = block.timestamp;
         _processWithdrawCashNote(
-            payable(_recepient),
+            payable(_recipient),
             payable(commitments[_commitment].creator),
             _price,
             _change
@@ -192,7 +192,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
 
         emit WithdrawCashNote(
             commitments[_commitment].creator,
-            _recepient,
+            _recipient,
             _nullifierHash,
             _price,
             _change
@@ -200,13 +200,13 @@ abstract contract BunnyNotes is ReentrancyGuard {
     }
 
     /** This is defined in a child contract */
-    function _processWithdrawGiftCard(address payable _recepient)
+    function _processWithdrawGiftCard(address payable _recipient)
         internal
         virtual;
 
     /** Process spending the UTXO note, this is defined in a child contract */
     function _processWithdrawCashNote(
-        address payable _recepient,
+        address payable _recipient,
         address payable _creator,
         uint256 _price,
         uint256 _change

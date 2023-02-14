@@ -6,6 +6,9 @@ import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
+import "@uniswap/hardhat-v3-deploy";
+import "hardhat-contract-sizer";
+import '@openzeppelin/hardhat-upgrades';
 
 dotenv.config();
 
@@ -23,19 +26,26 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.4",
-  networks: {
-    ropsten: {
-      url: process.env.ROPSTEN_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-    },
-    donau: {
-      url: process.env.BTT_DONAU_TESTNET_API || "",
-      accounts:
-        process.env.PRIVATE_KEY_DONAU !== undefined ? [process.env.PRIVATE_KEY_DONAU] : [],
-
+  solidity: {
+    version: "0.8.4",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000
+      }
     }
+  },
+  networks: {
+    // ropsten: {
+    //   url: process.env.ROPSTEN_URL || "",
+    //   accounts:
+    //     process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    // },
+    // donau: {
+    //   url: process.env.BTT_DONAU_TESTNET_API || "",
+    //   accounts:
+    //     process.env.KEY_DONAU !== undefined ? [process.env.KEY_DONAU] : [],
+    // }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

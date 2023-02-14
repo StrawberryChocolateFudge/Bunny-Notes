@@ -2,7 +2,6 @@ node_modules
 .env
 coverage
 coverage.json
-typechain
 
 circuits/input.json
 circuits/witnes.wtns
@@ -12,3 +11,4 @@ artifacts
 dist
 .parcel-cache
 build
+.openzeppelin

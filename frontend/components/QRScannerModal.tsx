@@ -5,7 +5,8 @@ import Dialog from '@mui/material/Dialog';
 import { QrReader } from 'react-qr-reader';
 import styled from '@emotion/styled';
 import { isMobile } from 'react-device-detect';
-import { parseNote } from '../../lib/note';
+import { parseNote } from '../../lib/BunnyNote';
+import { Tooltip } from '@mui/material';
 
 
 const ReaderFrame = styled("div")({
@@ -56,6 +57,7 @@ export interface ScanNoteDialogProps {
     onClose: () => void;
     setData: (d: string) => void;
     handleError: (msg: string) => void;
+    dialogTitle: string;
 }
 
 function ScanNoteDialog(props: ScanNoteDialogProps) {
@@ -67,7 +69,7 @@ function ScanNoteDialog(props: ScanNoteDialogProps) {
 
     return (
         <Dialog onClose={handleClose} open={open}>
-            <DialogTitle>Scan a Bunny Note</DialogTitle>
+            <DialogTitle>{props.dialogTitle}</DialogTitle>
             <QRReader handleClose={handleClose} setData={props.setData} handleError={props.handleError}></QRReader>
         </Dialog>
     );
@@ -76,6 +78,7 @@ function ScanNoteDialog(props: ScanNoteDialogProps) {
 interface ScanNoteButtonProps {
     setData: (d: string) => void;
     handleError: (msg: string) => void;
+    dialogTitle: string;
 }
 
 export default function ScanNoteButton(props: ScanNoteButtonProps) {
@@ -91,15 +94,19 @@ export default function ScanNoteButton(props: ScanNoteButtonProps) {
 
     return (
         <div>
-            <Button variant="contained"
-                onClick={handleClickOpen}>
-                Scan
-            </Button>
+            <Tooltip arrow title="Scan a QR code">
+                <Button variant="contained"
+                    sx={{ height: "100%" }}
+                    onClick={handleClickOpen}>
+                    Scan
+                </Button>
+            </Tooltip>
             <ScanNoteDialog
                 open={open}
                 onClose={handleClose}
                 setData={props.setData}
                 handleError={props.handleError}
+                dialogTitle={props.dialogTitle}
             />
         </div>
     );

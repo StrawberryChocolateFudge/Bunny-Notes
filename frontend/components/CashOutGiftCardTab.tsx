@@ -6,17 +6,21 @@ import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import VerifyIcon from "@mui/icons-material/Note"
 import Box from "@mui/material/Box"
 import { Base } from './Base';
 import ScanNoteButton from './QRScannerModal';
-import { parseNote, toNoteHex } from '../../lib/note';
+import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { generateZKProof, packSolidityProof } from '../zkp/generateProof';
-import { bunnyNotesWithdrawGiftCard, getChainId, getContract, getContractAddressFromCurrencyDenomination, netId, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
+import { bunnyNotesWithdrawGiftCard, getChainId, getContract, getContractAddressFromCurrencyDenomination, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
+import { styled, Typography } from '@mui/material';
 interface CashOutGiftCardTabProps extends Base {
     noteString: string
     setMyNoteString: (newValue: string) => void;
 }
+const IMG = styled("img")({
+    margin: "0 auto",
+    width: "130px"
+})
 
 export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
 
@@ -48,7 +52,7 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
         // Check if we are on the correct network!
         const chainId = await getChainId(props.provider);
 
-        if (chainId !== netId) {
+        if (chainId !== parseInt(props.selectedNetwork)) {
             props.displayError("You are on the wrong network!")
             return;
         }
@@ -57,13 +61,27 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
         const nullifierHash = toNoteHex(parsedNote.deposit.nullifierHash);
         const commitment = toNoteHex(parsedNote.deposit.commitment);
 
-        const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency);
-        const contract = await getContract(provider, contractAddress, "/ERC20Notes.json");
+        const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency, props.selectedNetwork);
+        const contract = await getContract(provider, contractAddress, "/BunnyNotes.json");
         const myAddress = await requestAccounts(provider);
         const change = "0";
         const zkp = await generateZKProof(parsedNote.deposit, myAddress, change);
         const solidityProof = packSolidityProof(zkp.proof);
-        await bunnyNotesWithdrawGiftCard(contract, solidityProof, nullifierHash, commitment, myAddress, change);
+
+        const tx = await bunnyNotesWithdrawGiftCard(contract, solidityProof, nullifierHash, commitment, myAddress, change).catch(err => {
+            props.displayError("Unable to Withdraw");
+            console.error(err);
+        });
+
+        if (tx !== undefined) {
+            await tx.wait().then((receipt) => {
+                if (receipt.status === 1) {
+                    props.navigateToVerifyPage([props.noteString, parsedNote])
+                }
+            })
+        }
+
+
     }
 
     return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
@@ -76,21 +94,20 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
             <Toolbar>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item>
-                        <VerifyIcon color="inherit" sx={{ display: 'block' }} />
+                        <ScanNoteButton dialogTitle="Scan a Gift Card" setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
                     </Grid>
                     <Grid item xs>
                         <TextField autoComplete='off' value={props.noteString} onChange={noteStringSetter} fullWidth placeholder="Paste your Note Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
                     </Grid>
-                    <Grid item>
-                        <ScanNoteButton setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
-                    </Grid>
+
                 </Grid>
             </Toolbar>
         </AppBar>
         <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center" }}>
-            <Tooltip title="Cash out the Gift Card">
-                <Button onClick={cashOutAction} variant="contained" sx={{ mr: 1 }}>
-                    Cash out
+            <Typography component="p" variant="subtitle1">You can withdraw a Gift Card's balance to your wallet.</Typography>
+            <Tooltip arrow title="Cash out the Gift Card">
+                <Button onClick={cashOutAction} sx={{ mr: 1 }}>
+                    <IMG alt="Cash out a Gift Card" src="/imgs/CashOut.svg" />
                 </Button>
             </Tooltip>
         </Box>

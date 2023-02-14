@@ -4,13 +4,14 @@ import { groth16 } from "snarkjs"
 import { FullProof } from "./types"
 
 
-export async function generateProof({ deposit, recepient, change, snarkArtifacts }: { deposit: Deposit, recepient: string, change: string, snarkArtifacts?: SnarkArtifacts }): Promise<FullProof> {
+// Generates the proofs for verification! 
+export async function generateNoteWithdrawProof({ deposit, recipient, change, snarkArtifacts }: { deposit: Deposit, recipient: string, change: string, snarkArtifacts?: SnarkArtifacts }): Promise<FullProof> {
     console.log("Generate proof start");
 
     const input = {
         nullifierHash: deposit.nullifierHash,
         commitmentHash: deposit.commitment,
-        recepient: recepient,
+        recipient,
         change,
         // private snark inputs
         nullifier: deposit.nullifier,
@@ -20,8 +21,8 @@ export async function generateProof({ deposit, recepient, change, snarkArtifacts
 
     if (!snarkArtifacts) {
         snarkArtifacts = {
-            wasmFilePath: `circuits/withdraw_js/withdraw.wasm`,
-            zkeyFilePath: `circuits/withdraw_0001.zkey`
+            wasmFilePath: `circuits/withdraw_bunnyNote/withdraw_js/withdraw.wasm`,
+            zkeyFilePath: `circuits/withdraw_bunnyNote/withdraw_0001.zkey`
         }
     }
 
@@ -41,7 +42,8 @@ export async function generateProof({ deposit, recepient, change, snarkArtifacts
  * @param fullProof The SnarkJS full proof.
  * @returns True if the proof is valid, false otherwise.
  */
-export function verifyProof(verificationKey: any, { proof, publicSignals }: FullProof): Promise<boolean> {
+
+export function verifyFourPublicSignals(verificationKey: any, { proof, publicSignals }: FullProof): Promise<boolean> {
     return groth16.verify(
         verificationKey,
         [
@@ -52,4 +54,46 @@ export function verifyProof(verificationKey: any, { proof, publicSignals }: Full
         ],
         proof
     )
+}
+
+export type IsOwnerProofDetails = {
+    secret: bigint;
+    nullifier: bigint;
+    salt: bigint;
+    commitmentHash: bigint;
+    smartContract: string;
+    relayer: string,
+    nullifierHash: bigint;
+};
+
+// The IsOwnerProof generation and verification
+export async function generateIsOwnerProof({ details, snarkArtifacts }: { details: IsOwnerProofDetails, snarkArtifacts?: SnarkArtifacts }) {
+    console.log("Generate proof start");
+    const input = {
+        //public inputs
+        commitmentHash: details.commitmentHash,
+        smartContractWallet: details.smartContract,
+        relayer: details.relayer,
+        nullifierHash: details.nullifierHash,
+
+        // private 
+        secret: details.secret,
+        nullifier: details.nullifier,
+        salt: details.salt
+    }
+
+    if (!snarkArtifacts) {
+        snarkArtifacts = {
+            wasmFilePath: `circuits/wallet_owner/isOwner_js/isOwner.wasm`,
+            zkeyFilePath: `circuits/wallet_owner/isOwner_0001.zkey`
+        }
+    }
+    console.time("Proof Time");
+
+
+    const { proof, publicSignals } = await groth16.fullProve(input, snarkArtifacts.wasmFilePath, snarkArtifacts.zkeyFilePath)
+    console.timeEnd("Proof Time");
+
+    return { proof, publicSignals }
+
 }

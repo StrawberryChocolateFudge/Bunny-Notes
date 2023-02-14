@@ -10,3 +10,7 @@ export function generateCommitmentHash(nullifier: BigNumberish, secret: BigNumbe
 export function generateNullifierHash(nullifier: BigNumberish): bigint {
     return poseidon([BigInt(nullifier)])
 }
+
+export function generateNullifierWithSalt(nullifier: BigNumberish, salt: BigNumberish): bigint {
+    return poseidon([BigInt(nullifier), BigInt(salt)]);
+}

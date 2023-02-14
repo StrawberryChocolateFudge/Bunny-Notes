@@ -1,9 +1,13 @@
 import { Deposit, FullProof } from "../../lib/types";
-import { generateProof } from "../../lib/generateProof";
-import { deposit, parseNote } from "../../lib/note";
+import { generateNoteWithdrawProof } from "../../lib/generateProof";
+import { deposit, parseNote } from "../../lib/BunnyNote";
 import packToSolidityProof from "../../lib/packToSolidityProof";
-import { netId } from "../web3/web3";
-const urlBASE = "https://bunnynotes.finance"
+
+let urlBASE = "https://bunnynotes.finance"
+// reset the url for the snarkArtifacts if we are in development mode
+if (process.env.NODE_ENV === "development") {
+    urlBASE = "http://localhost:1234"
+}
 
 
 
@@ -15,15 +19,15 @@ export type NoteDetails = [
 
 export type ParsedNote = { currency: string, amount: string, netId: number, deposit: Deposit }
 
-export async function createNote(currency, amount): Promise<NoteDetails> {
-    const noteString = await deposit({ currency, amount, netId })
+export async function createNote(currency, amount, netId: string): Promise<NoteDetails> {
+    const noteString = await deposit({ currency, amount, netId: parseInt(netId) })
     const parsedNote = await parseNote(noteString) as ParsedNote;
 
     return [noteString, parsedNote];
 }
 
-export async function generateZKProof(deposit: Deposit, recepient: string, change: string): Promise<FullProof> {
-    return await generateProof({ deposit, recepient, change, snarkArtifacts })
+export async function generateZKProof(deposit: Deposit, recipient: string, change: string): Promise<FullProof> {
+    return await generateNoteWithdrawProof({ deposit, recipient, change, snarkArtifacts })
 }
 
 export function packSolidityProof(proof: any) {

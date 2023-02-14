@@ -4,13 +4,10 @@ import { styled } from "@mui/material";
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import PurchaseGiftCardTab from './PurchaseGiftCardTab';
 import Header from './Header';
-import PurchaseCashNote from './PurchaseCashNote';
 import VerifyNoteTab from './VerifyNoteTab';
 import CashOutGiftCardTab from './CashOutGiftCardTab';
 import PaymentRequestTab from './PaymentRequestTab';
-import CircularProgress from "@mui/material/CircularProgress";
 import Snackbar from '@mui/material/Snackbar';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
@@ -21,11 +18,16 @@ import {
     Routes,
     Route,
 } from "react-router-dom";
-import { TestnetInfo } from './TestnetInfo';
 import { PaymentRequestPage } from './PaymentRequestPage';
 import { NotFoundPage } from './404page';
 import HelpPage from './HelpPage';
-
+import BunnyWalletTab from './BunnyWalletTab';
+import BunnyNotesTab from './BunnyNotesTab';
+import { SelectNetworkDialog } from './utils/NetworkSelector';
+import { getCurrenttNetworkFromSS, getSelectedNFromSS } from '../storage/session';
+import { NoteDetails } from '../zkp/generateProof';
+import { TermsPage } from './TermsPage';
+import { getTermsAcceptedInit } from './utils/TermsCheckbox';
 
 export interface Base {
     myAddress: string,
@@ -33,6 +35,11 @@ export interface Base {
     provider: any,
     setProvider: any,
     displayError: any,
+    selectedNetwork: string,
+    setSelectedNetwork: (n: string) => void;
+    navigateToVerifyPage: (note: NoteDetails) => void;
+    depositButtonDisabled: boolean;
+    setDepositButtonDisabled: (to: boolean) => void;
 }
 
 export function Copyright() {
@@ -56,6 +63,22 @@ export const Spacer = styled("div")({
 })
 
 export default function Base() {
+    // Handling if the dialog to select network should show
+    const currentN = getCurrenttNetworkFromSS();
+    const selectedN = getSelectedNFromSS();
+
+    let showNetworkSelectInit = true;
+    let selectedNetworkInit = "";
+
+    if (currentN === selectedN && currentN !== null) {
+        showNetworkSelectInit = false;
+        selectedNetworkInit = currentN;
+    }
+
+    const [showNetworkSelect, setShowNetworkSelect] = React.useState(showNetworkSelectInit);
+
+    const [selectedNetwork, setSelectedNetwork] = React.useState(selectedNetworkInit);
+
     const [snackbarOpen, setSnackbarOpen] = React.useState(false);
 
     const [snackbarMessage, setSnackbarMessage] = React.useState("");
@@ -69,6 +92,13 @@ export default function Base() {
     const [paymentRequest, setPaymentRequest] = React.useState({ price: "", payTo: "" })
 
     const [provider, setProvider] = React.useState(null);
+
+    // Track if the deposit button is disabled with state stored here
+    const [depositButtonDisabled, setDepositButtonDisabled] = React.useState(false);
+
+    // Initialize the terms accepted from local storage
+
+    const [termsAccepted, setTermsAccepted] = React.useState(getTermsAcceptedInit());
 
     const openSnackbar = (msg: string) => {
         setSnackbarOpen(true);
@@ -86,17 +116,32 @@ export default function Base() {
 
     const onTabToggle = (event: React.SyntheticEvent, newValue: number) => {
         setSelectedTab(newValue);
+        setDepositButtonDisabled(false);
     };
 
+    function navigateToVerifyPage(note: NoteDetails) {
+        setMyNoteString(note[0])
+        setSelectedTab(1);
 
-   
+        const clickButton = () => {
+            const button = document.getElementById("verifyNoteButton");
+            button?.click();
+        }
+        // Wait 1 second for the page to render then click the verify automaticly!
+        setTimeout(clickButton, 1000);
+    }
 
     const genericProps = {
         displayError: openSnackbar,
         provider,
         setProvider,
         setMyAddress,
-        myAddress
+        myAddress,
+        selectedNetwork,
+        setSelectedNetwork,
+        navigateToVerifyPage,
+        depositButtonDisabled,
+        setDepositButtonDisabled
     }
 
     const noteStringProps = {
@@ -109,42 +154,58 @@ export default function Base() {
         setPaymentRequest
     }
 
+    const networkSelectProps = {
+        displayError: openSnackbar,
+        selectedNetwork,
+        setSelectedNetwork,
+        showNetworkSelect,
+        setShowNetworkSelect,
+        setProvider,
+        termsAccepted,
+        setTermsAccepted
+    }
+
     const getTabContent = () => {
         switch (selectedTab) {
             case 0:
-                return <PurchaseGiftCardTab {...genericProps} />
+                return <BunnyNotesTab {...genericProps} />
             case 1:
-                return <PurchaseCashNote {...genericProps} />
-            case 2:
                 return <VerifyNoteTab {...genericProps} {...noteStringProps} />
-            case 3:
+            case 2:
                 return <CashOutGiftCardTab {...genericProps} {...noteStringProps}></CashOutGiftCardTab>
-            case 4:
+            case 3:
                 return <PaymentRequestTab {...genericProps} {...paymentRequestProps}></PaymentRequestTab>;
+            case 4:
+                return <BunnyWalletTab {...genericProps}></BunnyWalletTab>
             default:
                 break;
         }
     }
 
-    const mainRoute = () => <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Header withTabs={true} selectedTab={selectedTab} onTabToggle={onTabToggle} />
-        <Box component="main" sx={{ flex: 1, py: 6, px: 4, bgcolor: '#eaeff1' }}>
-            <TestnetInfo {...genericProps}></TestnetInfo>
-            <Spacer></Spacer>
-            {getTabContent()}
-        </Box>
-        <Box component="footer" sx={{ p: 2, bgcolor: '#eaeff1' }}>
-            <Copyright />
-        </Box>
-    </Box>
+
+
+    function mainRoute() {
+        return <React.Fragment>
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <Header withTabs={true} selectedTab={selectedTab} onTabToggle={onTabToggle} />
+                <Box component="main" sx={{ flex: 1, }}>
+                    {getTabContent()}
+                </Box>
+                <Box component="footer" sx={{ p: 2 }}>
+                    <Copyright />
+                </Box>
+            </Box>
+            <SelectNetworkDialog {...networkSelectProps}></SelectNetworkDialog>
+        </React.Fragment>
+    }
 
     const getRoutes = () => {
         return (<BrowserRouter>
             <Routes>
                 <Route path="/" element={mainRoute()}></Route>
-                <Route path="/paymentRequest/:payTo/:amount/:currency" element={<PaymentRequestPage {...genericProps}></PaymentRequestPage>}></Route>
+                <Route path="/paymentRequest/:payTo/:amount/:currency/:network" element={<PaymentRequestPage {...genericProps}></PaymentRequestPage>}></Route>
                 <Route path="*" element={<NotFoundPage></NotFoundPage>} />
-                <Route path="/help" element={<HelpPage></HelpPage>}></Route>
+                <Route path="/terms" element={<TermsPage></TermsPage>}></Route>
             </Routes>
         </BrowserRouter>)
     }

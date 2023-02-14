@@ -1,13 +1,12 @@
 // These are the functions using TRON that are using Props from Components
 
 import { ethers } from "ethers";
-// import { onBoardOrGetTronWeb, verifyAddress } from "./tronDeprecated";
 import { CardType } from "../components/CardGrid";
 import { createNote } from "../zkp/generateProof";
-import { onBoardOrGetProvider } from "./web3";
+import { getContract, getFee, onBoardOrGetProvider } from "./web3";
 
 
-export async function handleCardSelectWithProvider(props: any, denomination: string, currency: string, cardType: CardType) {
+export async function handleCardSelectWithProvider(props: any, denomination: string, currency: string, cardType: CardType, netId: string, noteAddress: string) {
     let provider = null;
     if (props.provider === null) {
         provider = await onBoardOrGetProvider(props.displayError);
@@ -26,13 +25,17 @@ export async function handleCardSelectWithProvider(props: any, denomination: str
     }
 
     if (props.provider === null && provider === null) {
-        props.displayError("Unableto connect to wallet!");
+        props.displayError("Unable to connect to wallet!");
         return false;
     }
 
-    const noteDetails = await createNote(currency, parseInt(denomination));
+    const erc20Notes = await getContract(props.provider, noteAddress, "/ERC20Notes.json");
+    const fee = await getFee(erc20Notes);
+    const formattedFee = ethers.utils.formatEther(fee);
 
-    return noteDetails;
+    const noteDetails = await createNote(currency, parseInt(denomination), netId);
+
+    return { noteDetails, formattedFee };
 
 }
 
