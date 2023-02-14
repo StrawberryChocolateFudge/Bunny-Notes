@@ -3,15 +3,10 @@ import Button from '@mui/material/Button';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import { QrReader } from 'react-qr-reader';
-import styled from '@emotion/styled';
 import { isMobile } from 'react-device-detect';
 import { parseNote } from '../../lib/BunnyNote';
 import { Tooltip } from '@mui/material';
 
-
-const ReaderFrame = styled("div")({
-    width: "100%"
-})
 
 interface QRReaderProps {
     setData: (d: string) => void;
@@ -22,7 +17,7 @@ interface QRReaderProps {
 const QRReader = (props: QRReaderProps) => {
     const facingMode = isMobile ? "environment" : "user";
     return (
-        <ReaderFrame>
+        <div style={{ width: "100%" }}>
             <QrReader
                 ViewFinder={ViewFinder}
                 constraints={{ facingMode }}
@@ -45,7 +40,7 @@ const QRReader = (props: QRReaderProps) => {
                 }
                 }
             />
-        </ReaderFrame>
+        </div>
     );
 };
 
