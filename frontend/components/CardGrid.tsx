@@ -7,7 +7,7 @@ export type CardType = "Gift Card" | "Cash Note" | "Payment Request";
 
 interface CardGridProps {
     cardProps: Array<SelectableCardsParams>
-    handleSelect: (denomination: string, currency: string, cardType: CardType,addresses : [string,string]) => void
+    handleSelect: (denomination: string, currency: string, cardType: CardType, addresses: [string, string]) => void
 
 }
 
@@ -24,7 +24,7 @@ export default function CardGrid(props: CardGridProps) {
 
     return (
         <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px" }}>
-            <Grid container rowSpacing={5} sx={{ margin: "0 auto" }} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+            <Grid justifyContent={"center"} container rowSpacing={5} sx={{ margin: "0 auto" }} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                 {renderGrid()}
             </Grid>
         </Box>
