@@ -6,7 +6,6 @@ import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
 import { BigNumber, ethers } from "ethers";
 import { bunnyNotesCommitments, bunnyNotesDeposit, ERC20Approve, ethNotesDeposit, getChainId, getContract, getFee, getIsContract, requestAccounts, ZEROADDRESS } from "../web3/web3";
-import { approveERC20SpendByOwner, depositToBunnyNoteByOwner } from "../web3/Wallet";
 import { parseEther } from "ethers/lib/utils";
 
 interface DownloadNoteProps {
@@ -20,7 +19,6 @@ interface DownloadNoteProps {
     showApproval: boolean
     setShowApproval: (to: boolean) => void;
     setRenderDownloadPage: (to: boolean) => void;
-    checkForBunnyWallet: boolean;
     myAddress: string;
     noteAddresses: [string, string];
     selectedNetwork: string;
@@ -192,61 +190,6 @@ export function downloadNote(props: DownloadNoteProps) {
         }
     }
 
-
-
-    const depositWithBunnyWallet = async () => {
-        const address: string = await requestAccounts(props.provider);
-
-        const bunnyWallet = await getContract(props.provider, props.myAddress, "/BunnyWallet.json");
-
-        const owner: string = await bunnyWallet.owner();
-        if (owner.toLowerCase() !== address.toLowerCase()) {
-            props.displayError("You don't own the Bunny Wallet");
-            return;
-        }
-
-        if (props.showApproval && !isNativeToken) {
-            // approve the spend using the bunny wallet, you must be the owner of the wallet
-            const erc20Notes = await getContract(props.provider, noteAddress, "/ERC20Notes.json");
-            const fee = await getFee(erc20Notes);
-            const formattedFee = ethers.utils.formatEther(fee);
-            const approveAmount = parseFloat(formattedFee) + parseFloat(noteDetails[1].amount);
-            props.setDepositButtonDisabled(true);
-            props.setShowApproval(false);
-            const tx = await approveERC20SpendByOwner(bunnyWallet, erc20Address, erc20Address, approveAmount.toString()).catch(err => {
-                props.displayError("Unable to Approve the spend with the Smart Contract Wallet!")
-                props.setShowApproval(true);
-            });
-            await handleApprovalTx(tx);
-            return;
-        } {
-            props.setDepositButtonDisabled(true);
-            // Deposit with bunny wallet
-            const bunnyNote = await getContract(props.provider, noteAddress, "/BunnyNotes.json");
-
-            const isCashNote = getIsCashNote();
-
-
-            const deposit = noteDetails[1].deposit;
-            // Check if the commitment exists already
-            const commitments = await bunnyNotesCommitments(bunnyNote, toNoteHex(deposit.commitment));
-            if (commitments.used) {
-                props.displayError("Invalid commitment. Deposit already used!");
-                props.setDepositButtonDisabled(false)
-                return;
-            }
-
-            const tx = await depositToBunnyNoteByOwner(bunnyWallet, noteAddress, erc20Address, toNoteHex(deposit.commitment), isCashNote, !isNativeToken).catch(err => {
-                props.displayError("Unable to create a Bunny Note with the Smart Contract Wallet!")
-                props.setDepositButtonDisabled(false)
-
-            });
-            await handleDepositTx(tx);
-            return;
-        }
-    }
-
-
     const depositClick = async () => {
         // if download was not clicked, render errror
         if (!props.downloadClicked) {
@@ -262,16 +205,7 @@ export function downloadNote(props: DownloadNoteProps) {
             return;
         }
 
-        let isContract = false;
-        if (props.checkForBunnyWallet) {
-            isContract = await getIsContract(props.provider, props.myAddress, props.displayError);
-        }
-        // If the provided address is a contract, it's assumed the user wants to use his Bunny Wallet!
-        if (!isContract) {
-            await depositWithOwnerAddress();
-        } else {
-            await depositWithBunnyWallet();
-        }
+        await depositWithOwnerAddress();
     }
 
 
