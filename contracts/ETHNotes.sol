@@ -5,13 +5,17 @@ import "@openzeppelin/contracts/utils/Address.sol";
 
 contract ETHNotes is BunnyNotes {
     string public constant NOTE_TYPE = "ETH";
-
+    
+    event EthNotesDeployed();
+    
     constructor(
         IVerifier _verifier,
         uint256 _denomination,
         uint8 _feeDivider,
         address _relayer
-    ) BunnyNotes(_verifier, _denomination, _feeDivider, _relayer) {}
+    ) BunnyNotes(_verifier, _denomination, _feeDivider, _relayer) {
+        emit EthNotesDeployed();
+    }
 
     function _processDeposit(address depositFor) internal override {
         if (msg.sender == relayer) {
