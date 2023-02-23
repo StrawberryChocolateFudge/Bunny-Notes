@@ -3,7 +3,6 @@ import React from "react";
 import { setTermsAcceptedToLS } from "../../storage/local";
 import { setSelectedNToSS } from "../../storage/session";
 import { BTTCTESTNETID, handleNetworkSelect } from "../../web3/web3";
-import { Center } from "../BunnyNotesTab";
 import { CheckWebsiteURLWarning } from "./CheckWebsiteURLWarning";
 import { TermsCheckbox } from "./TermsCheckbox";
 
@@ -41,6 +40,48 @@ export function SelectNetwork(props: SelectNetworkProps) {
         </FormControl>
     </Stack>;
 }
+
+
+type NetworkSelectProps = {
+    tooltipTitle: string,
+    chainId: string,
+    imageAlt: string,
+    imageSrc: string,
+    cardTypography: string,
+}
+
+type NetworkSelectButtonBuilderProps = {
+    networks: NetworkSelectProps[],
+    networkSelected: CallableFunction
+};
+
+export function NetworkSelectButtonBuilder(props: NetworkSelectButtonBuilderProps): React.ReactElement[] {
+    return props.networks.map(network => <Tooltip key={network.chainId} arrow title={network.tooltipTitle}>
+        <Button onClick={props.networkSelected(network.chainId)}>
+            <Card sx={{ padding: "5px" }}>
+                <img width="50px" alt={network.imageAlt} src={network.imageSrc} />
+                <Typography gutterBottom variant="subtitle1" component="div" >{network.cardTypography}</Typography>
+            </Card>
+        </Button></Tooltip>)
+}
+
+const networkButtons: NetworkSelectProps[] = [
+    {
+        tooltipTitle: "Select Bittorrent Chain",
+        chainId: "0x405",
+        imageAlt: "Bittorrent Chain",
+        imageSrc: "/imgs/bttLogo.svg",
+        cardTypography: "BTTC Testnet"
+    },
+    {
+        tooltipTitle: " Select Fantom",
+        chainId: "0xfa2",
+        imageAlt: "Fantom",
+        imageSrc: "/imgs/FantomLogo.svg",
+        cardTypography: "Fantom Testnet"
+    }
+]
+
 
 export function SelectNetworkDialog(props: SelectNetworkProps) {
 
@@ -94,9 +135,9 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
                 A Gift Card and Cash Note Protocol
             </DialogContentText>
             <Divider light />
-            <Center>
-                {NetworkCardButtons({ networkSelected })}
-            </Center>
+            <Stack direction={"row"} justifyContent="center">
+                {NetworkSelectButtonBuilder({ networks: networkButtons, networkSelected })}
+            </Stack>
             <Divider light />
             <TermsCheckbox termsAccepted={props.termsAccepted} onTermsChecked={onTermsChecked}></TermsCheckbox>
             {availableWallets()}
@@ -104,15 +145,4 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
         </DialogContent>
 
     </Dialog>
-}
-
-export function NetworkCardButtons(props: any) {
-    //Single button, hardcoded to select BTTC Chain for now
-    return <Tooltip arrow title="Select Bittorrent Chain">
-        <Button onClick={props.networkSelected("0x405")}>
-            <Card sx={{ padding: "5px" }}>
-                <img width="50px" alt="Bittorrent Chain" src="/imgs/bttLogo.svg" />
-                <Typography gutterBottom variant="subtitle1" component="div" >BTTC Donau Testnet</Typography>
-            </Card>
-        </Button></Tooltip>
 }

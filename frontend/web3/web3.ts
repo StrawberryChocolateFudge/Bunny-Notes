@@ -2,20 +2,24 @@ import MetaMaskOnboarding from "@metamask/onboarding";
 import { BigNumber, ethers } from "ethers";
 import { setCurrentNToSS } from "../storage/session";
 
-export const MAXCASHNOTESIZE = 100;
+// I only have 1 FTM and 1 BTTC notes right now!
+export const MAXCASHNOTESIZE = 1;
 
 export const BTTCTESTNETID = "0x405";
+
+export const FANTOMTESTNETID = "0xfa2";
+
 
 export const USDTMCONTRACTADDRESS_DONAU = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7";
 export const USDTM100ADDRESS_DONAU = "0x94D1f7e4667f2aE54494C2a99A18C8B4aED9B22A";
 
 export const BTT_NATIVE_DONAU = "0x2D524Ee2669b7F521B9d903A56002ba565cc50ba";
+export const FANTOM_NATIVE_TESTNET = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7";
 
 export const ZEROADDRESS = "0x0000000000000000000000000000000000000000"
 
 // Update this when new note contracts are added!!
 export function getContractAddressFromCurrencyDenomination(denomination: string, currency: string, networkId: string): string {
-
     switch (networkId) {
         case BTTCTESTNETID:
             if (denomination === "100" && currency === "USDTM") {
@@ -25,15 +29,21 @@ export function getContractAddressFromCurrencyDenomination(denomination: string,
             } else {
                 return ""
             }
+        case FANTOMTESTNETID:
+            if (denomination === "1" && currency === "FTM") {
+                return FANTOM_NATIVE_TESTNET;
+            }
         default:
             return ""
     }
 }
 
-export function getCurrencyAddressFromNetworkId(currency: string| undefined, netId: string | undefined): string {
+export function getCurrencyAddressFromNetworkId(currency: string | undefined, netId: string | undefined): string {
     switch (netId) {
         case BTTCTESTNETID:
             return getCurrencyAddressOnBTTCDonau(currency);
+        case FANTOMTESTNETID:
+            return getCurrencyAddressOnFantomTestnet(currency);
         default:
             return "INVALID";
     }
@@ -49,6 +59,14 @@ export function getCurrencyAddressOnBTTCDonau(currency: string | undefined) {
             return "INVALID";
     }
 }
+export function getCurrencyAddressOnFantomTestnet(currency: string | undefined) {
+    switch (currency) {
+        case "FTM":
+            return "Native Token"
+        default:
+            return "INVALID"
+    }
+}
 
 
 let RELAYERURL = "https://relayer.bunnynotes.finance"
@@ -59,6 +77,8 @@ if (process.env.NODE_ENV === "development") {
 
 export const BTTCTESTNETNETWORKURL = "https://pre-rpc.bt.io/";
 
+export const FANTOMTESTNETNETWORKURL = "https://xapi.testnet.fantom.network/lachesis";
+
 export function getExplorer(txId: string, network: string | undefined): string {
     if (!network) {
         return "";
@@ -66,6 +86,8 @@ export function getExplorer(txId: string, network: string | undefined): string {
     switch (network) {
         case BTTCTESTNETID:
             return `http://testscan.bt.io/#/transaction/${txId}`
+        case FANTOMTESTNETID:
+            return `https://testnet.ftmscan.com/tx/${txId}`
         default:
             return "";
     }
@@ -75,11 +97,53 @@ export function getNetworkNameFromId(netId): string {
     switch (netId) {
         case BTTCTESTNETID:
             return "BTTC Donau Testnet"
+        case FANTOMTESTNETID:
+            return "Fantom Testnet"
         default:
             return "INVALID"
     }
 }
 
+
+export function getJsonRpcProvider(network: string): any {
+    switch (network) {
+        case BTTCTESTNETID:
+            return new ethers.providers.JsonRpcProvider(BTTCTESTNETNETWORKURL)
+        case FANTOMTESTNETID:
+            return new ethers.providers.JsonRpcProvider(FANTOMTESTNETNETWORKURL)
+        default:
+            return undefined;
+    }
+}
+
+export function getWalletCurrencyFromFetchedChainId(chainId: number): string {
+    switch (chainId) {
+        case 1:
+            return "ETH"
+        case 0x405:
+            return "BTT"
+        case 0xfa2:
+            return "FTM"
+        default:
+            return "ETH"
+    }
+}
+
+
+export function getAvailableERC20Tokens(netId): AvailableERC20Token[] {
+    switch (netId) {
+        case 1:
+            return [{ address: "", name: "", logo: "" }]
+        case 0x405:
+            return [{
+                name: "USDTM", address: USDTMCONTRACTADDRESS_DONAU, logo: "/imgs/Bunny.svg"
+            }]
+        case 0xfa2:
+            return [{ address: "", name: "", logo: "" }]
+        default:
+            return [{ address: "", name: "", logo: "" }]
+    }
+}
 
 export function web3Injected(): boolean {
     //@ts-ignore
@@ -122,16 +186,7 @@ export async function handleNetworkSelect(networkId, handleError) {
     }
 }
 
-export function getWalletCurrencyFromFetchedChainId(chainId: number): string {
-    switch (chainId) {
-        case 1:
-            return "ETH"
-        case 0x405:
-            return "BTT"
-        default:
-            return "ETH"
-    }
-}
+
 
 function getWeb3Provider() {
     //@ts-ignore
@@ -155,18 +210,6 @@ export function onBoardOrGetProvider(handleError): any {
     } else {
         return getWeb3Provider()
     }
-}
-
-export function getJsonRpcProvider(network: string): any {
-
-    switch (network) {
-        case BTTCTESTNETID:
-            return new ethers.providers.JsonRpcProvider(BTTCTESTNETNETWORKURL)
-        default:
-            return undefined;
-    }
-
-
 }
 
 export async function requestAccounts(provider: any) {
@@ -207,9 +250,39 @@ export async function onboardOrSwitchNetwork(networkId, handleError) {
         case BTTCTESTNETID:
             await switchToDonauTestnet();
             return true;
+        case FANTOMTESTNETID:
+            await switchToFantomTestnet();
+            return true;
         default:
             return false;
     }
+}
+
+async function ethereumRequestAddChain(
+    hexchainId: string,
+    chainName: string,
+    name: string,
+    symbol: string,
+    decimals: number,
+    rpcUrls: string[],
+    blockExplorerUrls: string[]) {
+    //@ts-ignore
+    await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+            {
+                chainId: hexchainId,
+                chainName,
+                nativeCurrency: {
+                    name,
+                    symbol,
+                    decimals,
+                },
+                rpcUrls,
+                blockExplorerUrls,
+            },
+        ],
+    });
 }
 
 export async function switchToDonauTestnet() {
@@ -221,24 +294,18 @@ export async function switchToDonauTestnet() {
     const switched = await switch_to_Chain(hexchainId);
     if (!switched) {
         // If I cannot switch to it I try to add it!
+        await ethereumRequestAddChain(hexchainId, chainName, "BTT", "BTT", 18, rpcUrls, blockExplorerUrls);
+    }
+}
 
-        //@ts-ignore
-        await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [
-                {
-                    chainId: hexchainId,
-                    chainName,
-                    nativeCurrency: {
-                        name: "BTT",
-                        symbol: "BTT",
-                        decimals: 18,
-                    },
-                    rpcUrls,
-                    blockExplorerUrls,
-                },
-            ],
-        });
+export async function switchToFantomTestnet() {
+    const hexChainId = FANTOMTESTNETID;
+    const chainName = "Fantom testnet";
+    const rpcUrls = ["https://xapi.testnet.fantom.network/lachesis"]
+    const blockExplorerUrls = ["https://testnet.ftmscan.com/"]
+    const switched = await switch_to_Chain(hexChainId);
+    if (!switched) {
+        await ethereumRequestAddChain(hexChainId, chainName, "FTM", "FTM", 18, rpcUrls, blockExplorerUrls)
     }
 }
 
@@ -347,17 +414,4 @@ export interface AvailableERC20Token {
     address: string;
     name: string;
     logo: string;
-}
-
-export function getAvailableERC20Tokens(netId): AvailableERC20Token[] {
-    switch (netId) {
-        case 1:
-            return [{ address: "", name: "", logo: "" }]
-        case 0x405:
-            return [{
-                name: "USDTM", address: USDTMCONTRACTADDRESS_DONAU, logo: "/imgs/Bunny.svg"
-            }]
-        default:
-            return [{ address: "", name: "", logo: "" }]
-    }
 }
