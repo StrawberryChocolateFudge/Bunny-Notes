@@ -1,7 +1,3 @@
-![Bunny Notes](https://raw.githubusercontent.com/StrawberryChocolateFudge/Bunny-Notes/master/bunnyNotes.jpg)
-
-
-
 # Bunny Notes
 
 This is the full implementation of Bunny Notes, a zero-knowledge proof based Gift Card and Cash Note protocol.
@@ -9,12 +5,6 @@ This is the full implementation of Bunny Notes, a zero-knowledge proof based Gif
 The repository contains the zero-knowledge circuits, the solidity smart contracts and a front-end created with parcel.
 
 It uses the same repository for all for easy testing. 
-The project was built for a Hackathon and was scaffolded with hardhat
-
-
-## The Bunny Wallet
-
-Bunny wallet is a smart contract wallet that has relayed zkp based transactions built in, it uses uniswap v3 to provide gasless relayed token swaps
 
 ## Node Version:
 Use 18.12.1 !!
@@ -24,7 +14,6 @@ Use 18.12.1 !!
 To run the tests run 
 
    `npx hardhat test`
-
 
 ## Circom
 
