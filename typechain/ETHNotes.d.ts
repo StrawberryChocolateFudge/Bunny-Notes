@@ -136,11 +136,13 @@ interface ETHNotesInterface extends ethers.utils.Interface {
 
   events: {
     "Deposit(bytes32,address,uint256)": EventFragment;
+    "EthNotesDeployed()": EventFragment;
     "WithdrawCashNote(address,address,bytes32,uint256,uint256)": EventFragment;
     "WithdrawGiftCard(address,address,bytes32,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "EthNotesDeployed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "WithdrawCashNote"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "WithdrawGiftCard"): EventFragment;
 }
@@ -152,6 +154,8 @@ export type DepositEvent = TypedEvent<
     timestamp: BigNumber;
   }
 >;
+
+export type EthNotesDeployedEvent = TypedEvent<[] & {}>;
 
 export type WithdrawCashNoteEvent = TypedEvent<
   [string, string, string, BigNumber, BigNumber] & {
@@ -486,6 +490,10 @@ export class ETHNotes extends BaseContract {
       [string, string, BigNumber],
       { commitment: string; depositedBy: string; timestamp: BigNumber }
     >;
+
+    "EthNotesDeployed()"(): TypedEventFilter<[], {}>;
+
+    EthNotesDeployed(): TypedEventFilter<[], {}>;
 
     "WithdrawCashNote(address,address,bytes32,uint256,uint256)"(
       from?: null,
