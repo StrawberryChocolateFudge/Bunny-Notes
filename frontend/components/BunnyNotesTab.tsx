@@ -55,8 +55,6 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
 
     const [cardType, setCardType] = React.useState<CardType>("Gift Card");
 
-    const [checkForBunnyWallet, setCheckForBunnyWallet] = React.useState(true)
-
     const handleChecked = (event: React.ChangeEvent<HTMLInputElement>) => {
 
         if (event.target.checked) {
@@ -81,12 +79,10 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
 
     const addressSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         props.setMyAddress(event.target.value);
-        setCheckForBunnyWallet(true);
     }
 
     const setScannedAddress = (d: string) => {
         props.setMyAddress(d);
-        setCheckForBunnyWallet(true);
     }
 
     const importAddress = async () => {
@@ -97,13 +93,11 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
                 const account = await requestAccounts(provider);
                 props.setMyAddress(account);
                 props.setProvider(provider);
-                setCheckForBunnyWallet(false);
             }
 
         } else {
             const account = await requestAccounts(props.provider);
             props.setMyAddress(account);
-            setCheckForBunnyWallet(false);
         }
     }
 
@@ -140,7 +134,6 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
             selectedNetwork: props.selectedNetwork,
             noteAddresses,
             myAddress: props.myAddress,
-            checkForBunnyWallet,
             setRenderDownloadPage,
             showApproval,
             setShowApproval,
@@ -168,11 +161,8 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
             >
                 <Toolbar>
                     <Grid container spacing={2} alignItems="center">
-                        <Grid item>
-                            <ScanNoteButton dialogTitle='Scan a Wallet Address' setData={setScannedAddress} handleError={props.displayError}></ScanNoteButton>
-                        </Grid>
                         <Grid item xs>
-                            <Tooltip arrow title="You can use your Bunny Wallet address here to deposit with it!">
+                            <Tooltip arrow title="Your wallet address you use for depositing">
                                 <TextField
                                     fullWidth
                                     value={props.myAddress}

@@ -21,7 +21,6 @@ import {
 import { PaymentRequestPage } from './PaymentRequestPage';
 import { NotFoundPage } from './404page';
 import HelpPage from './HelpPage';
-import BunnyWalletTab from './BunnyWalletTab';
 import BunnyNotesTab from './BunnyNotesTab';
 import { SelectNetworkDialog } from './utils/NetworkSelector';
 import { getCurrenttNetworkFromSS, getSelectedNFromSS } from '../storage/session';
@@ -175,14 +174,10 @@ export default function Base() {
                 return <CashOutGiftCardTab {...genericProps} {...noteStringProps}></CashOutGiftCardTab>
             case 3:
                 return <PaymentRequestTab {...genericProps} {...paymentRequestProps}></PaymentRequestTab>;
-            case 4:
-                return <BunnyWalletTab {...genericProps}></BunnyWalletTab>
             default:
                 break;
         }
     }
-
-
 
     function mainRoute() {
         return <React.Fragment>
