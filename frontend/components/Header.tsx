@@ -21,7 +21,6 @@ export default function Header(props: HeaderProps) {
                     <Tab label="Verify a Note" />
                     <Tab label="Cash Out" />
                     <Tab label="Request Payment" />
-                    <Tab label="Bunny Wallet"></Tab>
                 </Tabs>
             </AppBar> : <React.Fragment></React.Fragment>}
 
