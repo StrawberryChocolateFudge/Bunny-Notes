@@ -1,5 +1,6 @@
 {
   "name": "bunny-notes",
+   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
     "dev": "parcel frontend/index.html",
     "build": "parcel build frontend/index.html && npm run copy",
