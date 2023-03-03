@@ -13,6 +13,8 @@ import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { styled, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
 import { bunnyNoteIsSpent, bunnyNotesCommitments, getContractAddressFromCurrencyDenomination, getErc20NoteToken, getJsonRpcProvider, getRpcContract } from '../web3/web3';
 import { getLoading } from './LoadingIndicator';
+import { commitmentQRStringParser } from '../qrcode/create';
+import { ParsedNote } from '../zkp/generateProof';
 interface VerifyNoteTabProps extends Base {
       noteString: string
       setMyNoteString: (newValue: string) => void;
@@ -36,6 +38,49 @@ const IMG = styled("img")({
 
 export const shortenAddress = (address: string) => <Tooltip title={address}><div>{address.substring(0, 6)}...{address.substring(address.length - 6)}</div></Tooltip>
 
+export const evalQRCodeType = async (qrString) => {
+      let cryptoNoteParseError = false;
+      let commitmentParseError = false;
+      let errorMessage = "";
+      let parsedQrCode = {};
+      try {
+            parsedQrCode = await parseNote(qrString);
+      } catch (err) {
+            cryptoNoteParseError = true;
+            errorMessage = err.message;
+      }
+
+      try {
+            parsedQrCode = commitmentQRStringParser(qrString);
+      } catch (err) {
+            commitmentParseError = true;
+            errorMessage = err.message;
+      }
+
+      if (!cryptoNoteParseError) {
+            return { type: "cryptoNote", code: parsedQrCode, err: errorMessage };
+      }
+
+      if (!commitmentParseError) {
+            return { type: "commitmentQR", code: parsedQrCode, err: errorMessage }
+      }
+
+      return { type: "invalid", code: parsedQrCode, err: errorMessage };
+}
+
+const getDetails = ({ type, code, err }: { type: string, code: any, err: string }) => {
+      if (type === "cryptoNote") {
+            const note = code as ParsedNote;
+            const nullifierHash = toNoteHex(note.deposit.nullifierHash);
+            const commitment = toNoteHex(note.deposit.commitment);
+            return [commitment, nullifierHash, note.amount, note.currency];
+      } else if (type === "commitmentQR") {
+            const nullifierHash = code.nullifierHash;
+            const commitment = code.commitment;
+            return [commitment, nullifierHash, code.amount, code.currency];
+      }
+      return [];
+}
 
 export default function VerifyNoteTab(props: VerifyNoteTabProps) {
 
@@ -51,24 +96,24 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
       }
 
       const fetchCommitment = async (provider: any) => {
-            let parsedNote;
 
-            try {
-                  parsedNote = await parseNote(props.noteString);
-            } catch (err) {
-                  props.displayError(err.message);
+            const evalResult = await evalQRCodeType(props.noteString);
+
+            if (evalResult.type === "invalid") {
+                  props.displayError(evalResult.err);
                   return;
             }
+
+            const [commitment, nullifierHash, amount, currency] = getDetails(evalResult);
+
             setLoading(true);
-            const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency, props.selectedNetwork);
+            const contractAddress = getContractAddressFromCurrencyDenomination(amount, currency, props.selectedNetwork);
             const contract = await getRpcContract(provider, contractAddress, "/ERC20Notes.json");
-            const commitmentBigInt = parsedNote.deposit.commitment;
-            const nullifierHash = parsedNote.deposit.nullifierHash
-            // // get the commitment data
+            // get the commitment data
 
-            const isSpent = await bunnyNoteIsSpent(contract, toNoteHex(nullifierHash))
+            const isSpent = await bunnyNoteIsSpent(contract, nullifierHash)
 
-            const commitments = await bunnyNotesCommitments(contract, toNoteHex(commitmentBigInt))
+            const commitments = await bunnyNotesCommitments(contract, commitment)
 
             if (!commitments.used) {
                   props.displayError("Invalid note. Missing Deposit!");
@@ -91,7 +136,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                   noteType: commitments.cashNote,
                   creator: commitments.creator,
                   recipient: recipient,
-                  denomination: `${parsedNote.amount} ${parsedNote.currency}`,
+                  denomination: `${amount} ${currency}`,
                   noteAddress: contractAddress,
                   erc20Address
 
@@ -102,7 +147,6 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
       const resetVerifyPage = () => {
             setCommitmentDetails(null);
       }
-
 
       return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
             <AppBar
@@ -152,7 +196,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                                                 </TableRow>
                                                 <TableRow>
                                                       <TableCell align="left">Recipient:</TableCell>
-                                                      <TableCell align="right">{shortenAddress(commitmentDetails.recipient)}</TableCell>
+                                                      <TableCell align="right">{commitmentDetails.recipient === "Not Spent" ? commitmentDetails.recipient : shortenAddress(commitmentDetails.recipient)}</TableCell>
                                                 </TableRow>
                                                 <TableRow>
                                                       <TableCell align="left">Note Type:</TableCell>
