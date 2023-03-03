@@ -1,20 +1,33 @@
 import { jsPDF } from "jspdf";
 import { CardType } from "../components/CardGrid";
 
-// separate PDF for bunny note or bunny wallet!
-//TODO: ADD BUNNY WALLET GRAFFITI STYLE TO THIS :) 
-export function downloadPDF(bearerText: string, denomination: string, commitment: string, cardType: CardType, dataUrl, noteString: string) {
+export async function downloadPDF(bearerText: string, denomination: string, commitment: string, cardType: CardType, dataUrl, noteString: string, commitmentQRCodeDataUrl) {
     var doc = new jsPDF("l", "px", "credit-card");
-    doc.setFontSize(6)
-    doc.text(bearerText, 16, 25);
-    doc.addImage(dataUrl, "JPEG", 15, 32, 40, 40);
-    doc.setFontSize(10)
-    doc.text("Bunny Note", 70, 40)
-    doc.text(`${denomination} ${cardType}`, 70, 55)
-    doc.setFontSize(6)
-    doc.text("bunnynotes.finance", 70, 70)
+    doc.setFontSize(7)
+    doc.text(bearerText, 3, 6);
+    doc.addImage(dataUrl, "JPEG", 1, 10, 90, 90);
+    doc.setFontSize(12)
+    doc.text(cardType, 101, 21);
+    doc.setFontSize(20)
+    doc.text(denomination, 100, 40);
+    doc.setFontSize(10);
+    doc.text("bunnynotes.finance", 102, 60)
     doc.setFontSize(2)
-    doc.text(noteString, 16, 85)
+    doc.text(noteString, 3, 110);
+    doc.addPage();
+    doc.addImage(commitmentQRCodeDataUrl, "JPEG", 1, 20, 60, 60);
+    doc.setFontSize(12);
+    doc.text("Scan this QR code to verify", 60, 40);
+    doc.text("validity without revealing", 60, 50);
+    doc.text("the secret", 60, 60)
     doc.save(`BunnyNote-${denomination}-${cardType}-${commitment}.pdf`)
-
+    // For testing I opened it in another window!
+    // var string = doc.output('datauristring');
+    // var embed = "<embed width='100%' height='100%' src='" + string + "'/>"
+    // var x = window.open() as Window;
+    // x.document.open();
+    // x.document.write(embed);
+    // x.document.close();
 }
+
+
