@@ -7,6 +7,7 @@ import { CardType } from "./CardGrid";
 import { BigNumber, ethers } from "ethers";
 import { bunnyNotesCommitments, bunnyNotesDeposit, ERC20Approve, ethNotesDeposit, getChainId, getContract, getFee, getIsContract, requestAccounts, ZEROADDRESS } from "../web3/web3";
 import { parseEther } from "ethers/lib/utils";
+import { commitmentQR } from "../qrcode/create";
 
 interface DownloadNoteProps {
     provider: any,
@@ -31,8 +32,9 @@ interface DownloadNoteProps {
 
 export function downloadNote(props: DownloadNoteProps) {
     const noteDetails = props.noteDetails as NoteDetails;
-
-    const denomination = `${noteDetails[1].amount} ${noteDetails[1].currency}`;
+    const amount = noteDetails[1].amount;
+    const currency = noteDetails[1].currency;
+    const denomination = `${amount} ${currency}`;
 
     const displayedFee = `${props.noteFee} ${noteDetails[1].currency}`;
 
@@ -210,10 +212,14 @@ export function downloadNote(props: DownloadNoteProps) {
 
 
 
-    const downloadClick = () => {
+    const downloadClick = async () => {
         const commitmentBigint = noteDetails[1].deposit.commitment;
+        const nullifierHashBigint = noteDetails[1].deposit.nullifierHash;
         // start the download of the PDF!
-        downloadPDF(bearerText, denomination, toNoteHex(commitmentBigint), props.cardType, props.qrCodeDataUrl, noteString);
+        const commitment = toNoteHex(commitmentBigint);
+        const nullifierHash = toNoteHex(nullifierHashBigint);
+        const commitmentQRDataUrl = await commitmentQR({ amount, currency, commitment, nullifierHash });
+        downloadPDF(bearerText, denomination, commitment, props.cardType, props.qrCodeDataUrl, noteString, commitmentQRDataUrl);
         props.setDownloadClicked(true);
     }
 
