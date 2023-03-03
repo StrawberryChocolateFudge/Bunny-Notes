@@ -6,6 +6,7 @@ import { QrReader } from 'react-qr-reader';
 import { isMobile } from 'react-device-detect';
 import { parseNote } from '../../lib/BunnyNote';
 import { Tooltip } from '@mui/material';
+import { evalQRCodeType } from './VerifyNoteTab';
 
 
 interface QRReaderProps {
@@ -25,13 +26,15 @@ const QRReader = (props: QRReaderProps) => {
                     if (!!result) {
                         // Only set the data if the note is valid
                         // otherwise render an error
-                        await parseNote(result?.text).then(() => {
+                        let qrCodeDetails = await evalQRCodeType(result?.text);
+
+                        if (qrCodeDetails.type === "invalid") {
+                            props.handleError(qrCodeDetails.err)
+                        } else {
                             props.setData(result?.text);
                             props.handleClose();
+                        }
 
-                        }).catch((err) => {
-                            props.handleError(err.message);
-                        });
                     }
                     if (!!error) {
                         // This is constantly triggered during scanning.
