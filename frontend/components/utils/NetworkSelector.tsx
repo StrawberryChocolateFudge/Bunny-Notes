@@ -72,14 +72,14 @@ const networkButtons: NetworkSelectProps[] = [
         imageAlt: "Bittorrent Chain",
         imageSrc: "/imgs/bttLogo.svg",
         cardTypography: "BTTC Testnet"
-    },
-    {
-        tooltipTitle: " Select Fantom",
-        chainId: "0xfa2",
-        imageAlt: "Fantom",
-        imageSrc: "/imgs/FantomLogo.svg",
-        cardTypography: "Fantom Testnet"
     }
+    // {
+    //     tooltipTitle: " Select Fantom",
+    //     chainId: "0xfa2",
+    //     imageAlt: "Fantom",
+    //     imageSrc: "/imgs/FantomLogo.svg",
+    //     cardTypography: "Fantom Testnet"
+    // }
 ]
 
 
