@@ -149,18 +149,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVerifier__factory>;
     getContractFactory(
-      name: "BunnyToken",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.BunnyToken__factory>;
-    getContractFactory(
-      name: "BunnyWallet",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.BunnyWallet__factory>;
-    getContractFactory(
-      name: "IOwnerVerifier",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IOwnerVerifier__factory>;
-    getContractFactory(
       name: "ERC20Notes",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC20Notes__factory>;
@@ -169,10 +157,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ETHNotes__factory>;
     getContractFactory(
-      name: "Verifier",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Verifier__factory>;
-    getContractFactory(
       name: "MOCKERC20",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MOCKERC20__factory>;
@@ -180,10 +164,6 @@ declare module "hardhat/types/runtime" {
       name: "MOCKERC721",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MOCKERC721__factory>;
-    getContractFactory(
-      name: "SwapTokens",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SwapTokens__factory>;
     getContractFactory(
       name: "Verifier",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -360,21 +340,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IVerifier>;
     getContractAt(
-      name: "BunnyToken",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.BunnyToken>;
-    getContractAt(
-      name: "BunnyWallet",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.BunnyWallet>;
-    getContractAt(
-      name: "IOwnerVerifier",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IOwnerVerifier>;
-    getContractAt(
       name: "ERC20Notes",
       address: string,
       signer?: ethers.Signer
@@ -385,11 +350,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ETHNotes>;
     getContractAt(
-      name: "Verifier",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Verifier>;
-    getContractAt(
       name: "MOCKERC20",
       address: string,
       signer?: ethers.Signer
@@ -399,11 +359,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.MOCKERC721>;
-    getContractAt(
-      name: "SwapTokens",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SwapTokens>;
     getContractAt(
       name: "Verifier",
       address: string,

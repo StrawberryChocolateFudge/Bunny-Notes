@@ -231,7 +231,7 @@ export class ERC20Notes extends BaseContract {
         used: boolean;
         creator: string;
         recipient: string;
-        cashNote: boolean;
+        spendingNote: boolean;
         createdDate: BigNumber;
         spentDate: BigNumber;
       }
@@ -241,7 +241,7 @@ export class ERC20Notes extends BaseContract {
 
     deposit(
       _commitment: BytesLike,
-      cashNote: boolean,
+      spendingNote: boolean,
       depositFor: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -318,7 +318,7 @@ export class ERC20Notes extends BaseContract {
       used: boolean;
       creator: string;
       recipient: string;
-      cashNote: boolean;
+      spendingNote: boolean;
       createdDate: BigNumber;
       spentDate: BigNumber;
     }
@@ -328,7 +328,7 @@ export class ERC20Notes extends BaseContract {
 
   deposit(
     _commitment: BytesLike,
-    cashNote: boolean,
+    spendingNote: boolean,
     depositFor: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -402,7 +402,7 @@ export class ERC20Notes extends BaseContract {
         used: boolean;
         creator: string;
         recipient: string;
-        cashNote: boolean;
+        spendingNote: boolean;
         createdDate: BigNumber;
         spentDate: BigNumber;
       }
@@ -412,7 +412,7 @@ export class ERC20Notes extends BaseContract {
 
     deposit(
       _commitment: BytesLike,
-      cashNote: boolean,
+      spendingNote: boolean,
       depositFor: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -562,7 +562,7 @@ export class ERC20Notes extends BaseContract {
 
     deposit(
       _commitment: BytesLike,
-      cashNote: boolean,
+      spendingNote: boolean,
       depositFor: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -641,7 +641,7 @@ export class ERC20Notes extends BaseContract {
 
     deposit(
       _commitment: BytesLike,
-      cashNote: boolean,
+      spendingNote: boolean,
       depositFor: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

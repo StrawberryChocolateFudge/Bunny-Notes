@@ -140,7 +140,7 @@ const _abi = [
       },
       {
         internalType: "bool",
-        name: "cashNote",
+        name: "spendingNote",
         type: "bool",
       },
       {
@@ -179,7 +179,7 @@ const _abi = [
       },
       {
         internalType: "bool",
-        name: "cashNote",
+        name: "spendingNote",
         type: "bool",
       },
       {
