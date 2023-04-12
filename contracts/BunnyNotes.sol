@@ -17,7 +17,7 @@ struct CommitmentStore {
     bool used;
     address creator;
     address recipient;
-    bool cashNote;
+    bool spendingNote;
     uint256 createdDate;
     uint256 spentDate;
 }
@@ -83,7 +83,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
 
     function deposit(
         bytes32 _commitment,
-        bool cashNote,
+        bool spendingNote,
         address depositFor
     ) external payable nonReentrant {
         require(
@@ -93,7 +93,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
 
         commitments[_commitment].used = true;
         commitments[_commitment].creator = depositFor;
-        commitments[_commitment].cashNote = cashNote;
+        commitments[_commitment].spendingNote = spendingNote;
         commitments[_commitment].createdDate = block.timestamp;
         _processDeposit(depositFor);
 
@@ -118,7 +118,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
             "The giftcard has already been spent"
         );
         require(
-            commitments[_commitment].cashNote == false,
+            commitments[_commitment].spendingNote == false,
             "You can only withdraw gift cards."
         );
         require(
@@ -155,7 +155,7 @@ abstract contract BunnyNotes is ReentrancyGuard {
         );
 
         require(
-            commitments[_commitment].cashNote == true,
+            commitments[_commitment].spendingNote == true,
             "You can only spend Cash notes."
         );
 

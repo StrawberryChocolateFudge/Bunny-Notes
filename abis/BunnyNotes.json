@@ -136,7 +136,7 @@
         },
         {
           "internalType": "bool",
-          "name": "cashNote",
+          "name": "spendingNote",
           "type": "bool"
         },
         {
@@ -175,7 +175,7 @@
         },
         {
           "internalType": "bool",
-          "name": "cashNote",
+          "name": "spendingNote",
           "type": "bool"
         },
         {
