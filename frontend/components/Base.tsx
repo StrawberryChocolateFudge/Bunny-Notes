@@ -198,7 +198,7 @@ export default function Base() {
         return (<BrowserRouter>
             <Routes>
                 <Route path="/" element={mainRoute()}></Route>
-                <Route path="/paymentRequest/:payTo/:amount/:currency/:network" element={<PaymentRequestPage {...genericProps}></PaymentRequestPage>}></Route>
+                {/* <Route path="/paymentRequest/:payTo/:amount/:currency/:network" element={<PaymentRequestPage {...genericProps}></PaymentRequestPage>}></Route> */}
                 <Route path="*" element={<NotFoundPage></NotFoundPage>} />
                 <Route path="/terms" element={<TermsPage></TermsPage>}></Route>
             </Routes>
