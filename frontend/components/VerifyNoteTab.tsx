@@ -200,7 +200,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                                                 </TableRow>
                                                 <TableRow>
                                                       <TableCell align="left">Note Type:</TableCell>
-                                                      <TableCell align="right">{commitmentDetails.noteType ? "Cash Note" : "Gift Card"}</TableCell>
+                                                      <TableCell align="right">{commitmentDetails.noteType ? "Spending Note" : "Bunny Note"}</TableCell>
                                                 </TableRow>
                                                 <TableRow>
                                                       <TableCell align="left">Note Contract Address:</TableCell>

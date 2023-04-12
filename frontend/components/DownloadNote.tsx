@@ -103,7 +103,7 @@ export function downloadNote(props: DownloadNoteProps) {
         </Grid>
     }
 
-    const getIsCashNote = () => props.cardType === "Cash Note" ? true : false;
+    const getIsSpendingNote = () => props.cardType === "Spending Note" ? true : false;
 
     const handleDepositTx = async (tx) => {
         if (tx !== undefined) {
@@ -151,7 +151,7 @@ export function downloadNote(props: DownloadNoteProps) {
             // after succesful approval  I can prompt the user to deposit the tokens to add value to the note
             const notesContract = await getContract(props.provider, noteAddress, "/BunnyNotes.json");
             const address = await requestAccounts(props.provider);
-            const isCashNote = getIsCashNote();
+            const isSpendingNote = getIsSpendingNote();
             const deposit = noteDetails[1].deposit;
             // Check if the commitment exists already to stop the deposit!
             const commitments = await bunnyNotesCommitments(notesContract, toNoteHex(deposit.commitment));
@@ -174,7 +174,7 @@ export function downloadNote(props: DownloadNoteProps) {
                     return;
                 }
 
-                const tx = await ethNotesDeposit(notesContract, toNoteHex(deposit.commitment), isCashNote, address, fee.add(denomination)).catch(err => {
+                const tx = await ethNotesDeposit(notesContract, toNoteHex(deposit.commitment), isSpendingNote, address, fee.add(denomination)).catch(err => {
                     props.displayError("Unable to deposit  Note");
                     props.setDepositButtonDisabled(false);
 
@@ -182,7 +182,7 @@ export function downloadNote(props: DownloadNoteProps) {
                 await handleDepositTx(tx);
                 return;
             } else {
-                const tx = await bunnyNotesDeposit(notesContract, toNoteHex(deposit.commitment), isCashNote, address).catch(err => {
+                const tx = await bunnyNotesDeposit(notesContract, toNoteHex(deposit.commitment), isSpendingNote, address).catch(err => {
                     props.displayError("Unable to deposit ERC20 Note");
                     props.setDepositButtonDisabled(false);
                 });
@@ -253,13 +253,8 @@ export function downloadNote(props: DownloadNoteProps) {
                         {noteDisplay()}
                         <Grid item sx={{ textAlign: "center" }}>
                             <Typography variant="subtitle1" component="div">
-                                Make sure you download the note before making a deposit!
+                                Make sure you download the note before making a deposit! If you loose the note we cannot recover the deposit for you!
                             </Typography>
-
-                            <Typography variant="subtitle1" component="div">
-                                If you loose the note we cannot recover the deposit for you!
-                            </Typography>
-
                             {props.showApproval && !isNativeToken ? <Tooltip arrow title={"Approve spending " + denomination + ` (plus ${displayedFee} fee)`}>
                                 <span><Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend</Button></span></Tooltip> : <Tooltip arrow title={"Deposit " + denomination + ` (plus ${displayedFee} fee)`}>
                                 <span><Button disabled={props.depositButtonDisabled} onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Deposit</Button></span></Tooltip>}

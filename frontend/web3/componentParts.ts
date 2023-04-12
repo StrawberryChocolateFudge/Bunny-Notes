@@ -3,7 +3,7 @@
 import { ethers } from "ethers";
 import { CardType } from "../components/CardGrid";
 import { createNote } from "../zkp/generateProof";
-import { getContract, getFee, onBoardOrGetProvider } from "./web3";
+import { getContract, getFee, onBoardOrGetProvider, requestAccounts } from "./web3";
 
 
 export async function handleCardSelectWithProvider(props: any, denomination: string, currency: string, cardType: CardType, netId: string, noteAddress: string) {
@@ -16,13 +16,8 @@ export async function handleCardSelectWithProvider(props: any, denomination: str
     } else {
         provider = props.provider;
     }
+    await requestAccounts(provider);
 
-    const addressValid = ethers.utils.isAddress(props.myAddress);
-
-    if (!addressValid) {
-        props.displayError("Invalid Address!");
-        return false;
-    }
 
     if (props.provider === null && provider === null) {
         props.displayError("Unable to connect to wallet!");

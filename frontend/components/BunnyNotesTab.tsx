@@ -1,11 +1,5 @@
 import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
 import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Tooltip from '@mui/material/Tooltip';
 import CardGrid, { CardType } from './CardGrid';
 import { getCardPropsData } from './utils/cardPropsData';
 import { Base } from './Base';
@@ -14,8 +8,7 @@ import { NoteDetails } from '../zkp/generateProof';
 import { createQR } from '../qrcode/create';
 import { onBoardOrGetProvider, requestAccounts } from '../web3/web3';
 import { handleCardSelectWithProvider } from '../web3/componentParts';
-import { Stack, styled, Switch } from '@mui/material';
-import ScanNoteButton from './QRScannerModal';
+import { Stack, styled, Typography } from '@mui/material';
 
 
 interface BunnyNotesPageProps extends Base {
@@ -24,6 +17,11 @@ interface BunnyNotesPageProps extends Base {
 export const Center = styled("div")({
     textAlign: "center"
 })
+
+const BunnyNotesIMG = styled("img")({
+    width: "300px",
+    padding: "10px",
+});
 
 const GiftCardIMG = styled("img")({
     width: "150px",
@@ -53,16 +51,7 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
 
     const [showApproval, setShowApproval] = React.useState(true);
 
-    const [cardType, setCardType] = React.useState<CardType>("Gift Card");
-
-    const handleChecked = (event: React.ChangeEvent<HTMLInputElement>) => {
-
-        if (event.target.checked) {
-            setCardType("Cash Note");
-        } else {
-            setCardType("Gift Card")
-        }
-    }
+    const [cardType, setCardType] = React.useState<CardType>("Bunny Note");
 
     React.useEffect(() => {
         async function getQRCode() {
@@ -77,24 +66,16 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
         getQRCode();
     }, [noteDetails])
 
-    const addressSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        props.setMyAddress(event.target.value);
-    }
 
-    const setScannedAddress = (d: string) => {
-        props.setMyAddress(d);
-    }
-
+    //UPDATE: Instead of having a bar to import address, you can just select a bunny note and the request accounts will run and provider will be set!
     const importAddress = async () => {
         if (props.provider === null) {
             const provider = await onBoardOrGetProvider(props.displayError);
-
             if (provider) {
                 const account = await requestAccounts(provider);
                 props.setMyAddress(account);
                 props.setProvider(provider);
             }
-
         } else {
             const account = await requestAccounts(props.provider);
             props.setMyAddress(account);
@@ -102,6 +83,7 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
     }
 
     const handleSelectGiftCard = async (denomination: string, currency: string, cardType: CardType, addresses: [string, string]) => {
+        await importAddress();
         const res = await handleCardSelectWithProvider(props, denomination, currency, cardType, props.selectedNetwork, addresses[1])
         if (res !== false) {
             setRenderDownloadPage(true);
@@ -119,10 +101,6 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
             setNoteAddresses(addresses);
             setNoteFee(res.formattedFee);
         }
-    }
-
-    const handleClickImage = (cardType: CardType) => () => {
-        setCardType(cardType);
     }
 
     if (renderDownloadPage) {
@@ -153,56 +131,15 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
 
     return (
         <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
-            <AppBar
-                position="static"
-                color="default"
-                elevation={0}
-                sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
-            >
-                <Toolbar>
-                    <Grid container spacing={2} alignItems="center">
-                        <Grid item xs>
-                            <Tooltip arrow title="Your wallet address you use for depositing">
-                                <TextField
-                                    fullWidth
-                                    value={props.myAddress}
-                                    onChange={addressSetter}
-                                    placeholder="Enter Your Wallet Address"
-                                    InputProps={{
-                                        disableUnderline: true,
-                                        sx: { fontSize: 'default' },
-                                    }}
-                                    variant="standard"
-                                />
-                            </Tooltip>
-                        </Grid>
-                        <Grid item>
-                            <Tooltip arrow title="Import Address From Wallet Extension">
-                                <Button onClick={importAddress} variant="contained" sx={{ mr: 1 }}>
-                                    Import Address                                </Button>
-                            </Tooltip>
-                        </Grid>
-                    </Grid>
-                </Toolbar>
-            </AppBar>
+            <Stack direction={"row"} justifyContent="center">
+                <BunnyNotesIMG alt="Bunny Notes" src="/imgs/BunnyNotes.svg" />
+            </Stack>
+            <Stack sx={{ padding: "30px" }} direction={"row"} justifyContent="center">
+                <Typography component="p" variant="subtitle1">Bunny Notes are printable crypto notes that hold value. Select the Denomination and deposit crypto to create one. You can store your value in Bunny Notes or give them to someone and transfer value offline!</Typography>
+            </Stack>
             <Center>
-                <Stack justifyContent={"center"} direction="row" spacing={1} alignItems={"center"}>
-                    <Tooltip arrow title="Select Gift Cards">
-                        <GiftCardIMG sx={{
-                            opacity: cardType === "Cash Note" ? "0.3" : "1"
-                        }} alt="Gift Card" src="/imgs/giftCard.svg" onClick={handleClickImage("Gift Card")} />
-                    </Tooltip>
-                    <Tooltip arrow title="Switch between Gift Card and Cash Note">
-                        <Switch checked={cardType === "Cash Note"} onChange={handleChecked}></Switch>
-                    </Tooltip>
-                    <Tooltip arrow title="Select Cash Notes">
-                        <CashNoteIMG sx={{
-                            opacity: cardType === "Gift Card" ? "0.3" : 1
-                        }} alt="Cash Note" src="/imgs/cashNote.svg" onClick={handleClickImage("Cash Note")} />
-                    </Tooltip>
-                </Stack>
-            </Center>{cardType === "Cash Note" ? <CardGrid handleSelect={handleSelectCashNote} cardProps={getCardPropsData("Cash Note", props.selectedNetwork)} ></CardGrid>
-                : <CardGrid handleSelect={handleSelectGiftCard} cardProps={getCardPropsData("Gift Card", props.selectedNetwork)} ></CardGrid>
+            </Center>{cardType === "Spending Note" ? <CardGrid handleSelect={handleSelectCashNote} cardProps={getCardPropsData("Spending Note", props.selectedNetwork)} ></CardGrid>
+                : <CardGrid handleSelect={handleSelectGiftCard} cardProps={getCardPropsData("Bunny Note", props.selectedNetwork)} ></CardGrid>
             }
         </Paper>
     );

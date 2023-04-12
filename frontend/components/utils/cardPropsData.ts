@@ -9,7 +9,7 @@ const TRON_A = "Tron";
 const ETH_N = "/imgs/eth_netwrokLogo.png";
 const ETH_A = "ETH";
 
-export function getCardPropsData(cardType: 'Gift Card' | "Cash Note" | "Payment Request", netId: string): Array<SelectableCardsParams> {
+export function getCardPropsData(cardType: 'Bunny Note' | "Spending Note" | "Payment Request", netId: string): Array<SelectableCardsParams> {
     if (cardType === "Payment Request") {
         switch (netId) {
             case BTTCTESTNETID:

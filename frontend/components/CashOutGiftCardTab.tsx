@@ -81,7 +81,6 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
             })
         }
 
-
     }
 
     return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
@@ -94,7 +93,7 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
             <Toolbar>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item>
-                        <ScanNoteButton dialogTitle="Scan a Gift Card" setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
+                        <ScanNoteButton dialogTitle="Scan a Bunny Note" setData={props.setMyNoteString} handleError={props.displayError}></ScanNoteButton>
                     </Grid>
                     <Grid item xs>
                         <TextField autoComplete='off' value={props.noteString} onChange={noteStringSetter} fullWidth placeholder="Paste your Note Here" InputProps={{ disableUnderline: true, sx: { fontSize: 'default' } }} variant="standard" />
@@ -104,10 +103,10 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
             </Toolbar>
         </AppBar>
         <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center" }}>
-            <Typography component="p" variant="subtitle1">You can withdraw a Gift Card's balance to your wallet.</Typography>
-            <Tooltip arrow title="Cash out the Gift Card">
+            <Typography component="p" variant="subtitle1">You can withdraw the Bunny Note balance to your wallet.</Typography>
+            <Tooltip arrow title="Cash out the Bunny Note">
                 <Button onClick={cashOutAction} sx={{ mr: 1 }}>
-                    <IMG alt="Cash out a Gift Card" src="/imgs/CashOut.svg" />
+                    <IMG alt="Cash out a Bunny Note" src="/imgs/CashOut.svg" />
                 </Button>
             </Tooltip>
         </Box>
