@@ -18,7 +18,7 @@ interface SelectNetworkProps {
 }
 
 const IMG = styled("img")({
-    width: "300px",
+    width: "288px",
     alignSelf: 'center'
 })
 
@@ -132,7 +132,7 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
         <DialogTitle sx={{ paddingBottom: "0", marginBottom: "0", display: "flex", justifyContent: "center" }}><IMG alt="Bunny Notes Title" src="/imgs/BunnyNotes.svg" /></DialogTitle>
         <DialogContent>
             <DialogContentText sx={{ textAlign: "center" }}>
-                A Gift Card and Cash Note Protocol
+                Select the network to continue
             </DialogContentText>
             <Divider light />
             <Stack direction={"row"} justifyContent="center">
