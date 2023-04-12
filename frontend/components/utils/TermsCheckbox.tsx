@@ -20,7 +20,7 @@ export function getTermsAcceptedInit() {
 
 export function TermsCheckbox(props: TermsCheckboxProps) {
     return <Stack alignItems={"center"} direction={"row"} justifyContent="center">
-        <Link href="/terms" target="_blank">I accept the terms and conditions</Link>
+        <Link href="/terms" target="_blank">I accept the terms</Link>
         <Checkbox checked={props.termsAccepted} onChange={props.onTermsChecked}></Checkbox>
     </Stack>
 }
