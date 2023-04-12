@@ -43,15 +43,15 @@ export interface Base {
 
 export function Copyright() {
     return (
-        <Typography variant="body2" color="text.secondary" align="center">
-            {'Copyright © '}
-            <MuiLink color="inherit" href="https://bunnynotes.finance">
-                bunnynotes.finance {" "}
-            </MuiLink>
-
-            {new Date().getFullYear()}
-            {/* <Button >Partner with us</Button> */}
-        </Typography >
+        <React.Fragment>
+            <Typography variant="body2" color="text.secondary" align="center">
+                {"\n"}
+                <MuiLink color="inherit" href="https://zkptech.solutions">
+                    Created by zkptech.solutions {" "}
+                </MuiLink>
+                {new Date().getFullYear()}
+            </Typography >
+        </React.Fragment>
     );
 }
 

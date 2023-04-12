@@ -135,7 +135,7 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
                 <BunnyNotesIMG alt="Bunny Notes" src="/imgs/BunnyNotes.svg" />
             </Stack>
             <Stack sx={{ padding: "30px" }} direction={"row"} justifyContent="center">
-                <Typography component="p" variant="subtitle1">Bunny Notes are printable crypto notes that hold value. Select the Denomination and deposit crypto to create one. You can store value in Bunny Notes long term or give them to someone and transfer value offline!</Typography>
+                <Typography component="p" variant="subtitle1">Bunny Notes are financial claims for value that was deposited into a smart contract. Select the denomination, download the printable note and make a deposit to create one. It can be used to store value without a wallet or to transfer value.</Typography>
             </Stack>
             <Center>
             </Center>{cardType === "Spending Note" ? <CardGrid handleSelect={handleSelectCashNote} cardProps={getCardPropsData("Spending Note", props.selectedNetwork)} ></CardGrid>
