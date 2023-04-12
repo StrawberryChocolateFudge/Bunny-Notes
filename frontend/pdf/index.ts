@@ -20,7 +20,7 @@ export async function downloadPDF(bearerText: string, denomination: string, comm
     doc.text("Scan this QR code to verify", 60, 40);
     doc.text("validity without revealing", 60, 50);
     doc.text("the secret", 60, 60)
-    doc.save(`BunnyNote-${denomination}-${cardType}-${commitment}.pdf`)
+    doc.save(`BunnyNote-${denomination}-${commitment}.pdf`)
     // For testing I opened it in another window!
     // var string = doc.output('datauristring');
     // var embed = "<embed width='100%' height='100%' src='" + string + "'/>"
