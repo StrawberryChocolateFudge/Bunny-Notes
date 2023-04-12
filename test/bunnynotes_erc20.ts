@@ -50,8 +50,8 @@ describe("BunnyNotes with ERC20 Notes", function () {
     expect(depositedNote.creator).to.equal(alice.address);
     // there is no recipeint yet
     expect(depositedNote.recipient).to.equal("0x0000000000000000000000000000000000000000");
-    // This is not a cash note
-    expect(depositedNote.cashNote).to.be.false;
+    // This is not a spending note
+    expect(depositedNote.spendingNote).to.be.false;
 
     // test double deposit with teh same commitment!
     let threwError = false;
@@ -96,7 +96,7 @@ describe("BunnyNotes with ERC20 Notes", function () {
     // there is no recipeint yet
     expect(depositedNote.recipient).to.equal("0x0000000000000000000000000000000000000000");
     // This is not a cash note
-    expect(depositedNote.cashNote).to.be.false;
+    expect(depositedNote.spendingNote).to.be.false;
   });
 
   it("It should create a gift card deposit and another address will withdraw it!", async function () {
@@ -160,7 +160,7 @@ describe("BunnyNotes with ERC20 Notes", function () {
 
     // this was not a cash note
 
-    expect(depositedNote.cashNote).to.be.false
+    expect(depositedNote.spendingNote).to.be.false
 
 
     // Try to withdraw it again
@@ -214,7 +214,7 @@ describe("BunnyNotes with ERC20 Notes", function () {
 
     expect(depositedNote.recipient).to.equal("0x0000000000000000000000000000000000000000");
 
-    expect(depositedNote.cashNote).to.be.true;
+    expect(depositedNote.spendingNote).to.be.true;
 
     //Bob is now requesting payment. This will be actually a front end feature...
 

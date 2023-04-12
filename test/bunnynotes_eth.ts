@@ -54,7 +54,7 @@ describe("Bunny Notes with ETH notes", function () {
         // there is no recipient yet
         expect(depositedNote.recipient).to.equal("0x0000000000000000000000000000000000000000");
         // this is not a cash note
-        expect(depositedNote.cashNote).to.be.false;
+        expect(depositedNote.spendingNote).to.be.false;
 
         // test double deposit with the same commitment
         let threwError = false;
@@ -95,7 +95,7 @@ describe("Bunny Notes with ETH notes", function () {
         // there is no recipient yet
         expect(depositedNote.recipient).to.equal("0x0000000000000000000000000000000000000000");
         // this is not a cash note
-        expect(depositedNote.cashNote).to.be.false;
+        expect(depositedNote.spendingNote).to.be.false;
 
     });
 
@@ -135,7 +135,7 @@ describe("Bunny Notes with ETH notes", function () {
         expect(depositedNote.recipient).to.equal(bob.address);
 
         // this was not a cash note
-        expect(depositedNote.cashNote).to.be.false;
+        expect(depositedNote.spendingNote).to.be.false;
 
         console.log(await getBalance(provider, alice.address));
 
@@ -166,7 +166,7 @@ describe("Bunny Notes with ETH notes", function () {
 
         expect(depositedNote.recipient).to.equal("0x0000000000000000000000000000000000000000");
 
-        expect(depositedNote.cashNote).to.be.true;
+        expect(depositedNote.spendingNote).to.be.true;
 
         // Bob is now requresting payment This will be actually a front end feature
 
