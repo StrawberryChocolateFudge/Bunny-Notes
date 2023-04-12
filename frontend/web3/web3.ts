@@ -350,12 +350,12 @@ export async function TESTNETMINTERC20(ERC20Contract: any, mintTo: string, amoun
     return await ERC20Contract.mint(mintTo, amount);
 }
 
-export async function bunnyNotesDeposit(contract: any, commitment: string, isCashNote: boolean, depositFor: string) {
-    return await contract.deposit(commitment, isCashNote, depositFor);
+export async function bunnyNotesDeposit(contract: any, commitment: string, isSpendingNote: boolean, depositFor: string) {
+    return await contract.deposit(commitment, isSpendingNote, depositFor);
 }
 
-export async function ethNotesDeposit(contract: any, commitment: string, isCashNote: boolean, depositFor: string, value: BigNumber) {
-    return await contract.deposit(commitment, isCashNote, depositFor, { value });
+export async function ethNotesDeposit(contract: any, commitment: string, isSpendingNote: boolean, depositFor: string, value: BigNumber) {
+    return await contract.deposit(commitment, isSpendingNote, depositFor, { value });
 }
 
 export async function bunnyNotesWithdrawGiftCard(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recipient: string, change: string) {
