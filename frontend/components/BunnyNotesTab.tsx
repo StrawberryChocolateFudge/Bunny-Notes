@@ -67,7 +67,7 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
     }, [noteDetails])
 
 
-    //UPDATE: Instead of having a bar to import address, you can just select a bunny note and the request accounts will run and provider will be set!
+    // Instead of having a bar to import address, you can just select a bunny note and the request accounts will run and provider will be set!
     const importAddress = async () => {
         if (props.provider === null) {
             const provider = await onBoardOrGetProvider(props.displayError);
