@@ -149,14 +149,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVerifier__factory>;
     getContractFactory(
-      name: "ERC20Notes",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC20Notes__factory>;
-    getContractFactory(
-      name: "ETHNotes",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ETHNotes__factory>;
-    getContractFactory(
       name: "MOCKERC20",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MOCKERC20__factory>;
@@ -339,16 +331,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IVerifier>;
-    getContractAt(
-      name: "ERC20Notes",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC20Notes>;
-    getContractAt(
-      name: "ETHNotes",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ETHNotes>;
     getContractAt(
       name: "MOCKERC20",
       address: string,

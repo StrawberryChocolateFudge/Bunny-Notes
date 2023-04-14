@@ -34,8 +34,6 @@ export type { IUniswapV3PoolState } from "./IUniswapV3PoolState";
 export type { ISwapRouter } from "./ISwapRouter";
 export type { BunnyNotes } from "./BunnyNotes";
 export type { IVerifier } from "./IVerifier";
-export type { ERC20Notes } from "./ERC20Notes";
-export type { ETHNotes } from "./ETHNotes";
 export type { MOCKERC20 } from "./MOCKERC20";
 export type { MOCKERC721 } from "./MOCKERC721";
 export type { Verifier } from "./Verifier";
@@ -73,8 +71,6 @@ export { IUniswapV3PoolState__factory } from "./factories/IUniswapV3PoolState__f
 export { ISwapRouter__factory } from "./factories/ISwapRouter__factory";
 export { BunnyNotes__factory } from "./factories/BunnyNotes__factory";
 export { IVerifier__factory } from "./factories/IVerifier__factory";
-export { ERC20Notes__factory } from "./factories/ERC20Notes__factory";
-export { ETHNotes__factory } from "./factories/ETHNotes__factory";
 export { MOCKERC20__factory } from "./factories/MOCKERC20__factory";
 export { MOCKERC721__factory } from "./factories/MOCKERC721__factory";
 export { Verifier__factory } from "./factories/Verifier__factory";

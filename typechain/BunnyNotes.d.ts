@@ -23,33 +23,39 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface BunnyNotesInterface extends ethers.utils.Interface {
   functions: {
     "_owner()": FunctionFragment;
+    "calculateFee(uint256)": FunctionFragment;
     "commitments(bytes32)": FunctionFragment;
-    "denomination()": FunctionFragment;
-    "deposit(bytes32,bool,address)": FunctionFragment;
-    "fee()": FunctionFragment;
+    "depositEth(bytes32,uint256)": FunctionFragment;
+    "depositToken(bytes32,uint256,address)": FunctionFragment;
+    "feeDivider()": FunctionFragment;
     "isSpent(bytes32)": FunctionFragment;
     "isSpentArray(bytes32[])": FunctionFragment;
     "nullifierHashes(bytes32)": FunctionFragment;
-    "relayer()": FunctionFragment;
     "verifier()": FunctionFragment;
-    "withdrawCashNote(uint256[8],bytes32,bytes32,address,uint256)": FunctionFragment;
-    "withdrawGiftCard(uint256[8],bytes32,bytes32,address,uint256)": FunctionFragment;
+    "withdraw(uint256[8],bytes32,bytes32,address)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "calculateFee",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "commitments",
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "denomination",
-    values?: undefined
+    functionFragment: "depositEth",
+    values: [BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "deposit",
-    values: [BytesLike, boolean, string]
+    functionFragment: "depositToken",
+    values: [BytesLike, BigNumberish, string]
   ): string;
-  encodeFunctionData(functionFragment: "fee", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "feeDivider",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "isSpent", values: [BytesLike]): string;
   encodeFunctionData(
     functionFragment: "isSpentArray",
@@ -59,10 +65,9 @@ interface BunnyNotesInterface extends ethers.utils.Interface {
     functionFragment: "nullifierHashes",
     values: [BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "relayer", values?: undefined): string;
   encodeFunctionData(functionFragment: "verifier", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "withdrawCashNote",
+    functionFragment: "withdraw",
     values: [
       [
         BigNumberish,
@@ -76,41 +81,25 @@ interface BunnyNotesInterface extends ethers.utils.Interface {
       ],
       BytesLike,
       BytesLike,
-      string,
-      BigNumberish
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "withdrawGiftCard",
-    values: [
-      [
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish
-      ],
-      BytesLike,
-      BytesLike,
-      string,
-      BigNumberish
+      string
     ]
   ): string;
 
   decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "commitments",
+    functionFragment: "calculateFee",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "denomination",
+    functionFragment: "commitments",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "fee", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "depositEth", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "depositToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "feeDivider", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isSpent", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isSpentArray",
@@ -120,53 +109,43 @@ interface BunnyNotesInterface extends ethers.utils.Interface {
     functionFragment: "nullifierHashes",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "relayer", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "verifier", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "withdrawCashNote",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "withdrawGiftCard",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
-    "Deposit(bytes32,address,uint256)": EventFragment;
-    "WithdrawCashNote(address,address,bytes32,uint256,uint256)": EventFragment;
-    "WithdrawGiftCard(address,address,bytes32,uint256)": EventFragment;
+    "DepositETH(bytes32,address,uint256,uint256,uint256)": EventFragment;
+    "DepositToken(bytes32,address,uint256,uint256,uint256,address)": EventFragment;
+    "WithdrawBunnyNote(address,address,bytes32)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "Deposit"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "WithdrawCashNote"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "WithdrawGiftCard"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DepositETH"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DepositToken"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WithdrawBunnyNote"): EventFragment;
 }
 
-export type DepositEvent = TypedEvent<
-  [string, string, BigNumber] & {
+export type DepositETHEvent = TypedEvent<
+  [string, string, BigNumber, BigNumber, BigNumber] & {
     commitment: string;
-    depositedBy: string;
+    depositFor: string;
     timestamp: BigNumber;
-  }
->;
-
-export type WithdrawCashNoteEvent = TypedEvent<
-  [string, string, string, BigNumber, BigNumber] & {
-    from: string;
-    to: string;
-    nullifierHashes: string;
-    price: BigNumber;
-    change: BigNumber;
-  }
->;
-
-export type WithdrawGiftCardEvent = TypedEvent<
-  [string, string, string, BigNumber] & {
-    from: string;
-    to: string;
-    nullifierHash: string;
+    denomination: BigNumber;
     fee: BigNumber;
   }
+>;
+
+export type DepositTokenEvent = TypedEvent<
+  [string, string, BigNumber, BigNumber, BigNumber, string] & {
+    commitment: string;
+    depositFor: string;
+    timestamp: BigNumber;
+    amount: BigNumber;
+    fee: BigNumber;
+    token: string;
+  }
+>;
+
+export type WithdrawBunnyNoteEvent = TypedEvent<
+  [string, string, string] & { from: string; to: string; commitment: string }
 >;
 
 export class BunnyNotes extends BaseContract {
@@ -215,30 +194,50 @@ export class BunnyNotes extends BaseContract {
   functions: {
     _owner(overrides?: CallOverrides): Promise<[string]>;
 
+    calculateFee(
+      denomination: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { fee: BigNumber }>;
+
     commitments(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [boolean, string, string, boolean, BigNumber, BigNumber] & {
+      [
+        boolean,
+        string,
+        string,
+        BigNumber,
+        BigNumber,
+        boolean,
+        string,
+        BigNumber
+      ] & {
         used: boolean;
         creator: string;
         recipient: string;
-        spendingNote: boolean;
         createdDate: BigNumber;
         spentDate: BigNumber;
+        usesToken: boolean;
+        token: string;
+        denomination: BigNumber;
       }
     >;
 
-    denomination(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    deposit(
+    depositEth(
       _commitment: BytesLike,
-      spendingNote: boolean,
-      depositFor: string,
+      denomination: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    fee(overrides?: CallOverrides): Promise<[BigNumber]>;
+    depositToken(
+      _commitment: BytesLike,
+      denomination: BigNumberish,
+      token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    feeDivider(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     isSpent(
       _nullifierHash: BytesLike,
@@ -255,11 +254,9 @@ export class BunnyNotes extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    relayer(overrides?: CallOverrides): Promise<[string]>;
-
     verifier(overrides?: CallOverrides): Promise<[string]>;
 
-    withdrawCashNote(
+    withdraw(
       _proof: [
         BigNumberish,
         BigNumberish,
@@ -273,55 +270,56 @@ export class BunnyNotes extends BaseContract {
       _nullifierHash: BytesLike,
       _commitment: BytesLike,
       _recipient: string,
-      _change: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    withdrawGiftCard(
-      _proof: [
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish
-      ],
-      _nullifierHash: BytesLike,
-      _commitment: BytesLike,
-      _recipient: string,
-      _change: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
   _owner(overrides?: CallOverrides): Promise<string>;
 
+  calculateFee(
+    denomination: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   commitments(
     arg0: BytesLike,
     overrides?: CallOverrides
   ): Promise<
-    [boolean, string, string, boolean, BigNumber, BigNumber] & {
+    [
+      boolean,
+      string,
+      string,
+      BigNumber,
+      BigNumber,
+      boolean,
+      string,
+      BigNumber
+    ] & {
       used: boolean;
       creator: string;
       recipient: string;
-      spendingNote: boolean;
       createdDate: BigNumber;
       spentDate: BigNumber;
+      usesToken: boolean;
+      token: string;
+      denomination: BigNumber;
     }
   >;
 
-  denomination(overrides?: CallOverrides): Promise<BigNumber>;
-
-  deposit(
+  depositEth(
     _commitment: BytesLike,
-    spendingNote: boolean,
-    depositFor: string,
+    denomination: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  fee(overrides?: CallOverrides): Promise<BigNumber>;
+  depositToken(
+    _commitment: BytesLike,
+    denomination: BigNumberish,
+    token: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  feeDivider(overrides?: CallOverrides): Promise<BigNumber>;
 
   isSpent(
     _nullifierHash: BytesLike,
@@ -335,11 +333,9 @@ export class BunnyNotes extends BaseContract {
 
   nullifierHashes(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
-  relayer(overrides?: CallOverrides): Promise<string>;
-
   verifier(overrides?: CallOverrides): Promise<string>;
 
-  withdrawCashNote(
+  withdraw(
     _proof: [
       BigNumberish,
       BigNumberish,
@@ -353,55 +349,56 @@ export class BunnyNotes extends BaseContract {
     _nullifierHash: BytesLike,
     _commitment: BytesLike,
     _recipient: string,
-    _change: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  withdrawGiftCard(
-    _proof: [
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish
-    ],
-    _nullifierHash: BytesLike,
-    _commitment: BytesLike,
-    _recipient: string,
-    _change: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
     _owner(overrides?: CallOverrides): Promise<string>;
 
+    calculateFee(
+      denomination: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     commitments(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [boolean, string, string, boolean, BigNumber, BigNumber] & {
+      [
+        boolean,
+        string,
+        string,
+        BigNumber,
+        BigNumber,
+        boolean,
+        string,
+        BigNumber
+      ] & {
         used: boolean;
         creator: string;
         recipient: string;
-        spendingNote: boolean;
         createdDate: BigNumber;
         spentDate: BigNumber;
+        usesToken: boolean;
+        token: string;
+        denomination: BigNumber;
       }
     >;
 
-    denomination(overrides?: CallOverrides): Promise<BigNumber>;
-
-    deposit(
+    depositEth(
       _commitment: BytesLike,
-      spendingNote: boolean,
-      depositFor: string,
+      denomination: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    fee(overrides?: CallOverrides): Promise<BigNumber>;
+    depositToken(
+      _commitment: BytesLike,
+      denomination: BigNumberish,
+      token: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    feeDivider(overrides?: CallOverrides): Promise<BigNumber>;
 
     isSpent(
       _nullifierHash: BytesLike,
@@ -418,11 +415,9 @@ export class BunnyNotes extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    relayer(overrides?: CallOverrides): Promise<string>;
-
     verifier(overrides?: CallOverrides): Promise<string>;
 
-    withdrawCashNote(
+    withdraw(
       _proof: [
         BigNumberish,
         BigNumberish,
@@ -436,118 +431,126 @@ export class BunnyNotes extends BaseContract {
       _nullifierHash: BytesLike,
       _commitment: BytesLike,
       _recipient: string,
-      _change: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    withdrawGiftCard(
-      _proof: [
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish
-      ],
-      _nullifierHash: BytesLike,
-      _commitment: BytesLike,
-      _recipient: string,
-      _change: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
   };
 
   filters: {
-    "Deposit(bytes32,address,uint256)"(
+    "DepositETH(bytes32,address,uint256,uint256,uint256)"(
       commitment?: BytesLike | null,
-      depositedBy?: null,
-      timestamp?: null
+      depositFor?: null,
+      timestamp?: null,
+      denomination?: null,
+      fee?: null
     ): TypedEventFilter<
-      [string, string, BigNumber],
-      { commitment: string; depositedBy: string; timestamp: BigNumber }
-    >;
-
-    Deposit(
-      commitment?: BytesLike | null,
-      depositedBy?: null,
-      timestamp?: null
-    ): TypedEventFilter<
-      [string, string, BigNumber],
-      { commitment: string; depositedBy: string; timestamp: BigNumber }
-    >;
-
-    "WithdrawCashNote(address,address,bytes32,uint256,uint256)"(
-      from?: null,
-      to?: null,
-      nullifierHashes?: null,
-      price?: null,
-      change?: null
-    ): TypedEventFilter<
-      [string, string, string, BigNumber, BigNumber],
+      [string, string, BigNumber, BigNumber, BigNumber],
       {
-        from: string;
-        to: string;
-        nullifierHashes: string;
-        price: BigNumber;
-        change: BigNumber;
+        commitment: string;
+        depositFor: string;
+        timestamp: BigNumber;
+        denomination: BigNumber;
+        fee: BigNumber;
       }
     >;
 
-    WithdrawCashNote(
-      from?: null,
-      to?: null,
-      nullifierHashes?: null,
-      price?: null,
-      change?: null
+    DepositETH(
+      commitment?: BytesLike | null,
+      depositFor?: null,
+      timestamp?: null,
+      denomination?: null,
+      fee?: null
     ): TypedEventFilter<
-      [string, string, string, BigNumber, BigNumber],
+      [string, string, BigNumber, BigNumber, BigNumber],
       {
-        from: string;
-        to: string;
-        nullifierHashes: string;
-        price: BigNumber;
-        change: BigNumber;
+        commitment: string;
+        depositFor: string;
+        timestamp: BigNumber;
+        denomination: BigNumber;
+        fee: BigNumber;
       }
     >;
 
-    "WithdrawGiftCard(address,address,bytes32,uint256)"(
-      from?: null,
-      to?: null,
-      nullifierHash?: null,
-      fee?: null
+    "DepositToken(bytes32,address,uint256,uint256,uint256,address)"(
+      commitment?: BytesLike | null,
+      depositFor?: null,
+      timestamp?: null,
+      amount?: null,
+      fee?: null,
+      token?: null
     ): TypedEventFilter<
-      [string, string, string, BigNumber],
-      { from: string; to: string; nullifierHash: string; fee: BigNumber }
+      [string, string, BigNumber, BigNumber, BigNumber, string],
+      {
+        commitment: string;
+        depositFor: string;
+        timestamp: BigNumber;
+        amount: BigNumber;
+        fee: BigNumber;
+        token: string;
+      }
     >;
 
-    WithdrawGiftCard(
+    DepositToken(
+      commitment?: BytesLike | null,
+      depositFor?: null,
+      timestamp?: null,
+      amount?: null,
+      fee?: null,
+      token?: null
+    ): TypedEventFilter<
+      [string, string, BigNumber, BigNumber, BigNumber, string],
+      {
+        commitment: string;
+        depositFor: string;
+        timestamp: BigNumber;
+        amount: BigNumber;
+        fee: BigNumber;
+        token: string;
+      }
+    >;
+
+    "WithdrawBunnyNote(address,address,bytes32)"(
       from?: null,
       to?: null,
-      nullifierHash?: null,
-      fee?: null
+      commitment?: null
     ): TypedEventFilter<
-      [string, string, string, BigNumber],
-      { from: string; to: string; nullifierHash: string; fee: BigNumber }
+      [string, string, string],
+      { from: string; to: string; commitment: string }
+    >;
+
+    WithdrawBunnyNote(
+      from?: null,
+      to?: null,
+      commitment?: null
+    ): TypedEventFilter<
+      [string, string, string],
+      { from: string; to: string; commitment: string }
     >;
   };
 
   estimateGas: {
     _owner(overrides?: CallOverrides): Promise<BigNumber>;
 
+    calculateFee(
+      denomination: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     commitments(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
-    denomination(overrides?: CallOverrides): Promise<BigNumber>;
-
-    deposit(
+    depositEth(
       _commitment: BytesLike,
-      spendingNote: boolean,
-      depositFor: string,
+      denomination: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    fee(overrides?: CallOverrides): Promise<BigNumber>;
+    depositToken(
+      _commitment: BytesLike,
+      denomination: BigNumberish,
+      token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    feeDivider(overrides?: CallOverrides): Promise<BigNumber>;
 
     isSpent(
       _nullifierHash: BytesLike,
@@ -564,11 +567,9 @@ export class BunnyNotes extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    relayer(overrides?: CallOverrides): Promise<BigNumber>;
-
     verifier(overrides?: CallOverrides): Promise<BigNumber>;
 
-    withdrawCashNote(
+    withdraw(
       _proof: [
         BigNumberish,
         BigNumberish,
@@ -582,25 +583,6 @@ export class BunnyNotes extends BaseContract {
       _nullifierHash: BytesLike,
       _commitment: BytesLike,
       _recipient: string,
-      _change: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    withdrawGiftCard(
-      _proof: [
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish
-      ],
-      _nullifierHash: BytesLike,
-      _commitment: BytesLike,
-      _recipient: string,
-      _change: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -608,21 +590,30 @@ export class BunnyNotes extends BaseContract {
   populateTransaction: {
     _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    calculateFee(
+      denomination: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     commitments(
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    denomination(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    deposit(
+    depositEth(
       _commitment: BytesLike,
-      spendingNote: boolean,
-      depositFor: string,
+      denomination: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    fee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    depositToken(
+      _commitment: BytesLike,
+      denomination: BigNumberish,
+      token: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    feeDivider(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     isSpent(
       _nullifierHash: BytesLike,
@@ -639,11 +630,9 @@ export class BunnyNotes extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    relayer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     verifier(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    withdrawCashNote(
+    withdraw(
       _proof: [
         BigNumberish,
         BigNumberish,
@@ -657,25 +646,6 @@ export class BunnyNotes extends BaseContract {
       _nullifierHash: BytesLike,
       _commitment: BytesLike,
       _recipient: string,
-      _change: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    withdrawGiftCard(
-      _proof: [
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish,
-        BigNumberish
-      ],
-      _nullifierHash: BytesLike,
-      _commitment: BytesLike,
-      _recipient: string,
-      _change: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
