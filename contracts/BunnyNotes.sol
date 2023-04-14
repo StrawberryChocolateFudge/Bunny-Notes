@@ -12,7 +12,7 @@ interface IVerifier {
         uint256[2] memory a,
         uint256[2][2] memory b,
         uint256[2] memory c,
-        uint256[4] memory _input
+        uint256[3] memory _input
     ) external returns (bool);
 }
 
@@ -20,7 +20,6 @@ struct CommitmentStore {
     bool used;
     address creator;
     address recipient;
-    bool spendingNote;
     uint256 createdDate;
     uint256 spentDate;
     bool usesToken;
@@ -35,8 +34,6 @@ contract BunnyNotes is ReentrancyGuard {
     IVerifier public immutable verifier;
 
     address payable public _owner;
-
-    address public relayer;
 
     uint256 public constant feeDivider = 100; // 1% fee will be used. This is the amount to divide the denomination to calculate the fee
 
@@ -61,53 +58,29 @@ contract BunnyNotes is ReentrancyGuard {
         address token
     );
 
-    event WithdrawGiftCard(address from, address to, bytes32 commitment);
-
-    event WithdrawCashNote(
-        address from,
-        address to,
-        bytes32 commitment,
-        uint256 price,
-        uint256 change
-    );
+    event WithdrawBunnyNote(address from, address to, bytes32 commitment);
 
     /**
         @dev : the constructor
-        @param _verifier is the address of SNARK verifier contract
-        @param _relayer The relayer can make deposits on behalf of other accounts! It's used in the child contracts
-        
+        @param _verifier is the address of SNARK verifier contract        
     */
 
-    constructor(IVerifier _verifier, address _relayer) {
+    constructor(IVerifier _verifier) {
         verifier = _verifier;
         _owner = payable(msg.sender);
-        relayer = _relayer;
-    }
-
-    function changeRelayer(address newRelayer) external {
-        require(msg.sender == _owner, "Only Owner");
-        relayer = newRelayer;
     }
 
     function depositEth(
         bytes32 _commitment,
-        bool spendingNote,
-        address depositFor,
         uint256 denomination
     ) external payable nonReentrant {
         require(!commitments[_commitment].used, "Used commitment");
         require(denomination > 0, "Invalid denomination");
         uint256 fee = calculateFee(denomination);
+        require(msg.value == denomination + fee, "Invalid Value");
 
-        if (msg.sender != relayer) {
-            require(msg.sender == depositFor, "Invalid depositor");
-            require(msg.value == denomination + fee, "Invalid Value");
-        } else {
-            require(msg.value == denomination, "Invalid Value");
-        }
         commitments[_commitment].used = true;
-        commitments[_commitment].creator = depositFor;
-        commitments[_commitment].spendingNote = spendingNote;
+        commitments[_commitment].creator = msg.sender;
         commitments[_commitment].createdDate = block.timestamp;
         commitments[_commitment].usesToken = false;
         commitments[_commitment].denomination = denomination;
@@ -115,7 +88,7 @@ contract BunnyNotes is ReentrancyGuard {
         Address.sendValue(_owner, fee);
         emit DepositETH(
             _commitment,
-            depositFor,
+            msg.sender,
             block.timestamp,
             denomination,
             fee
@@ -124,8 +97,6 @@ contract BunnyNotes is ReentrancyGuard {
 
     function depositToken(
         bytes32 _commitment,
-        bool spendingNote,
-        address depositFor,
         uint256 denomination,
         address token
     ) external nonReentrant {
@@ -133,36 +104,19 @@ contract BunnyNotes is ReentrancyGuard {
         require(denomination > 0, "Invalid denomination");
 
         commitments[_commitment].used = true;
-        commitments[_commitment].creator = depositFor;
-        commitments[_commitment].spendingNote = spendingNote;
+        commitments[_commitment].creator = msg.sender;
         commitments[_commitment].createdDate = block.timestamp;
         commitments[_commitment].usesToken = true;
         commitments[_commitment].denomination = denomination;
         commitments[_commitment].token = IERC20(token);
         uint256 fee = calculateFee(denomination);
-        if (msg.sender == relayer) {
-            // the relayer pays no fees, the fees are charged off-chain!
-            IERC20(token).safeTransferFrom(
-                relayer,
-                address(this),
-                denomination
-            );
-        } else {
-            require(msg.sender == depositFor, "Invalid depositor");
-
-            IERC20(token).safeTransferFrom(
-                msg.sender,
-                address(this),
-                denomination
-            );
-
-            // Send the owner the fee
-            IERC20(token).safeTransferFrom(msg.sender, _owner, fee);
-        }
+        IERC20(token).safeTransferFrom(msg.sender, address(this), denomination);
+        // Send the owner the fee
+        IERC20(token).safeTransferFrom(msg.sender, _owner, fee);
 
         emit DepositToken(
             _commitment,
-            depositFor,
+            msg.sender,
             block.timestamp,
             denomination,
             fee,
@@ -176,20 +130,15 @@ contract BunnyNotes is ReentrancyGuard {
         fee = denomination.div(feeDivider);
     }
 
-    function withdrawBunnyNote(
+    function withdraw(
         uint256[8] calldata _proof,
         bytes32 _nullifierHash,
         bytes32 _commitment,
-        address _recipient,
-        uint256 _change
+        address _recipient
     ) external nonReentrant {
         require(
             !nullifierHashes[_nullifierHash],
-            "The giftcard has already been spent"
-        );
-        require(
-            commitments[_commitment].spendingNote == false,
-            "You can only withdraw gift cards."
+            "The note has already been spent"
         );
         require(
             verifier.verifyProof(
@@ -199,8 +148,7 @@ contract BunnyNotes is ReentrancyGuard {
                 [
                     uint256(_nullifierHash),
                     uint256(_commitment),
-                    uint256(uint160(_recipient)),
-                    uint256(_change)
+                    uint256(uint160(_recipient))
                 ]
             ),
             "Invalid Withdraw proof"
@@ -224,86 +172,10 @@ contract BunnyNotes is ReentrancyGuard {
             );
         }
 
-        emit WithdrawGiftCard(
+        emit WithdrawBunnyNote(
             commitments[_commitment].creator,
             _recipient,
             _commitment
-        );
-    }
-
-    function withdrawCashNote(
-        uint256[8] calldata _proof,
-        bytes32 _nullifierHash,
-        bytes32 _commitment,
-        address _recipient,
-        uint256 _change
-    ) external payable nonReentrant {
-        require(
-            !nullifierHashes[_nullifierHash],
-            "The note has already been spent"
-        );
-
-        require(
-            commitments[_commitment].spendingNote == true,
-            "You can only spend Cash notes."
-        );
-
-        require(
-            _change <= commitments[_commitment].denomination,
-            "The requested change is too high!"
-        );
-
-        uint256 _price = commitments[_commitment].denomination.sub(_change);
-
-        require(_price > 0, "0 Price Payment is not allowed!");
-
-        require(
-            verifier.verifyProof(
-                [_proof[0], _proof[1]],
-                [[_proof[2], _proof[3]], [_proof[4], _proof[5]]],
-                [_proof[6], _proof[7]],
-                [
-                    uint256(_nullifierHash),
-                    uint256(_commitment),
-                    uint256(uint160(_recipient)),
-                    uint256(_change)
-                ]
-            ),
-            "Invalid Withdraw proof"
-        );
-
-        nullifierHashes[_nullifierHash] = true;
-        commitments[_commitment].recipient = _recipient;
-        commitments[_commitment].spentDate = block.timestamp;
-
-        if (commitments[_commitment].usesToken) {
-            //Transfer the tokens to the recipient if the note uses a token
-            commitments[_commitment].token.safeTransfer(_recipient, _price);
-            if (_change > 0) {
-                // Send the change back to the creator!
-                commitments[_commitment].token.safeTransfer(
-                    commitments[_commitment].creator,
-                    _change
-                );
-            }
-        } else {
-            // Transfer the ETH
-            Address.sendValue(payable(_recipient), _price);
-            if (_change > 0) {
-                // Send the change back to the creator!
-                Address.sendValue(
-                    payable(commitments[_commitment].creator),
-                    _change
-                );
-            }
-        }
-
-        emit WithdrawCashNote(
-            commitments[_commitment].creator,
-            _recipient,
-            _commitment,
-            _price,
-            _change
         );
     }
 
