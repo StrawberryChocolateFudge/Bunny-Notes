@@ -7,7 +7,6 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import MoneyIcon from "@mui/icons-material/Money";
-import { getCardPropsData } from "./utils/cardPropsData";
 import CardGrid, { CardType } from "./CardGrid";
 import { Base } from "./Base";
 import { useNavigate } from "react-router-dom";
@@ -115,6 +114,6 @@ export default function PaymentRequestTab(props: PaymentRequestTabProps) {
                 </Grid>
             </Toolbar>
         </AppBar>
-        <CardGrid handleSelect={handleSelectPaymentRequest} cardProps={getCardPropsData("Payment Request", props.selectedNetwork)}></CardGrid>
+        {/* <CardGrid handleSelect={handleSelectPaymentRequest} cardProps={getCardPropsData("Payment Request", props.selectedNetwork)}></CardGrid> */}
     </Paper >
 }

@@ -11,7 +11,7 @@ import { Base, Spacer } from './Base';
 import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { styled, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
-import { bunnyNoteIsSpent, bunnyNotesCommitments, getContractAddressFromCurrencyDenomination, getErc20NoteToken, getJsonRpcProvider, getRpcContract } from '../web3/web3';
+import { bunnyNoteIsSpent, bunnyNotesCommitments, getJsonRpcProvider, getNoteContractAddress, getRpcContract } from '../web3/web3';
 import { getLoading } from './LoadingIndicator';
 import { commitmentQRStringParser } from '../qrcode/create';
 import { ParsedNote } from '../zkp/generateProof';
@@ -23,12 +23,12 @@ interface VerifyNoteTabProps extends Base {
 
 export type Commitment = {
       validText: string
-      noteType: boolean
       creator: string
       recipient: string
       denomination: string,
       erc20Address: string,
-      noteAddress: string
+      noteAddress: string,
+      usesToken: boolean
 }
 
 const IMG = styled("img")({
@@ -107,7 +107,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
             const [commitment, nullifierHash, amount, currency] = getDetails(evalResult);
 
             setLoading(true);
-            const contractAddress = getContractAddressFromCurrencyDenomination(amount, currency, props.selectedNetwork);
+            const contractAddress = getNoteContractAddress(props.selectedNetwork);
             const contract = await getRpcContract(provider, contractAddress, "/ERC20Notes.json");
             // get the commitment data
 
@@ -124,21 +124,16 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
             const recipient = !isSpent ? "Not Spent" : commitments.recipient;
 
             //Try to get the token, if it throws then it must be an ETH note
-            let erc20Address = "Native Token";
-            try {
-                  erc20Address = await getErc20NoteToken(contract);
-            } catch (err) {
-            }
-
+            let erc20Address = commitments.usesToken ? commitments.token : "Native Token";
 
             setCommitmentDetails({
                   validText: !isSpent ? "Valid!" : "The Note has been spent!",
-                  noteType: commitments.cashNote,
                   creator: commitments.creator,
                   recipient: recipient,
                   denomination: `${amount} ${currency}`,
                   noteAddress: contractAddress,
-                  erc20Address
+                  erc20Address,
+                  usesToken: commitments.usesToken
 
             })
             setLoading(false);
@@ -199,11 +194,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                                                       <TableCell align="right">{commitmentDetails.recipient === "Not Spent" ? commitmentDetails.recipient : shortenAddress(commitmentDetails.recipient)}</TableCell>
                                                 </TableRow>
                                                 <TableRow>
-                                                      <TableCell align="left">Note Type:</TableCell>
-                                                      <TableCell align="right">{commitmentDetails.noteType ? "Spending Note" : "Bunny Note"}</TableCell>
-                                                </TableRow>
-                                                <TableRow>
-                                                      <TableCell align="left">Note Contract Address:</TableCell>
+                                                      <TableCell align="left">BunnyNote Contract:</TableCell>
                                                       <TableCell size="small" align="right">{shortenAddress(commitmentDetails.noteAddress)}</TableCell>
                                                 </TableRow>
                                                 <TableRow>

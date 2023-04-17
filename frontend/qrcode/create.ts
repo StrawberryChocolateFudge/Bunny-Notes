@@ -15,14 +15,13 @@ export function getCommitmentQRString(amount: string, currency: string, commitme
 
 export async function commitmentQR({ amount, currency, commitment, nullifierHash }: { amount: string, currency: string, commitment: string, nullifierHash: string }): Promise<any> {
 
-    const commitmentQRString = getCommitmentQRString(amount, currency, commitment, nullifierHash);
-
+    const QRString = getCommitmentQRString(amount, currency, commitment, nullifierHash);
     const buffer = await new AwesomeQR({
-        text: commitmentQRString,
+        text: QRString,
         size: 500
     }).draw();
 
-    return buffer;
+    return { buffer,QRString };
 }
 
 export function commitmentQRStringParser(commitmentString: string) {

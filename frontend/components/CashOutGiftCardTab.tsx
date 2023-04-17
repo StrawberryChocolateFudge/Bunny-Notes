@@ -11,7 +11,7 @@ import { Base } from './Base';
 import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { generateZKProof, packSolidityProof } from '../zkp/generateProof';
-import { bunnyNotesWithdrawGiftCard, getChainId, getContract, getContractAddressFromCurrencyDenomination, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
+import { getChainId, getContract, getNoteContractAddress, onBoardOrGetProvider, requestAccounts, withdraw } from '../web3/web3';
 import { styled, Typography } from '@mui/material';
 interface CashOutGiftCardTabProps extends Base {
     noteString: string
@@ -61,14 +61,13 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
         const nullifierHash = toNoteHex(parsedNote.deposit.nullifierHash);
         const commitment = toNoteHex(parsedNote.deposit.commitment);
 
-        const contractAddress = getContractAddressFromCurrencyDenomination(parsedNote.amount, parsedNote.currency, props.selectedNetwork);
+        const contractAddress = getNoteContractAddress(props.selectedNetwork);
         const contract = await getContract(provider, contractAddress, "/BunnyNotes.json");
         const myAddress = await requestAccounts(provider);
-        const change = "0";
-        const zkp = await generateZKProof(parsedNote.deposit, myAddress, change);
+        const zkp = await generateZKProof(parsedNote.deposit, myAddress);
         const solidityProof = packSolidityProof(zkp.proof);
 
-        const tx = await bunnyNotesWithdrawGiftCard(contract, solidityProof, nullifierHash, commitment, myAddress, change).catch(err => {
+        const tx = await withdraw(contract, solidityProof, nullifierHash, commitment, myAddress).catch(err => {
             props.displayError("Unable to Withdraw");
             console.error(err);
         });

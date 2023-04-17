@@ -6,9 +6,10 @@ import { Base } from './Base';
 import { downloadNote } from './DownloadNote';
 import { NoteDetails } from '../zkp/generateProof';
 import { createQR } from '../qrcode/create';
-import { onBoardOrGetProvider, requestAccounts } from '../web3/web3';
-import { handleCardSelectWithProvider } from '../web3/componentParts';
+import { getNoteContractAddress, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
 import { Stack, styled, Typography } from '@mui/material';
+import { EnterDenominationDialog } from './utils/EnterDenominationDialog';
+import { calculateFeeAndNote } from '../web3/calculateFeeAndNote';
 
 
 interface BunnyNotesPageProps extends Base {
@@ -53,6 +54,11 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
 
     const [cardType, setCardType] = React.useState<CardType>("Bunny Note");
 
+    const [showDenominationInput, setShowDenominationInput] = React.useState(false);
+
+    const [selectedCard, setSelectedCard] = React.useState({ tokenAddress: "", cardType: "", currency: "", isCustom: false });
+
+
     React.useEffect(() => {
         async function getQRCode() {
             const details = noteDetails;
@@ -82,26 +88,28 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
         }
     }
 
-    const handleSelectGiftCard = async (denomination: string, currency: string, cardType: CardType, addresses: [string, string]) => {
-        await importAddress();
-        const res = await handleCardSelectWithProvider(props, denomination, currency, cardType, props.selectedNetwork, addresses[1])
-        if (res !== false) {
-            setRenderDownloadPage(true);
-            setNoteDetails(res.noteDetails);
-            setNoteAddresses(addresses);
-            setNoteFee(res.formattedFee);
-        }
+    const handleSelectBunnyNote = async (currency: string, cardType: CardType, tokenAddress: string, isCustom: boolean) => {
+        setSelectedCard({ currency, cardType, tokenAddress, isCustom });
+        setShowDenominationInput(true);
     }
 
-    const handleSelectCashNote = async (denomination: string, currency: string, cardType: CardType, addresses: [string, string]) => {
-        const res = await handleCardSelectWithProvider(props, denomination, currency, cardType, props.selectedNetwork, addresses[1])
-        if (res !== false) {
-            setRenderDownloadPage(true);
-            setNoteDetails(res.noteDetails);
-            setNoteAddresses(addresses);
-            setNoteFee(res.formattedFee);
-        }
+    const handleCloseDenominationDialog = () => {
+        setShowDenominationInput(false);
     }
+
+    const handleAcceptDenominationDialog = async (denomination, tokencurrency, tokenAddress) => {
+        let currency = selectedCard.isCustom ? tokencurrency : selectedCard.currency;
+        let token = selectedCard.isCustom ? tokenAddress : selectedCard.tokenAddress;
+        await importAddress();
+        const { noteDetails, fee } = await calculateFeeAndNote(denomination, currency, props.selectedNetwork);
+        setShowDenominationInput(false);
+        const noteContractAddr = getNoteContractAddress(props.selectedNetwork);
+        setRenderDownloadPage(true);
+        setNoteDetails(noteDetails);
+        setNoteAddresses([token, noteContractAddr]);
+        setNoteFee(fee);
+    }
+
 
     if (renderDownloadPage) {
         return downloadNote({
@@ -130,17 +138,18 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
     }
 
     return (
-        <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
-            <Stack direction={"row"} justifyContent="center">
-                <BunnyNotesIMG alt="Bunny Notes" src="/imgs/BunnyNotes.svg" />
-            </Stack>
-            <Stack sx={{ padding: "30px" }} direction={"row"} justifyContent="center">
-                <Typography component="p" variant="subtitle1">Bunny Notes are financial claims for value that was deposited into a smart contract. Select the denomination, download the printable note and make a deposit to create one. It can be used to store value without a wallet or to transfer value.</Typography>
-            </Stack>
-            <Center>
-            </Center>{cardType === "Spending Note" ? <CardGrid handleSelect={handleSelectCashNote} cardProps={getCardPropsData("Spending Note", props.selectedNetwork)} ></CardGrid>
-                : <CardGrid handleSelect={handleSelectGiftCard} cardProps={getCardPropsData("Bunny Note", props.selectedNetwork)} ></CardGrid>
-            }
-        </Paper>
+        <React.Fragment>
+            <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
+                <Stack direction={"row"} justifyContent="center">
+                    <BunnyNotesIMG alt="Bunny Notes" src="/imgs/BunnyNotes.svg" />
+                </Stack>
+                <Stack sx={{ padding: "30px" }} direction={"row"} justifyContent="center">
+                    <Typography component="p" variant="subtitle1">Bunny Notes are financial claims for value that was deposited into a smart contract. Select the currency,enter the denomination, download the printable note and make a deposit to create one. It can be used to store value without a wallet or to transfer value.</Typography>
+                </Stack>
+                <CardGrid handleSelect={handleSelectBunnyNote} cardProps={getCardPropsData("Bunny Note", props.selectedNetwork)} ></CardGrid>
+
+            </Paper>
+            <EnterDenominationDialog displayError={props.displayError} isCustom={selectedCard.isCustom} showDialog={showDenominationInput} handleClose={handleCloseDenominationDialog} handleOk={handleAcceptDenominationDialog}></EnterDenominationDialog>
+        </React.Fragment>
     );
 }

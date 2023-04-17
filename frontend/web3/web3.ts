@@ -1,73 +1,24 @@
 import MetaMaskOnboarding from "@metamask/onboarding";
 import { BigNumber, ethers } from "ethers";
+import { formatEther, parseEther } from "ethers/lib/utils";
 import { setCurrentNToSS } from "../storage/session";
-
-// I only have 1 FTM and 1 BTTC notes right now!
-export const MAXCASHNOTESIZE = 1;
 
 export const BTTCTESTNETID = "0x405";
 
 export const FANTOMTESTNETID = "0xfa2";
 
-
-export const USDTMCONTRACTADDRESS_DONAU = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7";
-export const USDTM100ADDRESS_DONAU = "0x94D1f7e4667f2aE54494C2a99A18C8B4aED9B22A";
-
-export const BTT_NATIVE_DONAU = "0x2D524Ee2669b7F521B9d903A56002ba565cc50ba";
-export const FANTOM_NATIVE_TESTNET = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7";
+export const BTT_BUNNYNOTES_DONAU = "0x9598B4A28dd48D3b4b4C8A862D3220290D8dDE1b";
 
 export const ZEROADDRESS = "0x0000000000000000000000000000000000000000"
 
-// Update this when new note contracts are added!!
-export function getContractAddressFromCurrencyDenomination(denomination: string, currency: string, networkId: string): string {
-    switch (networkId) {
-        case BTTCTESTNETID:
-            if (denomination === "100" && currency === "USDTM") {
-                return USDTM100ADDRESS_DONAU;
-            } else if (denomination === "1" && currency === "BTT") {
-                return BTT_NATIVE_DONAU
-            } else {
-                return ""
-            }
-        case FANTOMTESTNETID:
-            if (denomination === "1" && currency === "FTM") {
-                return FANTOM_NATIVE_TESTNET;
-            }
-        default:
-            return ""
-    }
-}
-
-export function getCurrencyAddressFromNetworkId(currency: string | undefined, netId: string | undefined): string {
+export function getNoteContractAddress(netId) {
     switch (netId) {
         case BTTCTESTNETID:
-            return getCurrencyAddressOnBTTCDonau(currency);
-        case FANTOMTESTNETID:
-            return getCurrencyAddressOnFantomTestnet(currency);
+            return BTT_BUNNYNOTES_DONAU;
         default:
-            return "INVALID";
+            return BTT_BUNNYNOTES_DONAU;
     }
 }
-
-export function getCurrencyAddressOnBTTCDonau(currency: string | undefined) {
-    switch (currency) {
-        case "USDTM":
-            return USDTMCONTRACTADDRESS_DONAU;
-        case "BTT":
-            return "Native Token";
-        default:
-            return "INVALID";
-    }
-}
-export function getCurrencyAddressOnFantomTestnet(currency: string | undefined) {
-    switch (currency) {
-        case "FTM":
-            return "Native Token"
-        default:
-            return "INVALID"
-    }
-}
-
 
 let RELAYERURL = "https://relayer.bunnynotes.finance"
 
@@ -126,22 +77,6 @@ export function getWalletCurrencyFromFetchedChainId(chainId: number): string {
             return "FTM"
         default:
             return "ETH"
-    }
-}
-
-
-export function getAvailableERC20Tokens(netId): AvailableERC20Token[] {
-    switch (netId) {
-        case 1:
-            return [{ address: "", name: "", logo: "" }]
-        case 0x405:
-            return [{
-                name: "USDTM", address: USDTMCONTRACTADDRESS_DONAU, logo: "/imgs/Bunny.svg"
-            }]
-        case 0xfa2:
-            return [{ address: "", name: "", logo: "" }]
-        default:
-            return [{ address: "", name: "", logo: "" }]
     }
 }
 
@@ -350,24 +285,27 @@ export async function TESTNETMINTERC20(ERC20Contract: any, mintTo: string, amoun
     return await ERC20Contract.mint(mintTo, amount);
 }
 
-export async function bunnyNotesDeposit(contract: any, commitment: string, isSpendingNote: boolean, depositFor: string) {
-    return await contract.deposit(commitment, isSpendingNote, depositFor);
+export async function depositETH(contract: any, commitment: string, denomination: BigNumber) {
+    const fee = await calculateFee(contract, denomination);
+    return await contract.depositEth(commitment, denomination, { value: denomination.add(fee) });
 }
 
-export async function ethNotesDeposit(contract: any, commitment: string, isSpendingNote: boolean, depositFor: string, value: BigNumber) {
-    return await contract.deposit(commitment, isSpendingNote, depositFor, { value });
+export async function depositToken(contract: any, commitment: string, denomination: BigNumber, token: string) {
+    return await contract.depositToken(commitment, denomination, token);
 }
 
-export async function bunnyNotesWithdrawGiftCard(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recipient: string, change: string) {
-    return await contract.withdrawGiftCard(solidityProof, nullifierHash, commitment, recipient, change);
+
+export async function withdraw(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recipient: string, ) {
+    return await contract.withdraw(solidityProof, nullifierHash, commitment, recipient);
 }
 
-export async function bunnyNotesWithdrawCashNote(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recipient: string, change: string) {
-    return await contract.withdrawCashNote(solidityProof, nullifierHash, commitment, recipient, change);
-}
 
 export async function ERC20Approve(ERC20Contract: any, spenderContract: string, amount: any) {
     return await ERC20Contract.approve(spenderContract, amount);
+}
+
+export async function ERC20Balance(ERC20Contract: any, address: string) {
+    return await ERC20Contract.balanceOf(address);
 }
 
 // View Functions
@@ -384,30 +322,19 @@ export async function bunnyNoteIsSpentArray(contract: any, nullifierHashesArray:
     return await contract.isSpent(nullifierHashesArray);
 }
 
-export async function getErc20NoteToken(contract: any) {
-    return await contract.token();
+export async function calculateFee(contract: any, denomination: BigNumber) {
+    return await contract.calculateFee(denomination);
 }
-
-
-export async function getFee(contract: any) {
-    return await contract.fee();
-}
-
 
 export async function getAllowance(contract: any, owner: string, spender: string) {
     return await contract.allowance(owner, spender).call();
 }
 
-
-export async function relayCashNotePayment(details) {
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(details)
-    };
-
-    const res = await fetch(RELAYERURL, requestOptions);
-    return res;
+export function calculateFeeLocally(denomination: string): string {
+    // The fee is hardcoded 1% in the current smart contract so I can calculate it locally with 100
+    const parsedD = parseEther(denomination);
+    const fee = formatEther(parsedD.div(100));
+    return fee
 }
 
 export interface AvailableERC20Token {

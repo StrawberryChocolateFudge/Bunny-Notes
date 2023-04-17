@@ -12,15 +12,14 @@ export interface SelectableCardsParams {
   networkAlt: string;
   imageLink: string;
   imageAlt: string;
-  denomination: string;
   currency: string;
   cardType: CardType,
   erc20Address: string,
-  noteContractAddress: string
+  isCustom: boolean
 }
 
 export interface SelectableCardsProps extends SelectableCardsParams {
-  handleSelect: (denomination: string, currency: string, cardType: CardType, addresses: [string, string]) => void
+  handleSelect: (currency: string, cardType: CardType, tokenAddress: string, isCustom: boolean) => void
 }
 
 
@@ -35,11 +34,11 @@ const OverlayImgs = styled("div")({
 export function SelectableCards(props: SelectableCardsProps) {
 
   const purchaseSelected = () => {
-    props.handleSelect(props.denomination, props.currency, props.cardType, [props.erc20Address, props.noteContractAddress])
+    props.handleSelect(props.currency, props.cardType, props.erc20Address, props.isCustom)
   }
 
   const OverlayedImage = () => <OverlayImgs>
-    <img width={"50"} style={{ margin: "0 auto", marginTop: "10px" }} src={props.imageLink} alt={props.imageAlt} />
+    <img width={"50"} height={"50"} style={{ margin: "0 auto", marginTop: "10px" }} src={props.imageLink} alt={props.imageAlt} />
     <img width="20" style={{ right: "80px", bottom: "85px", position: "absolute" }} src={props.networkLogo} />
   </OverlayImgs>
 
@@ -50,7 +49,7 @@ export function SelectableCards(props: SelectableCardsProps) {
       </Typography>
     } else {
       return <Typography gutterBottom variant="subtitle1" component="div">
-        {props.denomination} {props.currency} 
+        {props.currency}
       </Typography>
     }
   }
