@@ -48,7 +48,7 @@ export function getCardPropsData(cardType: "Bunny Note", netId: string): Array<S
     switch (netId) {
         case BTTCTESTNETID:
             return [
-                { isCustom: true, networkAlt: "", networkLogo: "", imageLink: "/imgs/questionmarklogo.png", imageAlt: "Custom Token", currency: "Custom Token", cardType, erc20Address: "", },
+                { isCustom: true, networkAlt: "", networkLogo: "", imageLink: "/imgs/questionMark.png", imageAlt: "Custom Token", currency: "Custom Token", cardType, erc20Address: "", },
                 { isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/bttLogo.svg", imageAlt: "1 BTT", currency: "BTT", cardType, erc20Address: ZEROADDRESS },
                 // { networkAlt: "", networkLogo: "", imageLink: "/imgs/Bunny.svg", imageAlt: "100 USDTM", denomination: "100", currency: "USDTM", cardType, erc20Address: USDTMCONTRACTADDRESS_DONAU, noteContractAddress: USDTM100ADDRESS_DONAU },
             ]
