@@ -28,7 +28,7 @@ export function commitmentQRStringParser(commitmentString: string) {
     const commitmentQRCodeRegex = /commitment-(?<currency>\w+)-(?<amount>[\d.]+)-0x(?<commitment>[0-9a-fA-F]{64})-0x(?<nullifierHash>[0-9a-fA-F]{64})/g;
     const match = commitmentQRCodeRegex.exec(commitmentString);
     if (!match) {
-        throw new Error("Invalid Commitment QR Code");
+        throw new Error("Invalid Note");
     }
 
     //@ts-ignore
