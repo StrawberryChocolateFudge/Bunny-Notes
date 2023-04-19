@@ -1,7 +1,7 @@
 import { AppBar, Button, ButtonBase, Grid, Paper, Stack, styled, Toolbar, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { toNoteHex } from "../../lib/BunnyNote";
-import { downloadPDF } from "../pdf";
+import { downloadA4PDF, downloadPDF } from "../pdf";
 import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
 import { ethers } from "ethers";
@@ -42,7 +42,6 @@ export function downloadNote(props: DownloadNoteProps) {
 
     const erc20Address = props.noteAddresses[0];
     const noteAddress = props.noteAddresses[1];
-    console.log("note address", noteAddress);
     // Native tokens need no approval to spend!
     const isNativeToken = erc20Address === ZEROADDRESS;
     const Img = styled('img')({
@@ -52,7 +51,10 @@ export function downloadNote(props: DownloadNoteProps) {
         maxHeight: '100%',
     });
 
-    const bearerText = `The smart contract will pay the bearer on demand the sum of ${denominationAndCurr}`
+    const networkName = getNetworkNameFromId(props.selectedNetwork);
+
+
+    const bearerText = `The smart contract on ${networkName} will pay the bearer on demand the sum of ${denominationAndCurr}`
 
     const noteDisplay = () => {
         return <Grid item>
@@ -131,13 +133,11 @@ export function downloadNote(props: DownloadNoteProps) {
             // approve the spend, need to approve for the fee
             const contract = await getContract(props.provider, noteAddress, "/BunnyNotes.json");
             const fee = await calculateFee(contract, parseEther(amount));
-            const formattedFee = ethers.utils.formatEther(fee);
-            const approveAmount = parseFloat(formattedFee) + parseFloat(noteDetails[1].amount);
+            const approveAmount = fee.add(ethers.utils.parseEther(noteDetails[1].amount));
             const ERC20Contract = await getContract(props.provider, erc20Address, "/ERC20.json");
-            const convertedApproveAmount = ethers.utils.parseEther(approveAmount.toString());
             props.setDepositButtonDisabled(true);
             props.setShowApproval(false);
-            const tx = await ERC20Approve(ERC20Contract, noteAddress, convertedApproveAmount).catch((err) => {
+            const tx = await ERC20Approve(ERC20Contract, noteAddress, approveAmount).catch((err) => {
                 props.setShowApproval(true);
             });
 
@@ -201,16 +201,19 @@ export function downloadNote(props: DownloadNoteProps) {
         const commitment = toNoteHex(commitmentBigint);
         const nullifierHash = toNoteHex(nullifierHashBigint);
         const commitmentQRData = await commitmentQR({ amount, currency, commitment, nullifierHash });
-        const network = getNetworkNameFromId(props.selectedNetwork);
-        downloadPDF(bearerText,
-            denominationAndCurr,
+
+        downloadA4PDF({
+            bearerText,
+            denomination: denominationAndCurr,
             commitment,
-            props.cardType,
-            props.qrCodeDataUrl,
+            cardType: props.cardType,
+            dataUrl: props.qrCodeDataUrl,
             noteString,
-            commitmentQRData.QRString,
-            commitmentQRData.buffer,
-            network);
+            commitmentQRCodeString: commitmentQRData.QRString,
+            commitmentQRCodeDataUrl: commitmentQRData.buffer,
+            network: props.selectedNetwork,
+            tokenAddress: isNativeToken ? "Native Token" : erc20Address
+        })
         props.setDownloadClicked(true);
     }
 
