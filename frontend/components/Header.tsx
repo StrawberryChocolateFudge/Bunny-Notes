@@ -19,7 +19,7 @@ export default function Header(props: HeaderProps) {
                 <Tabs value={props.selectedTab} onChange={props.onTabToggle} textColor="inherit" variant='scrollable' scrollButtons allowScrollButtonsMobile aria-label="Bunny Notes Options">
                     <Tab label="Bunny Notes" />
                     <Tab label="Verify a Note" />
-                    <Tab label="Cash Out" />
+                    <Tab label="Withdraw" />
                     {/* <Tab label="Request Payment" /> */}
                 </Tabs>
             </AppBar> : <React.Fragment></React.Fragment>}
