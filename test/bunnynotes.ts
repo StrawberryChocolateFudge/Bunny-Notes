@@ -25,7 +25,7 @@ describe("Bunny Notes", async function () {
         const feeWithDenomination = denomination.add(fee);
 
 
-        const noteString1 = await deposit({ currency: "ETH", amount: 100, netId: 1337 });
+        const noteString1 = await deposit({ currency: "ETH", amount: '100', netId: 1337 });
         const parsedNote = await parseNote(noteString1);
         expect(parsedNote.deposit.commitment).is.not.undefined;
         // Now I can deposit eth to create a note
@@ -110,7 +110,7 @@ describe("Bunny Notes", async function () {
 
         const feeWithDenomination = denomination.add(fee);
 
-        const noteString1 = await deposit({ currency: "USDTM", amount: 100, netId: 1337 });
+        const noteString1 = await deposit({ currency: "USDTM", amount: '100', netId: 1337 });
         const parsedNote = await parseNote(noteString1);
         let errorOccured = false;
         let errorMessage = "";
@@ -210,7 +210,7 @@ describe("Bunny Notes", async function () {
         const denomination = parseEther("100");
         const fee = await bunnyNotes.calculateFee(denomination);
         const feeWithDenomination = denomination.add(fee);
-        const noteString1 = await deposit({ currency: "ETH", amount: 100, netId: 1337 });
+        const noteString1 = await deposit({ currency: "ETH", amount: '100', netId: 1337 });
         const parsedNote = await parseNote(noteString1);
         const depositTx = await bunnyNotes.connect(alice).depositEth(
             toNoteHex(parsedNote.deposit.commitment),
@@ -255,7 +255,7 @@ describe("Bunny Notes", async function () {
         const feeWithDenomination = denomination.add(fee);
 
         // Now alice has a note and she gives it to bob who can withdraw it
-        const noteString1 = await deposit({ currency: "USDTM", amount: 100, netId: 1337 });
+        const noteString1 = await deposit({ currency: "USDTM", amount: '100', netId: 1337 });
         const parsedNote = await parseNote(noteString1);
 
         await USDTM.mint(alice.address, feeWithDenomination);
