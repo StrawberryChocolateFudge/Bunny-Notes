@@ -27,16 +27,16 @@ export function TermsPage() {
             <p>By accessing this website we assume you accept these terms and conditions. Do not continue to use bunnynotes.finance if you do not agree to take all of the terms and conditions stated on this page.</p>
 
             <ol>
-                <li><p>Ownership and Use of Website Content
+                <li><p>OWNERSHIP AND USE OF WEBSITE CONTENT:
                     All content on this website, including but not limited to text, graphics, images, logos, and software, is the property of bunnynotes.finance and is protected by applicable intellectual property laws. You may use the content on this website only for personal, non-commercial purposes. You may not copy, reproduce, distribute, or modify any content on this website without our prior written consent.</p></li>
-                <li> <p>Disclaimer of Warranties and Limitation of Liability
+                <li> <p>DISCLAIMER OF WARRANTIES AND LIMITATION OF LIABILITY
                     Bunnynotes.finance provides this website on an "as is" and "as available" basis. We make no representations or warranties of any kind, express or implied, regarding the operation of this website or the information, content, materials, or products included on this website. We will not be liable for any damages arising from the use of this website, including but not limited to direct, indirect, incidental, punitive, and consequential damages.</p></li>
                 <li>
-                    <p>Changes to Terms and Conditions
+                    <p>CHANGES TO TERMS AND CONDITIONS:S
                         Bunnynotes.finance reserves the right to modify these terms and conditions at any time without prior notice. Your continued use of this website after such modifications will constitute your acceptance of the modified terms and conditions.</p>
                 </li>
                 <li>
-                    <p>Governing Law and Jurisdiction
+                    <p>GOVERNING LAW AND JURISDICTION:
                         These terms and conditions are governed by and construed in accordance with the laws of the jurisdiction in which bunnynotes.finance is located. Any disputes arising out of or in connection with these terms and conditions will be subject to the exclusive jurisdiction of the courts in that jurisdiction.</p>
                 </li>
             </ol>
@@ -49,34 +49,34 @@ export function TermsPage() {
 
             <ol>
                 <li><p>
-                    Collection of Personal Information:
+                    COLLECTION OF PERSONAL INFORMATION:
                     We do not collect any personal information from users of this website.
                 </p>
                 </li>
                 <li><p>
-                    Use of Cookies and Similar Technologies:
+                    USE OF COOKIES AND SIMILAR TECHNOLOGIES:
                     We do not use cookies or similar technologies on this website.
                 </p>
                 </li>
                 <li><p>
-                    Disclosure of Personal Information:
+                    DISCLOSURE OF PERSONAL INFORMATION:
                     We do not disclose any personal information to third parties.
                 </p>
                 </li>
                 <li>
                     <p>
-                        Data Retention:
+                        DATA RETENTION:
                         We do not retain any personal information.
                     </p>
                 </li>
                 <li>
                     <p>
-                        GDPR Compliance:
+                        GDPR COMPLIANCE:
                         We are committed to complying with the General Data Protection Regulation (GDPR). As we do not collect or process any personal data, we do not require a Data Protection Officer or a lawful basis for processing personal data.
                     </p>
                 </li>
                 <li>
-                    <p>Changes to Privacy Policy
+                    <p>CHANGES TO PRIVACY POLICY:
                         Bunnynotes.finance reserves the right to modify this privacy policy at any time without prior notice. Your continued use of this website after such modifications will constitute your acceptance of the modified privacy policy.</p>
                 </li>
             </ol>
