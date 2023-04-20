@@ -66,7 +66,7 @@ export function downloadA4PDF(
     //Using default page , which is A4 and units in milimeters
     let doc = new jsPDF();
     const networkName = getNetworkNameFromId(network);
-
+    doc.addImage("/imgs/LowOpacityBunnyPage.png", "PNG", 0, 0, 210, 297);
     //@ts-ignore
     var { TextField } = jsPDF.AcroForm;
     // Gonna do the title
@@ -90,7 +90,7 @@ export function downloadA4PDF(
 
     // The Logo image
     // /?TODO:  This is the logo placeholder 
-    doc.addImage("/imgs/bunnylogo.png", "PNG", 160, 3, 40, 40);
+    // doc.addImage("/imgs/BunnyLogoBW.jpg", "JPEG", 160, 3, 40, 40);
     // doc.ellipse(180, 25, 20, 20);
 
     // An Info text about the verification
@@ -183,7 +183,7 @@ PURPOSE: A bunny note is a printable and verifiable claim to withdraw value that
 INDEMNIFICATION: The creator of the smart contract and the website bunnynotes.finance are indemnified from any claims, damages, or losses arising from the use of Bunny Note. Parties acknowledge and agree that they use Bunny Note at their own risk and that the creator of the smart contract and the website bunnynotes.finance shall not be liable for any damages, losses, or expenses arising from the use of Bunny Note. Bunnynotes.finance offers no guarantee of any kind. Use it at your own risk.\n
 VERIFICATION: Bunny Note can be verified on the blockchain. Parties acknowledge and agree that they are solely responsible for verifying the authenticity of the Bunny Note and ensuring that it has not been tampered with.\n
 TRANSFERABILITY: Bunny Note is transferable and can be redeemed by the holder of the note. Parties acknowledge and agree that they are solely responsible for transferring the note to the intended recipient and that the creator of the smart contract and the website bunnynotes.finance shall not be liable for any losses or damages arising from the transfer of the note.\n
-GOVERNING LAW AND JURISDICTION: These terms and conditions shall be governed by and construed in accordance with the laws of the jurisdiction where the parties are located. Any dispute arising between the parties shall be resolved in the courts of the jurisdiction where the parties are located.\n
+GOVERNING LAW AND JURISDICTION: These terms and conditions shall be governed by and construed in accordance with the laws of the jurisdiction where the parties are located. Any dispute arising between the parties shall be resolved in the courts of the jurisdiction where the parties are located without involveing bunnynotes.finance or the creator of the smart contract.\n
 By using Bunny Note on the website bunnynotes.finance, parties acknowledge and agree to be bound by these terms and conditions. If parties do not agree to these terms and conditions, they should not use the Bunny Note and the website bunnynotes.finance.`;
 
 
