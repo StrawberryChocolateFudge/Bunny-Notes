@@ -5,7 +5,9 @@ export default function getTheme() {
         palette: {
             primary: {
                 light: '#efe9d1',
-                main: '#2d5840',
+                // main: '#2d5840',
+                main: '#3c8f27',
+
                 dark: '#006db3',
             },
         },
