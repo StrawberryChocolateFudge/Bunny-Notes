@@ -71,11 +71,6 @@ export function downloadNote(props: DownloadNoteProps) {
                 <Typography sx={{ marginLeft: "5px" }} variant="subtitle2" color="text.secondary">{bearerText}</Typography>
 
                 <Grid container spacing={2}>
-                    <Grid item>
-                        <ButtonBase sx={{ width: 128, height: 128 }}>
-                            <Img alt="Bunny Note QR Code" src={props.qrCodeDataUrl} />
-                        </ButtonBase>
-                    </Grid>
 
                     <Grid item xs container direction="column" spacing={2}>
                         <Grid item xs>
@@ -91,9 +86,6 @@ export function downloadNote(props: DownloadNoteProps) {
                         </Grid>
                     </Grid>
                 </Grid>
-                <Typography sx={{ fontSize: 5, overflow: "scroll" }} variant="subtitle2" component="small">
-                    {noteString}
-                </Typography>
 
             </Paper>
             <Stack sx={{ textAlign: "center" }}>
@@ -244,14 +236,23 @@ export function downloadNote(props: DownloadNoteProps) {
                     </Grid>
 
                     <Grid item sx={{ margin: "0 auto" }}>
-                        {noteDisplay()}
-                        <Grid item sx={{ textAlign: "center" }}>
-                            <Typography variant="subtitle1" component="div">
-                                Make sure you download the note before making a deposit! If you loose the note we cannot recover the deposit for you!
+                        <Stack sx={{ textAlign: "center" }}>
+                            <Typography variant="h6" component="div">{"Deposit " + denominationAndCurr}</Typography>
+                        </Stack>
+                        <Stack sx={{ textAlign: "center" }}>
+                            <Typography variant="subtitle2" component="div">
+                                plus 1% fee ({displayedFee})
                             </Typography>
+                        </Stack>
+                        <Grid item sx={{ textAlign: "center", paddingBottom: "20px" }}>
+
                             {props.showApproval && !isNativeToken ? <Tooltip arrow title={"Approve spending " + denominationAndCurr + ` (plus ${displayedFee} fee)`}>
                                 <span><Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend</Button></span></Tooltip> : <Tooltip arrow title={"Deposit " + denominationAndCurr + ` (plus ${displayedFee} fee)`}>
                                 <span><Button disabled={props.depositButtonDisabled} onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Deposit</Button></span></Tooltip>}
+                            <Typography variant="subtitle1" component="div">
+                                Make sure to download the note before making the deposit! If you loose the note we cannot recover the deposit for you!
+                            </Typography>
+
                         </Grid>
                     </Grid>
                 </Grid>
