@@ -19,10 +19,17 @@ export const Center = styled("div")({
     textAlign: "center"
 })
 
+const LogoIMG = styled("img")({
+    width: "200px",
+    padding: "10px",
+    margin: "0 auto"
+})
+
 const BunnyNotesIMG = styled("img")({
     width: "300px",
     padding: "10px",
 });
+
 
 const GiftCardIMG = styled("img")({
     width: "150px",
@@ -140,8 +147,10 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
     return (
         <React.Fragment>
             <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
-                <Stack direction={"row"} justifyContent="center">
-                    <BunnyNotesIMG alt="Bunny Notes" src="/imgs/BunnyNotes.svg" />
+                <Stack direction="row" justifyContent={"center"}>
+                    <Stack direction={"column"} justifyContent="center">
+                        <LogoIMG alt="BunnyLogo" src="/imgs/BunnyLogo.jpg" />
+                    </Stack>
                 </Stack>
                 <Stack sx={{ padding: "30px" }} direction={"row"} justifyContent="center">
                     <Typography component="p" variant="subtitle1">Bunny Notes are financial claims for value that was deposited into a smart contract. Select the currency,enter the denomination, download the printable note and make a deposit to create one. It can be used to store value without a wallet or to transfer value.</Typography>
