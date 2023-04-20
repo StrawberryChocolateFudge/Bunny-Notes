@@ -108,7 +108,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
 
             setLoading(true);
             const contractAddress = getNoteContractAddress(props.selectedNetwork);
-            const contract = await getRpcContract(provider, contractAddress, "/ERC20Notes.json");
+            const contract = await getRpcContract(provider, contractAddress, "/BunnyNotes.json");
             // get the commitment data
 
             const isSpent = await bunnyNoteIsSpent(contract, nullifierHash)
@@ -124,6 +124,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
             const recipient = !isSpent ? "Not Spent" : commitments.recipient;
 
             //Try to get the token, if it throws then it must be an ETH note
+            console.log(commitments);
             let erc20Address = commitments.usesToken ? commitments.token : "Native Token";
 
             setCommitmentDetails({
