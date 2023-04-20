@@ -105,7 +105,7 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
             <Typography component="p" variant="subtitle1">You can withdraw the Bunny Note balance to your wallet.</Typography>
             <Tooltip arrow title="Withdraw the Bunny Note">
                 <Button onClick={cashOutAction} sx={{ mr: 1 }}>
-                    <IMG alt="Withdraw a Bunny Note" src="/imgs/CashOut.svg" />
+                    <IMG alt="Withdraw a Bunny Note" src="/imgs/withdraw.svg" />
                 </Button>
             </Tooltip>
         </Box>
