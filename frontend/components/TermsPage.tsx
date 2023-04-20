@@ -3,6 +3,7 @@ import Paper from "@mui/material/Paper/Paper";
 import React from "react";
 import Close from "@mui/icons-material/Close";
 import { setTermsAcceptedToLS } from "../storage/local";
+import { Terms } from "../pdf";
 
 export function TermsPage() {
 
@@ -21,54 +22,85 @@ export function TermsPage() {
 
         <div>
 
-            <p>These terms and conditions outline the rules and regulations for the use of bunnynotes.finance's Website, located at bunnynotes.finance.</p>
+            <p>By accessing this website, you agree to be bound by these terms and conditions of use, which govern your use of this website. If you do not agree with these terms and conditions, please do not use this website.</p>
 
             <p>By accessing this website we assume you accept these terms and conditions. Do not continue to use bunnynotes.finance if you do not agree to take all of the terms and conditions stated on this page.</p>
 
-            <p>The following terminology applies to these Terms and Conditions, Privacy Statement and Disclaimer Notice and all Agreements: "Client", "You" and "Your" refers to you, the person log on this website and compliant to the Company’s terms and conditions. "The Company", "Ourselves", "We", "Our" and "Us", refers to our Company. "Party", "Parties", or "Us", refers to both the Client and ourselves. All terms refer to the offer, acceptance and consideration of payment necessary to undertake the process of our assistance to the Client in the most appropriate manner for the express purpose of meeting the Client’s needs in respect of provision of the Company’s stated services, in accordance with and subject to, prevailing law of Netherlands. Any use of the above terminology or other words in the singular, plural, capitalization and/or he/she or they, are taken as interchangeable and therefore as referring to same.</p>
-
-            <h2><strong>Testnet</strong></h2>
-            <p>Bunny Notes is currently only available on testnet. It is provided as-is without warranty of any kind.</p>
-            <p>bunnynotes.finance reserves the right to monitor all transactions and to block any transactions which can violate sanctions, come from hacker's wallet or causes breach of these Terms and Conditions.</p>
-
-            <h2><strong>Cookies</strong></h2>
-
-            <p>We do not use cookies but might use them in the future. By accessing bunnynotes.finance, you agreed to use cookies in agreement with the bunnynotes.finance's Privacy Policy, see below. </p>
-
-            <h2><strong>iFrames</strong></h2>
-
-            <p>Without prior approval and written permission, you may not create frames around our Webpages that alter in any way the visual presentation or appearance of our Website.</p>
-
-            <h2><strong>Your Privacy</strong></h2>
-
-            <p>At bunnynotes.finance, accessible from https://bunnynotes.finance, one of our main priorities is the privacy of our visitors. This document contains types of information that is collected and recorded by bunnynotes.finance and how we use it.</p>
-
-            <p>If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us.</p>
-
-            <h3>Log Files</h3>
-
-            <p>bunnynotes.finance follows a standard procedure of using log files. These files log visitors when they visit websites. All hosting companies do this and a part of hosting services' analytics. The information collected by log files include internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of the information is for analyzing trends, administering the site, tracking users' movement on the website, and gathering demographic information.</p>
+            <ol>
+                <li><p>Ownership and Use of Website Content
+                    All content on this website, including but not limited to text, graphics, images, logos, and software, is the property of bunnynotes.finance and is protected by applicable intellectual property laws. You may use the content on this website only for personal, non-commercial purposes. You may not copy, reproduce, distribute, or modify any content on this website without our prior written consent.</p></li>
+                <li> <p>Disclaimer of Warranties and Limitation of Liability
+                    Bunnynotes.finance provides this website on an "as is" and "as available" basis. We make no representations or warranties of any kind, express or implied, regarding the operation of this website or the information, content, materials, or products included on this website. We will not be liable for any damages arising from the use of this website, including but not limited to direct, indirect, incidental, punitive, and consequential damages.</p></li>
+                <li>
+                    <p>Changes to Terms and Conditions
+                        Bunnynotes.finance reserves the right to modify these terms and conditions at any time without prior notice. Your continued use of this website after such modifications will constitute your acceptance of the modified terms and conditions.</p>
+                </li>
+                <li>
+                    <p>Governing Law and Jurisdiction
+                        These terms and conditions are governed by and construed in accordance with the laws of the jurisdiction in which bunnynotes.finance is located. Any disputes arising out of or in connection with these terms and conditions will be subject to the exclusive jurisdiction of the courts in that jurisdiction.</p>
+                </li>
+            </ol>
 
 
-            <h3>Children's Information</h3>
 
-            <p>Another part of our priority is adding protection for children while using the internet. We encourage parents and guardians to observe, participate in, and/or monitor and guide their online activity.</p>
 
-            <p>bunnynotes.finance does not knowingly collect any Personal Identifiable Information from children under the age of 13.</p>
+            <h4>Privacy Policy</h4>
+            <p>Bunnynotes.finance is committed to protecting your privacy. This privacy policy explains how we collect, use, and disclose your personal information. By using this website, you consent to the collection, use, and disclosure of your personal information in accordance with this privacy policy.</p>
 
-            <h3>Online Privacy Policy Only</h3>
+            <ol>
+                <li><p>
+                    Collection of Personal Information:
+                    We do not collect any personal information from users of this website.
+                </p>
+                </li>
+                <li><p>
+                    Use of Cookies and Similar Technologies:
+                    We do not use cookies or similar technologies on this website.
+                </p>
+                </li>
+                <li><p>
+                    Disclosure of Personal Information:
+                    We do not disclose any personal information to third parties.
+                </p>
+                </li>
+                <li>
+                    <p>
+                        Data Retention:
+                        We do not retain any personal information.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        GDPR Compliance:
+                        We are committed to complying with the General Data Protection Regulation (GDPR). As we do not collect or process any personal data, we do not require a Data Protection Officer or a lawful basis for processing personal data.
+                    </p>
+                </li>
+                <li>
+                    <p>Changes to Privacy Policy
+                        Bunnynotes.finance reserves the right to modify this privacy policy at any time without prior notice. Your continued use of this website after such modifications will constitute your acceptance of the modified privacy policy.</p>
+                </li>
+            </ol>
 
-            <p>This Privacy Policy applies only to our online activities and is valid for visitors to our website with regards to the information that they shared and/or collect in bunnynotes.finance. This policy is not applicable to any information collected offline or via channels other than this website.</p>
-
-            <h3>Consent</h3>
-
-            <p>By using our website, you hereby consent to our Privacy Policy and agree to its Terms and Conditions.</p>
-
-            <h2><strong>Reservation of Rights</strong></h2>
-
-            <p>We reserve the right to request that you remove all links or any particular link to our Website. You approve to immediately remove all links to our Website upon request. We also reserve the right to amend these terms and conditions and it’s linking policy at any time. By continuously linking to our Website, you agree to be bound to and follow these linking terms and conditions.</p>
-
-            <h2><strong>Disclaimer</strong></h2>
+            <h4>Bunny Notes</h4>
+            <p>The following terms and conditions apply to the use of Bunny Notes on the website bunnynotes.finance:</p>
+            <ol>
+                <li>
+                    <p>PURPOSE: A bunny note is a printable and verifiable claim to withdraw value that was deposited into a smart contract through the website bunnynotes.finance. It is designed to facilitate the transfer of value between parties who deposit into and withdraw funds from a smart contract.</p>
+                </li>
+                <li>
+                    <p>INDEMNIFICATION: The creator of the smart contract and the website bunnynotes.finance are indemnified from any claims, damages, or losses arising from the use of Bunny Note. Parties acknowledge and agree that they use Bunny Note at their own risk and that the creator of the smart contract and the website bunnynotes.finance shall not be liable for any damages, losses, or expenses arising from the use of Bunny Note. Bunnynotes.finance offers no guarantee of any kind. Use it at your own risk.</p>
+                </li>
+                <li>
+                    <p>VERIFICATION: Bunny Note can be verified on the blockchain. Parties acknowledge and agree that they are solely responsible for verifying the authenticity of the Bunny Note and ensuring that it has not been tampered with.</p>
+                </li>
+                <li>
+                    <p>TRANSFERABILITY: Bunny Note is transferable and can be redeemed by the holder of the note. Parties acknowledge and agree that they are solely responsible for transferring the note to the intended recipient and that the creator of the smart contract and the website bunnynotes.finance shall not be liable for any losses or damages arising from the transfer of the note.</p>
+                </li>
+                <li>
+                    <p>GOVERNING LAW AND JURISDICTION: These terms and conditions shall be governed by and construed in accordance with the laws of the jurisdiction where the parties are located. Any dispute arising between the parties shall be resolved in the courts of the jurisdiction where the parties are located without involveing bunnynotes.finance or the creator of the smart contract.</p>
+                </li>
+            </ol>
+            <p>By using Bunny Note on the website bunnynotes.finance, parties acknowledge and agree to be bound by these terms and conditions. If parties do not agree to these terms and conditions, they should not use the Bunny Note and the website bunnynotes.finance.</p>
 
             <p>bunnynotes.finance is not responsible for financial loss of any kind. Cryptocurrencies pose high financial risk. You use them at your own risk!</p>
 
@@ -76,5 +108,5 @@ export function TermsPage() {
         <div style={{ display: "flex", justifyContent: "center", flexDirection: "row" }}>
             <Button variant="contained" onClick={() => { acceptTerms() }}>Accept</Button>
         </div>
-    </Paper>
+    </Paper >
 }
