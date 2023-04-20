@@ -48,7 +48,7 @@ export function EnterDenominationDialog(props: EnterDenominationDialogProps) {
 
     const renderCustomInputs = () => {
         return <React.Fragment>
-            <TextField sx={{ marginBottom: "10px" }} autoComplete="off" placeholder="..." label="Currency (Ticker)" type={"text"} value={tokenTicker} onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            <TextField autoFocus={props.isCustom} sx={{ marginBottom: "10px" }} autoComplete="off" placeholder="..." label="Currency (Ticker)" type={"text"} value={tokenTicker} onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 setTokenTicker(event.target.value);
             }}></TextField>
 
@@ -66,7 +66,7 @@ export function EnterDenominationDialog(props: EnterDenominationDialogProps) {
             <Stack direction="column" justifyContent={"space-around"}>
                 {props.isCustom ? renderCustomInputs() : null}
 
-                <TextField autoFocus={true} sx={{ marginBottom: "10px" }} autoComplete="off" placeholder="Face Value" label="Denomination" type={"number"} value={amount} onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                <TextField autoFocus={!props.isCustom} sx={{ marginBottom: "10px" }} autoComplete="off" placeholder="Face Value" label="Denomination" type={"number"} value={amount} onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                     setAmount(event.target.value);
                 }}></TextField>
                 <DialogContentText>
