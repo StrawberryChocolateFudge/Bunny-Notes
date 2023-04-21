@@ -124,7 +124,6 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
             const recipient = !isSpent ? "Not Spent" : commitments.recipient;
 
             //Try to get the token, if it throws then it must be an ETH note
-            console.log(commitments);
             let erc20Address = commitments.usesToken ? commitments.token : "Native Token";
 
             setCommitmentDetails({
@@ -173,8 +172,8 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                         (loading ? getLoading() : <React.Fragment>
                               <Typography component="p" variant="subtitle1">Verify a Bunny Note. You can check if it's still valid and contains a balance!</Typography>
                               <Tooltip arrow title="Verify the Note">
-                                    <Button id="verifyNoteButton" onClick={onVerify} sx={{ mr: 1 }}>
-                                          <IMG alt="Verify a Note" src="/imgs/VerifyLogo.svg" />
+                                    <Button variant="contained" id="verifyNoteButton" onClick={onVerify} sx={{ mr: 1, fontSize: "20px" }}>
+                                          Verify
                                     </Button>
                               </Tooltip> </React.Fragment>)
                         : <React.Fragment>
