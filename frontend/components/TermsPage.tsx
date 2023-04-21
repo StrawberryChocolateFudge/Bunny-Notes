@@ -1,9 +1,9 @@
-import { Button, IconButton } from "@mui/material";
+import { Button, Divider, IconButton, Typography } from "@mui/material";
 import Paper from "@mui/material/Paper/Paper";
 import React from "react";
 import Close from "@mui/icons-material/Close";
 import { setTermsAcceptedToLS } from "../storage/local";
-import { Terms } from "../pdf";
+import { default as MuiLink } from "@mui/material/Link";
 
 export function TermsPage() {
 
@@ -82,6 +82,12 @@ export function TermsPage() {
             </ol>
 
             <h4>Bunny Notes</h4>
+            <Typography variant="body2" color="text.secondary" align="left">
+                <MuiLink color="inherit" href="https://raw.githubusercontent.com/StrawberryChocolateFudge/Bunny-Notes/bunnyNotesOnly/contracts/BunnyNotes.sol">
+                    Smart Contract
+                </MuiLink>
+            </Typography>
+
             <p>The following terms and conditions apply to the use of Bunny Notes on the website bunnynotes.finance:</p>
             <ol>
                 <li>
@@ -103,7 +109,6 @@ export function TermsPage() {
             <p>By using Bunny Note on the website bunnynotes.finance, parties acknowledge and agree to be bound by these terms and conditions. If parties do not agree to these terms and conditions, they should not use the Bunny Note and the website bunnynotes.finance.</p>
 
             <p>bunnynotes.finance is not responsible for financial loss of any kind. Cryptocurrencies pose high financial risk. You use them at your own risk!</p>
-
         </div>
         <div style={{ display: "flex", justifyContent: "center", flexDirection: "row" }}>
             <Button variant="contained" onClick={() => { acceptTerms() }}>Accept</Button>
