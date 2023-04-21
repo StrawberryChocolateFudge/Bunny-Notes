@@ -5,7 +5,7 @@ import { downloadA4PDF, downloadPDF } from "../pdf";
 import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
 import { ethers } from "ethers";
-import { bunnyNotesCommitments, calculateFee, depositETH, depositToken, ERC20Approve, getChainId, getContract, getNetworkNameFromId, requestAccounts, ZEROADDRESS } from "../web3/web3";
+import { bunnyNotesCommitments, calculateFee, depositETH, depositToken, ERC20Approve, getChainId, getContract, getNetworkNameFromId, onboardOrSwitchNetwork, requestAccounts, ZEROADDRESS } from "../web3/web3";
 import { parseEther } from "ethers/lib/utils";
 import { commitmentQR } from "../qrcode/create";
 
@@ -121,6 +121,7 @@ export function downloadNote(props: DownloadNoteProps) {
     }
 
     const depositWithOwnerAddress = async () => {
+
         if (props.showApproval && !isNativeToken) {
             // approve the spend, need to approve for the fee
             const contract = await getContract(props.provider, noteAddress, "/BunnyNotes.json");
@@ -152,11 +153,23 @@ export function downloadNote(props: DownloadNoteProps) {
                     props.displayError("Unable to deposit  Note");
                     props.setDepositButtonDisabled(false);
 
+                }).catch(err => {
+                    {
+                        if (err.message.includes("underlying network changed")) {
+                            props.displayError("Underlying error changed! Refresh the application!")
+                        }
+                    }
                 });
                 await handleDepositTx(tx);
                 return;
             } else {
                 const tx = await depositToken(notesContract, toNoteHex(deposit.commitment), parseEther(amount), erc20Address).catch(err => {
+                    if (err.message.includes("underlying network changed")) {
+                        props.displayError("Underlying error changed! Refresh the application!")
+                        return;
+                    }
+
+
                     props.displayError("Unable to deposit ERC20 Note");
                     props.setDepositButtonDisabled(false);
                 });
