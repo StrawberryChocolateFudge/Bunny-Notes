@@ -18,9 +18,7 @@ import {
     Routes,
     Route,
 } from "react-router-dom";
-import { PaymentRequestPage } from './PaymentRequestPage';
 import { NotFoundPage } from './404page';
-import HelpPage from './HelpPage';
 import BunnyNotesTab from './BunnyNotesTab';
 import { SelectNetworkDialog } from './utils/NetworkSelector';
 import { getCurrenttNetworkFromSS, getSelectedNFromSS } from '../storage/session';
@@ -140,7 +138,7 @@ export default function Base() {
         setSelectedNetwork,
         navigateToVerifyPage,
         depositButtonDisabled,
-        setDepositButtonDisabled
+        setDepositButtonDisabled,
     }
 
     const noteStringProps = {
