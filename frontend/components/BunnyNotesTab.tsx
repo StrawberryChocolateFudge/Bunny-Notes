@@ -7,9 +7,10 @@ import { downloadNote } from './DownloadNote';
 import { NoteDetails } from '../zkp/generateProof';
 import { createQR } from '../qrcode/create';
 import { getNoteContractAddress, onBoardOrGetProvider, requestAccounts } from '../web3/web3';
-import { Stack, styled, Typography } from '@mui/material';
+import { Button, Stack, styled, Typography } from '@mui/material';
 import { EnterDenominationDialog } from './utils/EnterDenominationDialog';
 import { calculateFeeAndNote } from '../web3/calculateFeeAndNote';
+import { deleteSelectedNetworksFromSS } from '../storage/session';
 
 
 interface BunnyNotesPageProps extends Base {
@@ -117,6 +118,10 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
         setNoteFee(fee);
     }
 
+    const switchNetwork = () => {
+        // empty the session storage end refresh the page!
+        deleteSelectedNetworksFromSS()
+    }
 
     if (renderDownloadPage) {
         return downloadNote({
@@ -153,10 +158,12 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
                     </Stack>
                 </Stack>
                 <Stack sx={{ padding: "30px" }} direction={"row"} justifyContent="center">
-                    <Typography component="p" variant="subtitle1">Bunny Notes are financial claims for value that was deposited into a smart contract. Select the currency,enter the denomination, download the printable note and make a deposit to create one. It can be used to store value without a wallet or to transfer value.</Typography>
+                    <Typography component="p" variant="subtitle1">Bunny Notes are financial claims for value that was deposited into a smart contract. Select the currency, enter the denomination, download the printable note and make a deposit to create one. It can be used to store value without a wallet or to transfer value.</Typography>
+                </Stack>
+                <Stack direction={"row"} justifyContent="center">
+                    <Button onClick={() => switchNetwork()} >Switch Network</Button>
                 </Stack>
                 <CardGrid handleSelect={handleSelectBunnyNote} cardProps={getCardPropsData("Bunny Note", props.selectedNetwork)} ></CardGrid>
-
             </Paper>
             <EnterDenominationDialog displayError={props.displayError} isCustom={selectedCard.isCustom} showDialog={showDenominationInput} handleClose={handleCloseDenominationDialog} handleOk={handleAcceptDenominationDialog}></EnterDenominationDialog>
         </React.Fragment>
