@@ -140,6 +140,7 @@ contract BunnyNotes is ReentrancyGuard {
             !nullifierHashes[_nullifierHash],
             "The note has already been spent"
         );
+        require(commitments[_commitment].used, "Unused Note!");
         require(
             verifier.verifyProof(
                 [_proof[0], _proof[1]],
@@ -179,13 +180,13 @@ contract BunnyNotes is ReentrancyGuard {
         );
     }
 
-    /** @dev wether a giftcard is already spent */
+    /** @dev whether a BunnyNote is already spent */
 
     function isSpent(bytes32 _nullifierHash) public view returns (bool) {
         return nullifierHashes[_nullifierHash];
     }
 
-    /** Whether an array of giftcards is already spent */
+    /** Whether an array of BunnyNotes is already spent */
     function isSpentArray(
         bytes32[] calldata _nullifierHashes
     ) external view returns (bool[] memory spent) {

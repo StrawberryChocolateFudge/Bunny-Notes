@@ -246,6 +246,24 @@ describe("Bunny Notes", async function () {
         const nullified = await bunnyNotes.nullifierHashes(toNoteHex(parsedNote.deposit.nullifierHash));
         expect(nullified).to.be.true;
 
+        //tries to withdraw again and it should fail
+        let errorOccured = false;
+        let errorMessage = "";
+        try {
+            await bunnyNotes.withdraw(
+                packToSolidityProof(proofRes.proof),
+                toNoteHex(parsedNote.deposit.nullifierHash),
+                toNoteHex(parsedNote.deposit.commitment),
+                bob.address
+            );
+        } catch (err: any) {
+            errorOccured = true;
+            errorMessage = err.message;
+        }
+
+        expect(errorOccured).to.be.true;
+        expect(errorMessage.includes("The note has already been spent")).to.be.true;
+
     })
 
     it("alice creates an erc20 note and bob address withdraws it", async function () {
@@ -292,4 +310,31 @@ describe("Bunny Notes", async function () {
         expect(bobNewTokenBalance).to.equal(bobTokenbalance.add(denomination));
     })
 
+    it("Tests withdrawing an unbacked note", async function () {
+        const { owner, alice, bob, attacker, USDTM, Verifier, bunnyNotes, relayer, provider } = await setUpBunnyNotes();
+        const noteString1 = await deposit({ currency: "USDTM", amount: '100', netId: 1337 });
+        const parsedNote = await parseNote(noteString1);
+        const proofRes = await generateNoteWithdrawProof(
+            {
+                deposit: parsedNote.deposit,
+                recipient: bob.address
+            }
+        )
+        let errorOccured = false;
+        let errorMessage = "";
+        try {
+            const withdrawRes = await bunnyNotes.withdraw(
+                packToSolidityProof(proofRes.proof),
+                toNoteHex(parsedNote.deposit.nullifierHash),
+                toNoteHex(parsedNote.deposit.commitment),
+                bob.address
+            );
+        } catch (err: any) {
+            errorOccured = true;
+            errorMessage = err.message;
+        }
+
+        expect(errorOccured).to.be.true;
+        expect(errorMessage.includes("Unused Note!")).to.be.true;
+    })
 })
