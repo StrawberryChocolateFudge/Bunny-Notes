@@ -17,3 +17,11 @@ export function setSelectedNToSS(networkSelected) {
 export function getSelectedNFromSS() {
     return sessionStorage.getItem("networkSelected");
 }
+
+
+export function deleteSelectedNetworksFromSS() {
+    sessionStorage.removeItem("networkSelected");
+    sessionStorage.removeItem("networkId");
+    // Gonna also reload the page here
+    window.location.reload();
+}
