@@ -48,13 +48,16 @@ export default function getTheme() {
             MuiButton: {
                 styleOverrides: {
                     root: {
-                        textTransform: 'none',
+                        textTransform: 'none'
                     },
                     contained: {
                         boxShadow: 'none',
                         '&:active': {
                             boxShadow: 'none',
                         },
+                        "&:hover": {
+                            backgroundColor: '#a7e397'
+                        }
                     },
                 },
             },
