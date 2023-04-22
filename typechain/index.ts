@@ -37,6 +37,7 @@ export type { IVerifier } from "./IVerifier";
 export type { MOCKERC20 } from "./MOCKERC20";
 export type { MOCKERC721 } from "./MOCKERC721";
 export type { Verifier } from "./Verifier";
+export type { ZKBToken } from "./ZKBToken";
 
 export { Initializable__factory } from "./factories/Initializable__factory";
 export { ReentrancyGuardUpgradeable__factory } from "./factories/ReentrancyGuardUpgradeable__factory";
@@ -74,3 +75,4 @@ export { IVerifier__factory } from "./factories/IVerifier__factory";
 export { MOCKERC20__factory } from "./factories/MOCKERC20__factory";
 export { MOCKERC721__factory } from "./factories/MOCKERC721__factory";
 export { Verifier__factory } from "./factories/Verifier__factory";
+export { ZKBToken__factory } from "./factories/ZKBToken__factory";

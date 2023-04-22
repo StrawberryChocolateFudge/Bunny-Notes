@@ -1,7 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { Contract } from "ethers";
 import { ethers } from "hardhat";
-import { BunnyNotes, MOCKERC20 } from "../typechain";
+import { BunnyNotes, ERC20, MOCKERC20 } from "../typechain";
 
 import { expect } from "chai";
 
@@ -30,13 +30,17 @@ export async function expectRevert(callback: CallableFunction, errorMessage: str
 
 }
 
-export async function setUpBunnyNotes(): Promise<{ owner: SignerWithAddress, alice: SignerWithAddress, bob: SignerWithAddress, USDTM: MOCKERC20, Verifier: Contract, relayer: SignerWithAddress, bunnyNotes: BunnyNotes, provider: any, attacker: SignerWithAddress }> {
+export async function setUpBunnyNotes(): Promise<{ owner: SignerWithAddress, alice: SignerWithAddress, bob: SignerWithAddress, USDTM: MOCKERC20, Verifier: Contract, relayer: SignerWithAddress, bunnyNotes: BunnyNotes, provider: any, attacker: SignerWithAddress, feelesstoken: MOCKERC20 }> {
     const [owner, alice, bob, attacker, relayer] = await ethers.getSigners();
 
     const MockERC20Factory = await ethers.getContractFactory("MOCKERC20");
     const MockERC20 = await MockERC20Factory.deploy();
     const USDTM = await MockERC20.deployed();
 
+
+    const FeeLessTokenFactory = await ethers.getContractFactory("MOCKERC20");
+    const feelessTokenDeploy = await FeeLessTokenFactory.deploy();
+    const feelesstoken = await feelessTokenDeploy.deployed();
     // Mint some USDTOM to the owner
 
     await USDTM.mint(owner.address, ethers.utils.parseEther("100"));
@@ -46,10 +50,10 @@ export async function setUpBunnyNotes(): Promise<{ owner: SignerWithAddress, ali
     const Verifier = await VerifierDeploy.deployed();
 
     const BunnyNotesFactory = await ethers.getContractFactory("BunnyNotes");
-    const bunnyNotesDeploy = await BunnyNotesFactory.deploy(Verifier.address);
+    const bunnyNotesDeploy = await BunnyNotesFactory.deploy(Verifier.address, feelesstoken.address);
     const bunnyNotes = await bunnyNotesDeploy.deployed();
 
     const provider = ethers.provider;
 
-    return { owner, alice, bob, attacker, USDTM, Verifier, bunnyNotes, relayer, provider }
+    return { owner, alice, bob, attacker, USDTM, Verifier, bunnyNotes, relayer, provider, feelesstoken }
 }

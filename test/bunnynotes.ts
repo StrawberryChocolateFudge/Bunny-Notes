@@ -337,4 +337,49 @@ describe("Bunny Notes", async function () {
         expect(errorOccured).to.be.true;
         expect(errorMessage.includes("Unused Note!")).to.be.true;
     })
+
+    it("Testing Feeless token", async function () {
+        const { owner, alice, bob, attacker, USDTM, Verifier, bunnyNotes, relayer, provider, feelesstoken } = await setUpBunnyNotes();
+
+        const noteString = await deposit({ currency: "ZKB", amount: "100", netId: 1337 });
+        const parsedNote = await parseNote(noteString);
+
+        let feelessAddress = await bunnyNotes.feelessToken();
+        expect(feelessAddress).to.equal(feelesstoken.address);
+
+        await feelesstoken.connect(bob).approve(bunnyNotes.address, ethers.utils.parseEther("100"));
+        await feelesstoken.mint(bob.address, ethers.utils.parseEther("100"));
+
+        // I can just deposit the feeless token without fees :) 
+
+        await bunnyNotes.connect(bob).depositToken(
+            toNoteHex(parsedNote.deposit.commitment),
+            ethers.utils.parseEther("100"),
+            feelesstoken.address
+        );
+        // The token was deposited without using fees :) 
+        const commitment = await bunnyNotes.commitments(
+            toNoteHex(parsedNote.deposit.commitment));
+
+        expect(commitment.usesToken).to.be.true;
+        expect(commitment.token).to.equal(feelesstoken.address);
+
+        let errorOccured = false;
+        let errorMessage = "";
+
+        try {
+            await bunnyNotes.connect(bob).setFeelessToken(USDTM.address);
+        } catch (err: any) {
+            errorOccured = true;
+            errorMessage = err.message;
+        }
+        console.log(errorMessage);
+        expect(errorOccured).to.be.true;
+        expect(errorMessage.includes("Only owner")).to.be.true;
+
+        await bunnyNotes.setFeelessToken(USDTM.address);
+
+        feelessAddress = await bunnyNotes.feelessToken();
+        expect(feelessAddress).to.equal(USDTM.address);
+    })
 })

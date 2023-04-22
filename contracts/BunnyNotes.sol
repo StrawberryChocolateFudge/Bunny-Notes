@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-
 interface IVerifier {
     function verifyProof(
         uint256[2] memory a,
@@ -34,6 +33,8 @@ contract BunnyNotes is ReentrancyGuard {
     IVerifier public immutable verifier;
 
     address payable public _owner;
+
+    address public feelessToken; // The owner can specify one token that has no fees!
 
     uint256 public constant feeDivider = 100; // 1% fee will be used. This is the amount to divide the denomination to calculate the fee
 
@@ -65,9 +66,15 @@ contract BunnyNotes is ReentrancyGuard {
         @param _verifier is the address of SNARK verifier contract        
     */
 
-    constructor(IVerifier _verifier) {
+    constructor(IVerifier _verifier, address _feelessToken) {
         verifier = _verifier;
         _owner = payable(msg.sender);
+        feelessToken = _feelessToken;
+    }
+
+    function setFeelessToken(address newFeelesstoken) external {
+        require(msg.sender == _owner, "Only owner");
+        feelessToken = newFeelesstoken;
     }
 
     function depositEth(
@@ -111,8 +118,12 @@ contract BunnyNotes is ReentrancyGuard {
         commitments[_commitment].token = IERC20(token);
         uint256 fee = calculateFee(denomination);
         IERC20(token).safeTransferFrom(msg.sender, address(this), denomination);
-        // Send the owner the fee
-        IERC20(token).safeTransferFrom(msg.sender, _owner, fee);
+
+        // The owner can set 1 token to be without fees!
+        if (token != feelessToken) {
+            // Send the owner the fee
+            IERC20(token).safeTransferFrom(msg.sender, _owner, fee);
+        }
 
         emit DepositToken(
             _commitment,

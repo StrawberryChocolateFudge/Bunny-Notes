@@ -160,6 +160,10 @@ declare module "hardhat/types/runtime" {
       name: "Verifier",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Verifier__factory>;
+    getContractFactory(
+      name: "ZKBToken",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ZKBToken__factory>;
 
     getContractAt(
       name: "Initializable",
@@ -346,6 +350,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Verifier>;
+    getContractAt(
+      name: "ZKBToken",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ZKBToken>;
 
     // default types
     getContractFactory(

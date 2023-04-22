@@ -28,9 +28,11 @@ interface BunnyNotesInterface extends ethers.utils.Interface {
     "depositEth(bytes32,uint256)": FunctionFragment;
     "depositToken(bytes32,uint256,address)": FunctionFragment;
     "feeDivider()": FunctionFragment;
+    "feelessToken()": FunctionFragment;
     "isSpent(bytes32)": FunctionFragment;
     "isSpentArray(bytes32[])": FunctionFragment;
     "nullifierHashes(bytes32)": FunctionFragment;
+    "setFeelessToken(address)": FunctionFragment;
     "verifier()": FunctionFragment;
     "withdraw(uint256[8],bytes32,bytes32,address)": FunctionFragment;
   };
@@ -56,6 +58,10 @@ interface BunnyNotesInterface extends ethers.utils.Interface {
     functionFragment: "feeDivider",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "feelessToken",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "isSpent", values: [BytesLike]): string;
   encodeFunctionData(
     functionFragment: "isSpentArray",
@@ -64,6 +70,10 @@ interface BunnyNotesInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "nullifierHashes",
     values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setFeelessToken",
+    values: [string]
   ): string;
   encodeFunctionData(functionFragment: "verifier", values?: undefined): string;
   encodeFunctionData(
@@ -100,6 +110,10 @@ interface BunnyNotesInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "feeDivider", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "feelessToken",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "isSpent", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isSpentArray",
@@ -107,6 +121,10 @@ interface BunnyNotesInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "nullifierHashes",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setFeelessToken",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "verifier", data: BytesLike): Result;
@@ -239,6 +257,8 @@ export class BunnyNotes extends BaseContract {
 
     feeDivider(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    feelessToken(overrides?: CallOverrides): Promise<[string]>;
+
     isSpent(
       _nullifierHash: BytesLike,
       overrides?: CallOverrides
@@ -253,6 +273,11 @@ export class BunnyNotes extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    setFeelessToken(
+      newFeelesstoken: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     verifier(overrides?: CallOverrides): Promise<[string]>;
 
@@ -321,6 +346,8 @@ export class BunnyNotes extends BaseContract {
 
   feeDivider(overrides?: CallOverrides): Promise<BigNumber>;
 
+  feelessToken(overrides?: CallOverrides): Promise<string>;
+
   isSpent(
     _nullifierHash: BytesLike,
     overrides?: CallOverrides
@@ -332,6 +359,11 @@ export class BunnyNotes extends BaseContract {
   ): Promise<boolean[]>;
 
   nullifierHashes(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+
+  setFeelessToken(
+    newFeelesstoken: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   verifier(overrides?: CallOverrides): Promise<string>;
 
@@ -400,6 +432,8 @@ export class BunnyNotes extends BaseContract {
 
     feeDivider(overrides?: CallOverrides): Promise<BigNumber>;
 
+    feelessToken(overrides?: CallOverrides): Promise<string>;
+
     isSpent(
       _nullifierHash: BytesLike,
       overrides?: CallOverrides
@@ -414,6 +448,11 @@ export class BunnyNotes extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    setFeelessToken(
+      newFeelesstoken: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     verifier(overrides?: CallOverrides): Promise<string>;
 
@@ -552,6 +591,8 @@ export class BunnyNotes extends BaseContract {
 
     feeDivider(overrides?: CallOverrides): Promise<BigNumber>;
 
+    feelessToken(overrides?: CallOverrides): Promise<BigNumber>;
+
     isSpent(
       _nullifierHash: BytesLike,
       overrides?: CallOverrides
@@ -565,6 +606,11 @@ export class BunnyNotes extends BaseContract {
     nullifierHashes(
       arg0: BytesLike,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    setFeelessToken(
+      newFeelesstoken: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     verifier(overrides?: CallOverrides): Promise<BigNumber>;
@@ -615,6 +661,8 @@ export class BunnyNotes extends BaseContract {
 
     feeDivider(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    feelessToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     isSpent(
       _nullifierHash: BytesLike,
       overrides?: CallOverrides
@@ -628,6 +676,11 @@ export class BunnyNotes extends BaseContract {
     nullifierHashes(
       arg0: BytesLike,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    setFeelessToken(
+      newFeelesstoken: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     verifier(overrides?: CallOverrides): Promise<PopulatedTransaction>;
