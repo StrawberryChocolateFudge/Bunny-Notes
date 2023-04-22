@@ -2,6 +2,7 @@ import { Button, Card, Checkbox, Dialog, DialogContent, DialogContentText, Dialo
 import React from "react";
 import { setTermsAcceptedToLS } from "../../storage/local";
 import { setSelectedNToSS } from "../../storage/session";
+import { networkButtons, NetworkSelectProps } from "../../web3/cardPropsData";
 import { BTTCTESTNETID, handleNetworkSelect } from "../../web3/web3";
 import { CheckWebsiteURLWarning } from "./CheckWebsiteURLWarning";
 import { TermsCheckbox } from "./TermsCheckbox";
@@ -42,13 +43,6 @@ export function SelectNetwork(props: SelectNetworkProps) {
 }
 
 
-type NetworkSelectProps = {
-    tooltipTitle: string,
-    chainId: string,
-    imageAlt: string,
-    imageSrc: string,
-    cardTypography: string,
-}
 
 type NetworkSelectButtonBuilderProps = {
     networks: NetworkSelectProps[],
@@ -65,22 +59,6 @@ export function NetworkSelectButtonBuilder(props: NetworkSelectButtonBuilderProp
         </Button></Tooltip>)
 }
 
-const networkButtons: NetworkSelectProps[] = [
-    {
-        tooltipTitle: "Select Bittorrent Chain",
-        chainId: "0x405",
-        imageAlt: "Bittorrent Chain",
-        imageSrc: "/imgs/bttLogo.svg",
-        cardTypography: "BTTC Testnet"
-    }
-    // {
-    //     tooltipTitle: " Select Fantom",
-    //     chainId: "0xfa2",
-    //     imageAlt: "Fantom",
-    //     imageSrc: "/imgs/FantomLogo.svg",
-    //     cardTypography: "Fantom Testnet"
-    // }
-]
 
 
 export function SelectNetworkDialog(props: SelectNetworkProps) {
@@ -130,6 +108,7 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
         <CheckWebsiteURLWarning />
 
         <DialogTitle sx={{ paddingBottom: "0", marginBottom: "0", display: "flex", justifyContent: "center" }}><IMG alt="Bunny Notes Title" src="/imgs/BunnyNotes.svg" /></DialogTitle>
+        {/* <Button sx={{ margin: "0 auto" }}>Visit the Token Sale Page</Button> */}
         <DialogContent>
             <DialogContentText sx={{ textAlign: "center" }}>
                 Select the network to continue

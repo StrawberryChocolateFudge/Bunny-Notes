@@ -7,6 +7,8 @@ export const BTTCTESTNETID = "0x405";
 
 export const FANTOMTESTNETID = "0xfa2";
 
+export const BSCTESTNETID = "0x61";
+
 export const BTT_BUNNYNOTES_DONAU = "0x3bc314B9448E1E33921a9E146bFdA16639a11e4F";
 
 export const ZEROADDRESS = "0x0000000000000000000000000000000000000000"
@@ -188,6 +190,9 @@ export async function onboardOrSwitchNetwork(networkId, handleError) {
         case FANTOMTESTNETID:
             await switchToFantomTestnet();
             return true;
+        case BSCTESTNETID:
+            await switchToBSCTestnet();
+            return true;
         default:
             return false;
     }
@@ -230,6 +235,17 @@ export async function switchToDonauTestnet() {
     if (!switched) {
         // If I cannot switch to it I try to add it!
         await ethereumRequestAddChain(hexchainId, chainName, "BTT", "BTT", 18, rpcUrls, blockExplorerUrls);
+    }
+}
+
+export async function switchToBSCTestnet() {
+    const hexChainId = BSCTESTNETID;
+    const chainName = "Binance Chain Testnet";
+    const rpcUrls = ["https://data-seed-prebsc-1-s3.binance.org:8545/"];
+    const blockExplorerUrls = ["https://testnet.bscscan.com/"];
+    const switched = await switch_to_Chain(hexChainId);
+    if (!switched) {
+        await ethereumRequestAddChain(hexChainId, chainName, "BNB", "BNB", 18, rpcUrls, blockExplorerUrls);
     }
 }
 
