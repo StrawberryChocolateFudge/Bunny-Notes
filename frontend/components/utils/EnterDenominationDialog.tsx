@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogContent, DialogContentText, DialogTitle, Divider, Stack, TextField } from "@mui/material"
+import { Button, Dialog, DialogContent, DialogContentText, Divider, Stack, TextField } from "@mui/material"
 import { isAddress } from "ethers/lib/utils";
 import React from "react"
 
@@ -7,6 +7,7 @@ interface EnterDenominationDialogProps {
     handleClose: CallableFunction,
     showDialog: boolean,
     isCustom: boolean,
+    isFeeless: boolean
     displayError: CallableFunction
 }
 
@@ -69,8 +70,11 @@ export function EnterDenominationDialog(props: EnterDenominationDialogProps) {
                 <TextField autoFocus={!props.isCustom} sx={{ marginBottom: "10px" }} autoComplete="off" placeholder="Face Value" label="Denomination" type={"number"} value={amount} onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                     setAmount(event.target.value);
                 }}></TextField>
+
                 <DialogContentText>
-                    The entered denomination is the note's face value. A 1% fee is charged on deposit.
+                    {props.isFeeless
+                        ? "The entered denomination is the note's face value. There is no deposit fee!"
+                        : "The entered denomination is the note's face value. A 1% fee is charged on deposit."}
                 </DialogContentText>
             </Stack>
             <Divider sx={{ marginBottom: "10px" }} light />

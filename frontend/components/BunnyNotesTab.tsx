@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import CardGrid, { CardType } from './CardGrid';
-import { getCardPropsData } from './utils/cardPropsData';
 import { Base } from './Base';
 import { downloadNote } from './DownloadNote';
 import { NoteDetails } from '../zkp/generateProof';
@@ -11,6 +10,7 @@ import { Button, Stack, styled, Typography } from '@mui/material';
 import { EnterDenominationDialog } from './utils/EnterDenominationDialog';
 import { calculateFeeAndNote } from '../web3/calculateFeeAndNote';
 import { deleteSelectedNetworksFromSS } from '../storage/session';
+import { getCardPropsData } from '../web3/cardPropsData';
 
 
 interface BunnyNotesPageProps extends Base {
@@ -64,8 +64,7 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
 
     const [showDenominationInput, setShowDenominationInput] = React.useState(false);
 
-    const [selectedCard, setSelectedCard] = React.useState({ tokenAddress: "", cardType: "", currency: "", isCustom: false });
-
+    const [selectedCard, setSelectedCard] = React.useState({ tokenAddress: "", cardType: "", currency: "", isCustom: false, isFeeless: false });
 
     React.useEffect(() => {
         async function getQRCode() {
@@ -96,8 +95,8 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
         }
     }
 
-    const handleSelectBunnyNote = async (currency: string, cardType: CardType, tokenAddress: string, isCustom: boolean) => {
-        setSelectedCard({ currency, cardType, tokenAddress, isCustom });
+    const handleSelectBunnyNote = async (currency: string, cardType: CardType, tokenAddress: string, isCustom: boolean, isFeeless: boolean) => {
+        setSelectedCard({ currency, cardType, tokenAddress, isCustom, isFeeless });
         setShowDenominationInput(true);
     }
 
@@ -115,7 +114,13 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
         setRenderDownloadPage(true);
         setNoteDetails(noteDetails);
         setNoteAddresses([token, noteContractAddr]);
-        setNoteFee(fee);
+
+        if (selectedCard.isFeeless) {
+            setNoteFee("0");
+        } else {
+            setNoteFee(fee);
+        }
+
     }
 
     const switchNetwork = () => {
@@ -141,7 +146,8 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
             downloadClicked,
             setDownloadClicked,
             displayError: props.displayError,
-            provider: props.provider
+            provider: props.provider,
+            isFeeless: selectedCard.isFeeless
         })
     }
 
@@ -165,7 +171,7 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
                 </Stack>
                 <CardGrid handleSelect={handleSelectBunnyNote} cardProps={getCardPropsData("Bunny Note", props.selectedNetwork)} ></CardGrid>
             </Paper>
-            <EnterDenominationDialog displayError={props.displayError} isCustom={selectedCard.isCustom} showDialog={showDenominationInput} handleClose={handleCloseDenominationDialog} handleOk={handleAcceptDenominationDialog}></EnterDenominationDialog>
+            <EnterDenominationDialog displayError={props.displayError} isFeeless={selectedCard.isFeeless} isCustom={selectedCard.isCustom} showDialog={showDenominationInput} handleClose={handleCloseDenominationDialog} handleOk={handleAcceptDenominationDialog}></EnterDenominationDialog>
         </React.Fragment>
     );
 }

@@ -7,7 +7,7 @@ export const BTTCTESTNETID = "0x405";
 
 export const FANTOMTESTNETID = "0xfa2";
 
-export const BTT_BUNNYNOTES_DONAU = "0x9598B4A28dd48D3b4b4C8A862D3220290D8dDE1b";
+export const BTT_BUNNYNOTES_DONAU = "0x3bc314B9448E1E33921a9E146bFdA16639a11e4F";
 
 export const ZEROADDRESS = "0x0000000000000000000000000000000000000000"
 
@@ -295,7 +295,7 @@ export async function depositToken(contract: any, commitment: string, denominati
 }
 
 
-export async function withdraw(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recipient: string, ) {
+export async function withdraw(contract: any, solidityProof: any, nullifierHash: string, commitment: string, recipient: string,) {
     return await contract.withdraw(solidityProof, nullifierHash, commitment, recipient);
 }
 
@@ -320,6 +320,14 @@ export async function bunnyNoteIsSpent(contract: any, nullifierHash: any) {
 
 export async function bunnyNoteIsSpentArray(contract: any, nullifierHashesArray: Array<string>) {
     return await contract.isSpent(nullifierHashesArray);
+}
+
+export async function getFeelessToken(contract: any) {
+    return await contract.feelessToken();
+}
+
+export function isFeelessToken(requestedToken: string, fetchedToken: string) {
+    return requestedToken.toLowerCase() === fetchedToken.toLowerCase();
 }
 
 export async function calculateFee(contract: any, denomination: BigNumber) {

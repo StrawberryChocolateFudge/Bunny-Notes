@@ -5,7 +5,7 @@ import { downloadA4PDF, downloadPDF } from "../pdf";
 import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
 import { ethers } from "ethers";
-import { bunnyNotesCommitments, calculateFee, depositETH, depositToken, ERC20Approve, getChainId, getContract, getNetworkNameFromId, onboardOrSwitchNetwork, requestAccounts, ZEROADDRESS } from "../web3/web3";
+import { bunnyNotesCommitments, calculateFee, depositETH, depositToken, ERC20Approve, getChainId, getContract, getFeelessToken, getNetworkNameFromId, isFeelessToken, onboardOrSwitchNetwork, requestAccounts, ZEROADDRESS } from "../web3/web3";
 import { parseEther } from "ethers/lib/utils";
 import { commitmentQR } from "../qrcode/create";
 
@@ -27,6 +27,7 @@ interface DownloadNoteProps {
     navigateToVerifyPage: (noteDetails: NoteDetails) => void;
     depositButtonDisabled: boolean;
     setDepositButtonDisabled: (to: boolean) => void;
+    isFeeless: boolean;
 }
 
 
@@ -44,57 +45,10 @@ export function downloadNote(props: DownloadNoteProps) {
     const noteAddress = props.noteAddresses[1];
     // Native tokens need no approval to spend!
     const isNativeToken = erc20Address === ZEROADDRESS;
-    const Img = styled('img')({
-        margin: 'auto',
-        display: 'block',
-        maxWidth: '100%',
-        maxHeight: '100%',
-    });
 
     const networkName = getNetworkNameFromId(props.selectedNetwork);
 
-
     const bearerText = `The smart contract on ${networkName} will pay the bearer on demand the sum of ${denominationAndCurr}`
-
-    const noteDisplay = () => {
-        return <Grid item>
-            <Paper
-                id="NOTE"
-                sx={{
-                    p: 2,
-                    margin: 'auto',
-                    maxWidth: "100%",
-                    flexGrow: 1,
-                    backgroundColor: "white"
-                }}
-            >
-                <Typography sx={{ marginLeft: "5px" }} variant="subtitle2" color="text.secondary">{bearerText}</Typography>
-
-                <Grid container spacing={2}>
-
-                    <Grid item xs container direction="column" spacing={2}>
-                        <Grid item xs>
-                            <Typography gutterBottom variant="subtitle1" component="div">
-                                Bunny Note
-                            </Typography>
-                            <Typography variant="body2" gutterBottom>
-                                {denominationAndCurr}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                bunnynotes.finance
-                            </Typography>
-                        </Grid>
-                    </Grid>
-                </Grid>
-
-            </Paper>
-            <Stack sx={{ textAlign: "center" }}>
-                <Typography variant="subtitle2" component="div">
-                    Deposit Fee: {displayedFee}
-                </Typography>
-            </Stack>
-        </Grid>
-    }
 
     const handleDepositTx = async (tx) => {
         if (tx !== undefined) {
@@ -110,23 +64,44 @@ export function downloadNote(props: DownloadNoteProps) {
         }
     }
 
-    const handleApprovalTx = async (tx) => {
+    const handleApprovalTx = async (tx, notesContract, deposit) => {
         if (tx !== undefined) {
-            await tx.wait().then((receipt) => {
+            await tx.wait().then(async (receipt) => {
                 if (receipt.status === 1) {
-                    props.setDepositButtonDisabled(false);
+                    await handleDepositToken(notesContract, deposit)
                 }
             })
         }
     }
 
+    const handleDepositToken = async (notesContract, deposit) => {
+        const tx = await depositToken(notesContract, toNoteHex(deposit.commitment), parseEther(amount), erc20Address).catch(err => {
+            if (err.message.includes("underlying network changed")) {
+                props.displayError("Underlying error changed! Refresh the application!")
+                return;
+            }
+
+
+            props.displayError("Unable to deposit ERC20 Note");
+            props.setDepositButtonDisabled(false);
+        });
+        await handleDepositTx(tx);
+    }
+
     const depositWithOwnerAddress = async () => {
+        const notesContract = await getContract(props.provider, noteAddress, "/BunnyNotes.json");
+        const deposit = noteDetails[1].deposit;
+        const commitments = await bunnyNotesCommitments(notesContract, toNoteHex(deposit.commitment));
+        if (commitments.used) {
+            props.displayError("Invalid commitment. Deposit already exists!");
+            return;
+        }
 
         if (props.showApproval && !isNativeToken) {
             // approve the spend, need to approve for the fee
-            const contract = await getContract(props.provider, noteAddress, "/BunnyNotes.json");
-            const fee = await calculateFee(contract, parseEther(amount));
-            const approveAmount = fee.add(ethers.utils.parseEther(noteDetails[1].amount));
+            const fee = await calculateFee(notesContract, parseEther(amount));
+            const approveAmount = props.isFeeless ? ethers.utils.parseEther(noteDetails[1].amount) : fee.add(ethers.utils.parseEther(noteDetails[1].amount));
+
             const ERC20Contract = await getContract(props.provider, erc20Address, "/ERC20.json");
             props.setDepositButtonDisabled(true);
             props.setShowApproval(false);
@@ -134,20 +109,11 @@ export function downloadNote(props: DownloadNoteProps) {
                 props.setShowApproval(true);
             });
 
-            await handleApprovalTx(tx);
+            await handleApprovalTx(tx, notesContract, deposit);
             return;
         } else {
             props.setDepositButtonDisabled(true);
-            // after succesful approval  I can prompt the user to deposit the tokens to add value to the note
-            const notesContract = await getContract(props.provider, noteAddress, "/BunnyNotes.json");
-            const deposit = noteDetails[1].deposit;
             // Check if the commitment exists already to stop the deposit!
-            const commitments = await bunnyNotesCommitments(notesContract, toNoteHex(deposit.commitment));
-            if (commitments.used) {
-                props.displayError("Invalid commitment. Deposit already exists!");
-                props.setDepositButtonDisabled(false);
-                return;
-            }
             if (isNativeToken) {
                 const tx = await depositETH(notesContract, toNoteHex(deposit.commitment), parseEther(amount)).catch(err => {
                     props.displayError("Unable to deposit  Note");
@@ -163,17 +129,7 @@ export function downloadNote(props: DownloadNoteProps) {
                 await handleDepositTx(tx);
                 return;
             } else {
-                const tx = await depositToken(notesContract, toNoteHex(deposit.commitment), parseEther(amount), erc20Address).catch(err => {
-                    if (err.message.includes("underlying network changed")) {
-                        props.displayError("Underlying error changed! Refresh the application!")
-                        return;
-                    }
-
-
-                    props.displayError("Unable to deposit ERC20 Note");
-                    props.setDepositButtonDisabled(false);
-                });
-                await handleDepositTx(tx);
+                await handleDepositToken(notesContract, deposit)
                 return;
             }
         }
@@ -252,12 +208,13 @@ export function downloadNote(props: DownloadNoteProps) {
                         <Stack sx={{ textAlign: "center" }}>
                             <Typography variant="h6" component="div">{"Deposit " + denominationAndCurr}</Typography>
                         </Stack>
-                        <Stack sx={{ textAlign: "center" }}>
-                            <Typography variant="subtitle2" component="div">
-                                plus 1% fee ({displayedFee})
-                            </Typography>
-                        </Stack>
-                        <Grid item sx={{ textAlign: "center", paddingBottom: "20px" }}>
+                        {props.isFeeless ? null :
+                            <Stack sx={{ textAlign: "center" }}>
+                                <Typography variant="subtitle2" component="div">
+                                    plus 1% fee ({displayedFee})
+                                </Typography>
+                            </Stack>}
+                        <Grid item sx={{ textAlign: "center", paddingBottom: "20px", marginTop: "20px" }}>
 
                             {props.showApproval && !isNativeToken ? <Tooltip arrow title={"Approve spending " + denominationAndCurr + ` (plus ${displayedFee} fee)`}>
                                 <span><Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend</Button></span></Tooltip> : <Tooltip arrow title={"Deposit " + denominationAndCurr + ` (plus ${displayedFee} fee)`}>
