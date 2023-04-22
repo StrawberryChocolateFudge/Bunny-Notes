@@ -36,6 +36,7 @@ export type { BunnyNotes } from "./BunnyNotes";
 export type { IVerifier } from "./IVerifier";
 export type { MOCKERC20 } from "./MOCKERC20";
 export type { MOCKERC721 } from "./MOCKERC721";
+export type { TokenSale } from "./TokenSale";
 export type { Verifier } from "./Verifier";
 export type { ZKBToken } from "./ZKBToken";
 
@@ -74,5 +75,6 @@ export { BunnyNotes__factory } from "./factories/BunnyNotes__factory";
 export { IVerifier__factory } from "./factories/IVerifier__factory";
 export { MOCKERC20__factory } from "./factories/MOCKERC20__factory";
 export { MOCKERC721__factory } from "./factories/MOCKERC721__factory";
+export { TokenSale__factory } from "./factories/TokenSale__factory";
 export { Verifier__factory } from "./factories/Verifier__factory";
 export { ZKBToken__factory } from "./factories/ZKBToken__factory";

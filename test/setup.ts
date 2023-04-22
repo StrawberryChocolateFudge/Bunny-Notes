@@ -1,7 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { Contract } from "ethers";
 import { ethers } from "hardhat";
-import { BunnyNotes, ERC20, MOCKERC20 } from "../typechain";
+import { BunnyNotes, ERC20, MOCKERC20, TokenSale } from "../typechain";
 
 import { expect } from "chai";
 
@@ -30,7 +30,7 @@ export async function expectRevert(callback: CallableFunction, errorMessage: str
 
 }
 
-export async function setUpBunnyNotes(): Promise<{ owner: SignerWithAddress, alice: SignerWithAddress, bob: SignerWithAddress, USDTM: MOCKERC20, Verifier: Contract, relayer: SignerWithAddress, bunnyNotes: BunnyNotes, provider: any, attacker: SignerWithAddress, feelesstoken: MOCKERC20 }> {
+export async function setUpBunnyNotes(): Promise<{ owner: SignerWithAddress, alice: SignerWithAddress, bob: SignerWithAddress, USDTM: MOCKERC20, Verifier: Contract, relayer: SignerWithAddress, bunnyNotes: BunnyNotes, provider: any, attacker: SignerWithAddress, feelesstoken: MOCKERC20, tokensale: TokenSale }> {
     const [owner, alice, bob, attacker, relayer] = await ethers.getSigners();
 
     const MockERC20Factory = await ethers.getContractFactory("MOCKERC20");
@@ -53,7 +53,12 @@ export async function setUpBunnyNotes(): Promise<{ owner: SignerWithAddress, ali
     const bunnyNotesDeploy = await BunnyNotesFactory.deploy(Verifier.address, feelesstoken.address);
     const bunnyNotes = await bunnyNotesDeploy.deployed();
 
+    const TokenSaleFactory = await ethers.getContractFactory("TokenSale");
+    const tokensaleDeploy = await TokenSaleFactory.deploy(relayer.address, USDTM.address);
+    const tokensale = await tokensaleDeploy.deployed();
+
+
     const provider = ethers.provider;
 
-    return { owner, alice, bob, attacker, USDTM, Verifier, bunnyNotes, relayer, provider, feelesstoken }
+    return { owner, alice, bob, attacker, USDTM, Verifier, bunnyNotes, relayer, provider, feelesstoken, tokensale }
 }
