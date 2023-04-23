@@ -1,7 +1,8 @@
 import { expect } from "chai";
 import { setUpBunnyNotes } from "./setup";
-
+import { tokensalePriceCalculator } from "../frontend/web3/web3";
 import { ethers } from "hardhat";
+import { formatEther } from "ethers/lib/utils";
 
 describe("Crowdsale", async function () {
     it("tokensale", async function () {
@@ -39,7 +40,7 @@ describe("Crowdsale", async function () {
 
         bobBalance = await USDTM.balanceOf(bob.address);
 
-        expect(bobBalance).to.equal(ethers.utils.parseEther("10000"));
+        expect(bobBalance).to.equal(ethers.utils.parseEther("15000"));
         relayerTokenBalance = await USDTM.balanceOf(relayer.address);
 
         const relayerEthBalanceAgain = await relayer.getBalance();
@@ -47,11 +48,11 @@ describe("Crowdsale", async function () {
 
         tokensSold = await tokensale.getTokensSold();
 
-        expect(tokensSold).to.equal(ethers.utils.parseEther("10000"));
+        expect(tokensSold).to.equal(ethers.utils.parseEther("15000"));
 
         let tokensLeft = await tokensale.getTokensLeft();
 
-        expect(tokensLeft).to.equal(ethers.utils.parseEther("49990000"))
+        expect(tokensLeft).to.equal(ethers.utils.parseEther("49985000"))
 
         // Now I buy all the tokens
         // 50 000 000 - 10 000
@@ -70,10 +71,10 @@ describe("Crowdsale", async function () {
         expect(errorOccured).to.be.true;
         expect(errorMessage.includes("Exceeds allowed limit")).to.be.true;
 
-        await tokensale.connect(bob).buyTokens({ value: ethers.utils.parseEther("4999") });
+        await tokensale.connect(bob).buyTokens({ value: ethers.utils.parseEther("3332") });
 
         tokensSold = await tokensale.getTokensSold();
-        expect(tokensSold).to.equal(ethers.utils.parseEther("50000000"))
+        expect(tokensSold).to.equal(ethers.utils.parseEther("49995000"))
         tokensLeft = await tokensale.getTokensLeft();
         errorOccured = false;
 
@@ -86,6 +87,24 @@ describe("Crowdsale", async function () {
 
         expect(errorOccured).to.be.true;
         expect(errorMessage.includes("Exceeds allowed limit")).to.be.true;
+
+    })
+
+    it("front end token sale counter", async function () {
+        const { tokensale } = await setUpBunnyNotes();
+        let price = tokensalePriceCalculator("1");
+        expect(formatEther(price)).to.equal("15000.0");
+
+        let tokenAmount = await tokensale.getTokenAmount(ethers.utils.parseEther("1"));
+        expect(price).to.equal(tokenAmount);
+
+        price = tokensalePriceCalculator("0.232");
+        tokenAmount = await tokensale.getTokenAmount(ethers.utils.parseEther("0.232"));
+        expect(price).to.equal(tokenAmount);
+
+        price = tokensalePriceCalculator("12.232");
+        tokenAmount = await tokensale.getTokenAmount(ethers.utils.parseEther("12.232"));
+        expect(price).to.equal(tokenAmount);
 
     })
 })
