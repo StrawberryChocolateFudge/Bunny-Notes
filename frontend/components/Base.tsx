@@ -25,6 +25,7 @@ import { getCurrenttNetworkFromSS, getSelectedNFromSS } from '../storage/session
 import { NoteDetails } from '../zkp/generateProof';
 import { TermsPage } from './TermsPage';
 import { getTermsAcceptedInit } from './utils/TermsCheckbox';
+import { TokenSalePage } from './TokenSalePage';
 
 export interface Base {
     myAddress: string,
@@ -196,9 +197,9 @@ export default function Base() {
         return (<BrowserRouter>
             <Routes>
                 <Route path="/" element={mainRoute()}></Route>
-                {/* <Route path="/paymentRequest/:payTo/:amount/:currency/:network" element={<PaymentRequestPage {...genericProps}></PaymentRequestPage>}></Route> */}
                 <Route path="*" element={<NotFoundPage></NotFoundPage>} />
                 <Route path="/terms" element={<TermsPage></TermsPage>}></Route>
+                <Route path="/tokensale" element={<TokenSalePage displayError={openSnackbar}></TokenSalePage>}></Route>
             </Routes>
         </BrowserRouter>)
     }
