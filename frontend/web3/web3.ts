@@ -11,12 +11,25 @@ export const BSCTESTNETID = "0x61";
 
 export const BTT_BUNNYNOTES_DONAU = "0x3bc314B9448E1E33921a9E146bFdA16639a11e4F";
 
+export const BUNNYNOTES_BSC_TESTNET = "0xF273919f7e9239D5C8C70f49368fF80c0a91064A";
+
+export const BUNNYNOTES_TOKENSALE_TESTNET = "0x57ca49c07328da62335Fc450176C274157C01eB6";
+
+export const ZKBTokenAddress_BSC = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7" 
+
+
+export const tokensalePriceCalculator = (bnbAmount: string) => {
+    return parseEther(bnbAmount).mul(15000);
+}
+
 export const ZEROADDRESS = "0x0000000000000000000000000000000000000000"
 
-export function getNoteContractAddress(netId) {
+export function getNoteContractAddress(netId: any) {
     switch (netId) {
         case BTTCTESTNETID:
             return BTT_BUNNYNOTES_DONAU;
+        case BSCTESTNETID:
+            return BUNNYNOTES_BSC_TESTNET;
         default:
             return BTT_BUNNYNOTES_DONAU;
     }
@@ -32,6 +45,8 @@ export const BTTCTESTNETNETWORKURL = "https://pre-rpc.bt.io/";
 
 export const FANTOMTESTNETNETWORKURL = "https://xapi.testnet.fantom.network/lachesis";
 
+export const BSCTESTNETNETWORKURL = "https://data-seed-prebsc-1-s3.binance.org:8545";
+
 export function getExplorer(txId: string, network: string | undefined): string {
     if (!network) {
         return "";
@@ -41,17 +56,21 @@ export function getExplorer(txId: string, network: string | undefined): string {
             return `http://testscan.bt.io/#/transaction/${txId}`
         case FANTOMTESTNETID:
             return `https://testnet.ftmscan.com/tx/${txId}`
+        case BSCTESTNETID:
+            return `https://testnet.bscscan.com/address/${txId}`
         default:
             return "";
     }
 }
 
-export function getNetworkNameFromId(netId): string {
+export function getNetworkNameFromId(netId: any): string {
     switch (netId) {
         case BTTCTESTNETID:
             return "BTTC Donau Testnet"
         case FANTOMTESTNETID:
             return "Fantom Testnet"
+        case BSCTESTNETID:
+            return "Binance Smart Chain Testnet"
         default:
             return "INVALID"
     }
@@ -64,6 +83,8 @@ export function getJsonRpcProvider(network: string): any {
             return new ethers.providers.JsonRpcProvider(BTTCTESTNETNETWORKURL)
         case FANTOMTESTNETID:
             return new ethers.providers.JsonRpcProvider(FANTOMTESTNETNETWORKURL)
+        case BSCTESTNETID:
+            return new ethers.providers.JsonRpcProvider(BSCTESTNETNETWORKURL)
         default:
             return undefined;
     }
@@ -77,6 +98,8 @@ export function getWalletCurrencyFromFetchedChainId(chainId: number): string {
             return "BTT"
         case 0xfa2:
             return "FTM"
+        case 0x61:
+            return "BNB"
         default:
             return "ETH"
     }
@@ -91,7 +114,7 @@ export function web3Injected(): boolean {
     }
 }
 
-export async function getChainId(provider): Promise<number> {
+export async function getChainId(provider: any): Promise<number> {
     const { chainId } = await provider.getNetwork();
     return chainId
 }
@@ -112,7 +135,7 @@ export function doOnBoarding() {
 }
 
 
-export async function handleNetworkSelect(networkId, handleError) {
+export async function handleNetworkSelect(networkId: any, handleError: any) {
     const onboardSuccess = await onboardOrSwitchNetwork(networkId, handleError);
     if (!onboardSuccess) {
         return false;
@@ -139,7 +162,7 @@ function getWeb3Provider() {
     return provider;
 }
 
-export function onBoardOrGetProvider(handleError): any {
+export function onBoardOrGetProvider(handleError: any): any {
     if (!web3Injected()) {
         handleError("You need to install metamask!");
         doOnBoarding();
@@ -168,7 +191,7 @@ export async function watchAsset(erc20Params: any, onError: any) {
                 },
             },
         })
-        .then((success) => {
+        .then((success: any) => {
             if (success) {
             } else {
                 onError();
@@ -177,7 +200,7 @@ export async function watchAsset(erc20Params: any, onError: any) {
         .catch(console.error);
 }
 
-export async function onboardOrSwitchNetwork(networkId, handleError) {
+export async function onboardOrSwitchNetwork(networkId: any, handleError: any) {
     if (!web3Injected()) {
         handleError("You need to install metamask!");
         await doOnBoarding();
@@ -267,7 +290,7 @@ async function switch_to_Chain(chainId: string) {
         await window.ethereum.request({
             method: "wallet_switchEthereumChain",
             params: [{ chainId }],
-        }).catch(err => {
+        }).catch((err: any) => {
             if (err.message !== "User rejected the request.")
                 errorOccured = true;
         })
@@ -324,9 +347,13 @@ export async function ERC20Balance(ERC20Contract: any, address: string) {
     return await ERC20Contract.balanceOf(address);
 }
 
+export async function buyTokens(contract: any, amount: string) {
+    return await contract.buyTokens({ value: parseEther(amount) });
+}
+
 // View Functions
 
-export async function bunnyNotesCommitments(contract: any, commitment) {
+export async function bunnyNotesCommitments(contract: any, commitment: any) {
     return await contract.commitments(commitment);
 }
 
@@ -361,8 +388,13 @@ export function calculateFeeLocally(denomination: string): string {
     return fee
 }
 
+export async function tokensLeft(crowdsalecontract: any) {
+    return await crowdsalecontract.tokensLeft();
+}
+
 export interface AvailableERC20Token {
     address: string;
     name: string;
     logo: string;
 }
+
