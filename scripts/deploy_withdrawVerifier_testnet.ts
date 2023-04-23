@@ -10,6 +10,7 @@ async function main() {
 
     console.log('Verifier is deployed to :', verifier.address);
     // Verifier is deployed to : 0xAca78197856E90985949DaBFA2B687f42D9d0Aa2 on Donau testnet
+    // Verifier is deployed to : 0xD98F9B6AB4fbA9b7173Cfe92Ae1Eb9A3F3F91751 on BSC Testnet!!
 }
 
 

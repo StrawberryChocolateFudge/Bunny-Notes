@@ -8,6 +8,7 @@ async function main() {
     const zkbtoken = await ZKBDeploy.deployed();
     console.log("ZKB Token deployed to ", zkbtoken.address);
     // ZKB Token deployed to  0x72b5bD690A3253e4B6cCB7A4bAe53EC34b1e8Df2 on Donau testnet
+    // ZKB Token deployed to  0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7 on BSC testnet
 }
 
 
