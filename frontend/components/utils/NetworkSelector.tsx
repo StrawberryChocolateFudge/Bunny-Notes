@@ -1,4 +1,4 @@
-import { Button, Card, Checkbox, Dialog, DialogContent, DialogContentText, DialogTitle, Divider, FormControl, InputLabel, Link, MenuItem, Select, SelectChangeEvent, Stack, styled, TextField, Tooltip, Typography } from "@mui/material";
+import { Button, Card, Dialog, DialogContent, DialogContentText, DialogTitle, Divider, FormControl, MenuItem, Select, SelectChangeEvent, Stack, styled, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { setTermsAcceptedToLS } from "../../storage/local";
 import { setSelectedNToSS } from "../../storage/session";
@@ -108,7 +108,7 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
         <CheckWebsiteURLWarning />
 
         <DialogTitle sx={{ paddingBottom: "0", marginBottom: "0", display: "flex", justifyContent: "center" }}><IMG alt="Bunny Notes Title" src="/imgs/BunnyNotes.svg" /></DialogTitle>
-        {/* <Button sx={{ margin: "0 auto" }}>Visit the Token Sale Page</Button> */}
+        <Button href="/tokensale" sx={{ margin: "0 auto" }}>Visit the Token Sale Page (on BSC)</Button>
         <DialogContent>
             <DialogContentText sx={{ textAlign: "center" }}>
                 Select the network to continue
