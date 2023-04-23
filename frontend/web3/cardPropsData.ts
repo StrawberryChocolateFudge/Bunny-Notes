@@ -19,13 +19,13 @@ export function getCardPropsData(cardType: "Bunny Note", netId: string): Array<S
             return [
                 { isFeeless: false, isCustom: true, networkAlt: "", networkLogo: "", imageLink: "/imgs/questionMark.png", imageAlt: "Custom Token", currency: "Custom Token", cardType, erc20Address: "", },
                 { isFeeless: false, isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/bttLogo.svg", imageAlt: "BTT", currency: "BTT", cardType, erc20Address: ZEROADDRESS },
-                { isFeeless: true, isCustom: false, networkAlt: BSC_A, networkLogo: BSC_N, imageLink: "/imgs/Bunny.svg", imageAlt: "ZKB", currency: "ZKB", cardType, erc20Address: BTTZKB, },
+                // { isFeeless: true, isCustom: false, networkAlt: BSC_A, networkLogo: BSC_N, imageLink: "/imgs/BunnyLogo.jpg", imageAlt: "ZKB", currency: "ZKB", cardType, erc20Address: BTTZKB, },
             ]
         case BSCTESTNETID:
             return [
                 { isFeeless: false, isCustom: true, networkAlt: "", networkLogo: "", imageLink: "/imgs/questionMark.png", imageAlt: "Custom Token", currency: "Custom Token", cardType, erc20Address: "", },
                 { isFeeless: false, isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/bnb-chain-binance-smart-chain-logo.svg", imageAlt: "BNB", currency: "BNB", cardType, erc20Address: ZEROADDRESS },
-                { isFeeless: true, isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/Bunny.svg", imageAlt: "ZKB", currency: "ZKB", cardType, erc20Address: BSCZKB, },
+                { isFeeless: true, isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/BunnyLogo.jpg", imageAlt: "ZKB", currency: "ZKB", cardType, erc20Address: BSCZKB, },
             ]
         // case FANTOMTESTNETID:
         //     return [
@@ -48,19 +48,20 @@ export type NetworkSelectProps = {
 
 export const networkButtons: NetworkSelectProps[] = [
     {
-        tooltipTitle: "Select Bittorrent Chain",
-        chainId: BTTCTESTNETID,
-        imageAlt: "Bittorrent Chain",
-        imageSrc: "/imgs/bttLogo.svg",
-        cardTypography: "BTTC Testnet"
-    },
-    {
         tooltipTitle: "Select Binance Smart Chain Testnet",
         chainId: BSCTESTNETID,
         imageAlt: "Binance Smart Chain",
         imageSrc: "/imgs/bnb-chain-binance-smart-chain-logo.svg",
-        cardTypography: "BSC Testnet"
+        cardTypography: "Binance Smart Chain"
     }
+    , {
+        tooltipTitle: "Select Bittorrent Chain",
+        chainId: BTTCTESTNETID,
+        imageAlt: "Bittorrent Chain",
+        imageSrc: "/imgs/bttLogo.svg",
+        cardTypography: "BitTorrent Chain"
+    }
+
     // {
     //     tooltipTitle: " Select Fantom",
     //     chainId: "0xfa2",
