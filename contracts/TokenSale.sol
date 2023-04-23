@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 
 /**
  * @title ZKB Token Sale
- * The rate calculation makes the assumption that 50 000 000 ZKB tokens will be sold from the total supply of 100 million at the rate of 10000 ZKB for 1 BNB
+ * The rate calculation makes the assumption that 50 000 000 ZKB tokens will be sold from the total supply of 100 million at the rate of 15000 ZKB for 1 BNB
 
  * @dev Crowdsale is the base contract for managing this token crowdsale,
  * allowing investors to purchase tokens with ether. This contract implements
@@ -40,7 +40,7 @@ contract TokenSale is Context, ReentrancyGuard {
 
     uint256 private tokensSold;
 
-    uint256 private rate = 10000;
+    uint256 public rate = 15000;
 
     uint256 private maxSold = 50000000e18;
 
@@ -113,7 +113,7 @@ contract TokenSale is Context, ReentrancyGuard {
 
         _preValidatePurchase(msg.sender, weiAmount);
         // calculate token amount to be created
-        uint256 tokens = _getTokenAmount(weiAmount);
+        uint256 tokens = getTokenAmount(weiAmount);
 
         require(tokens.add(tokensSold) <= maxSold, "Exceeds allowed limit");
 
@@ -177,9 +177,7 @@ contract TokenSale is Context, ReentrancyGuard {
      * @param weiAmount Value in wei to be converted into tokens
      * @return Number of tokens that can be purchased with the specified _weiAmount
      */
-    function _getTokenAmount(
-        uint256 weiAmount
-    ) internal view returns (uint256) {
+    function getTokenAmount(uint256 weiAmount) public view returns (uint256) {
         return rate.mul(weiAmount);
     }
 

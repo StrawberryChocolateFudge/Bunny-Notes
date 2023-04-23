@@ -6,6 +6,7 @@ cp abis/BunnyNotes.json dist/BunnyNotes.json
 cp abis/MOCKERC20.json dist/MOCKERC20.json
 cp abis/ERC20.json dist/ERC20.json
 cp abis/WithdrawVerifier.json dist/WithdrawVerifier.json
+cp abis/TokenSale.json dist/TokenSale.json
 rm -rf dist/imgs
 
 cp -R imgs dist/imgs

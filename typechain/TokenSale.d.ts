@@ -22,8 +22,10 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface TokenSaleInterface extends ethers.utils.Interface {
   functions: {
     "buyTokens()": FunctionFragment;
+    "getTokenAmount(uint256)": FunctionFragment;
     "getTokensLeft()": FunctionFragment;
     "getTokensSold()": FunctionFragment;
+    "rate()": FunctionFragment;
     "token()": FunctionFragment;
     "wallet()": FunctionFragment;
     "weiRaised()": FunctionFragment;
@@ -31,6 +33,10 @@ interface TokenSaleInterface extends ethers.utils.Interface {
 
   encodeFunctionData(functionFragment: "buyTokens", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "getTokenAmount",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getTokensLeft",
     values?: undefined
   ): string;
@@ -38,11 +44,16 @@ interface TokenSaleInterface extends ethers.utils.Interface {
     functionFragment: "getTokensSold",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "rate", values?: undefined): string;
   encodeFunctionData(functionFragment: "token", values?: undefined): string;
   encodeFunctionData(functionFragment: "wallet", values?: undefined): string;
   encodeFunctionData(functionFragment: "weiRaised", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "buyTokens", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getTokenAmount",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getTokensLeft",
     data: BytesLike
@@ -51,6 +62,7 @@ interface TokenSaleInterface extends ethers.utils.Interface {
     functionFragment: "getTokensSold",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "rate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "wallet", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "weiRaised", data: BytesLike): Result;
@@ -119,9 +131,16 @@ export class TokenSale extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    getTokenAmount(
+      weiAmount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     getTokensLeft(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     getTokensSold(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    rate(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     token(overrides?: CallOverrides): Promise<[string]>;
 
@@ -134,9 +153,16 @@ export class TokenSale extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  getTokenAmount(
+    weiAmount: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   getTokensLeft(overrides?: CallOverrides): Promise<BigNumber>;
 
   getTokensSold(overrides?: CallOverrides): Promise<BigNumber>;
+
+  rate(overrides?: CallOverrides): Promise<BigNumber>;
 
   token(overrides?: CallOverrides): Promise<string>;
 
@@ -147,9 +173,16 @@ export class TokenSale extends BaseContract {
   callStatic: {
     buyTokens(overrides?: CallOverrides): Promise<void>;
 
+    getTokenAmount(
+      weiAmount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getTokensLeft(overrides?: CallOverrides): Promise<BigNumber>;
 
     getTokensSold(overrides?: CallOverrides): Promise<BigNumber>;
+
+    rate(overrides?: CallOverrides): Promise<BigNumber>;
 
     token(overrides?: CallOverrides): Promise<string>;
 
@@ -195,9 +228,16 @@ export class TokenSale extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    getTokenAmount(
+      weiAmount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getTokensLeft(overrides?: CallOverrides): Promise<BigNumber>;
 
     getTokensSold(overrides?: CallOverrides): Promise<BigNumber>;
+
+    rate(overrides?: CallOverrides): Promise<BigNumber>;
 
     token(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -211,9 +251,16 @@ export class TokenSale extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    getTokenAmount(
+      weiAmount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getTokensLeft(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getTokensSold(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    rate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
