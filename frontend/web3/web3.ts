@@ -15,7 +15,7 @@ export const BUNNYNOTES_BSC_TESTNET = "0xF273919f7e9239D5C8C70f49368fF80c0a91064
 
 export const BUNNYNOTES_TOKENSALE_TESTNET = "0x57ca49c07328da62335Fc450176C274157C01eB6";
 
-export const ZKBTokenAddress_BSC = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7" 
+export const ZKBTokenAddress_BSC = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7"
 
 
 export const tokensalePriceCalculator = (bnbAmount: string) => {
@@ -389,7 +389,7 @@ export function calculateFeeLocally(denomination: string): string {
 }
 
 export async function tokensLeft(crowdsalecontract: any) {
-    return await crowdsalecontract.tokensLeft();
+    return await crowdsalecontract.getTokensLeft();
 }
 
 export interface AvailableERC20Token {
