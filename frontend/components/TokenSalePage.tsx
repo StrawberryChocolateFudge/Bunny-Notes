@@ -1,7 +1,8 @@
-import { Paper, Stack, TextField, Typography, CircularProgress, Button, Divider } from "@mui/material";
-import { formatEther } from "ethers/lib/utils";
+import { Paper, Stack, TextField, Typography, Button, } from "@mui/material";
+import { BigNumber } from "ethers/lib/ethers";
+import { formatEther, parseEther } from "ethers/lib/utils";
 import React from "react";
-import { BSCTESTNETID, BUNNYNOTES_TOKENSALE_TESTNET, buyTokens, getContract, handleNetworkSelect, tokensalePriceCalculator, watchAsset, ZKBTokenAddress_BSC } from "../web3/web3";
+import { BSCTESTNETID, BUNNYNOTES_TOKENSALE_TESTNET, buyTokens, getContract, handleNetworkSelect, tokensalePriceCalculator, tokensLeft, watchAsset, ZKBTokenAddress_BSC } from "../web3/web3";
 
 function Body1(txt) {
     return <Typography component="div" variant="body1">{txt}</Typography>
@@ -41,7 +42,33 @@ export function TokenSalePage(props: any) {
         }
         const provider = await handleNetworkSelect(BSCTESTNETID, props.displayError);
         const tokenSaleContract = await getContract(provider, BUNNYNOTES_TOKENSALE_TESTNET, "/TokenSale.json");
-        const buyTx = await buyTokens(tokenSaleContract, bnbToSpend).catch(err => {
+
+        const tokensLeftAmount: BigNumber = await tokensLeft(tokenSaleContract).catch(err => {
+            props.displayError("Network error. Check your wallet.");
+            return;
+        });
+
+        if (!tokensLeftAmount) {
+            return;
+        }
+
+        const tokensLeftFormatted = formatEther(tokensLeftAmount);
+
+        if (parseFloat(tokensLeftFormatted) === 0) {
+            props.displayError("Token Sale Ended!");
+            return;
+        }
+
+        const salePrice = tokensalePriceCalculator(bnbToSpend);
+
+        const amountLeftAfterSale = tokensLeftAmount.sub(salePrice);
+
+        if (amountLeftAfterSale.lte(parseEther("0"))) {
+            props.displayError(`Don't have enough tokens left for that. Remainding balance is ${tokensLeftFormatted} ZKB`);
+            return;
+        }
+
+        await buyTokens(tokenSaleContract, bnbToSpend).catch(err => {
             if (err.message.includes("insufficient funds")) {
                 props.displayError("Insufficient Funds.")
             } else {
@@ -49,17 +76,15 @@ export function TokenSalePage(props: any) {
             }
             return false;
         });
-        if (buyTx) {
-            await buyTx.wait(async (receipt) => {
-                if (receipt.status === 1) {
-                    await watchAsset({
-                        address: ZKBTokenAddress_BSC,
-                        symbol: "ZKB",
-                        decimals: 18
-                    }, () => props.handleError("Unable to add token to wallet"));
-                }
-            })
-        }
+
+    }
+
+    async function addAsset() {
+        await watchAsset({
+            address: ZKBTokenAddress_BSC,
+            symbol: "ZKB",
+            decimals: 18
+        }, () => props.handleError("Unable to add token to wallet"));
     }
 
     return <Paper sx={{ maxWidth: 936, margin: "auto", padding: "20px" }}>
@@ -116,6 +141,9 @@ export function TokenSalePage(props: any) {
         </Stack>
         <Stack direction="row" justifyContent="center">
             {Body1("Enter the amount of BNB you wish to spend and the price indicator above will update.")}
+        </Stack>
+        <Stack direction="row" justifyContent="center">
+            <Button onClick={() => addAsset()}>Add to wallet</Button>
         </Stack>
     </Paper>
 }
