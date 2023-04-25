@@ -19,6 +19,12 @@ export function getCardPropsData(cardType: "Bunny Note", netId: string): Array<S
             return [
                 { isFeeless: false, isCustom: true, networkAlt: "", networkLogo: "", imageLink: "/imgs/questionMark.png", imageAlt: "Custom Token", currency: "Custom Token", cardType, erc20Address: "", },
                 { isFeeless: false, isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/bttLogo.svg", imageAlt: "BTT", currency: "BTT", cardType, erc20Address: ZEROADDRESS },
+
+                // These are example tokens without any address so approving them will just not work:
+                { isFeeless: false, isCustom: false, networkAlt: ETH_A, networkLogo: ETH_N, imageLink: "/imgs/ethLogo.svg", imageAlt: "ETH", currency: "ETH", cardType, erc20Address: "" },
+                { isFeeless: false, isCustom: false, networkAlt: BSC_A, networkLogo: BSC_N, imageLink: "/imgs/btcLogo.svg", imageAlt: "BTC_b", currency: "BTC_b", cardType, erc20Address: "" },
+                { isFeeless: false, isCustom: false, networkAlt: TRON_A, networkLogo: TRON_N, imageLink: "/imgs/usddLogo.svg", imageAlt: "USDD_t", currency: "USDD_t", cardType, erc20Address: "" },
+                { isFeeless: false, isCustom: false, networkAlt: ETH_A, networkLogo: ETH_N, imageLink: "/imgs/tetherLogo.svg", imageAlt: "USDT_t", currency: "USDT_t", cardType, erc20Address: "" }
                 // { isFeeless: true, isCustom: false, networkAlt: BSC_A, networkLogo: BSC_N, imageLink: "/imgs/BunnyLogo.jpg", imageAlt: "ZKB", currency: "ZKB", cardType, erc20Address: BTTZKB, },
             ]
         case BSCTESTNETID:
