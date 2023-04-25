@@ -102,6 +102,12 @@ export function downloadNote(props: DownloadNoteProps) {
             const fee = await calculateFee(notesContract, parseEther(amount));
             const approveAmount = props.isFeeless ? ethers.utils.parseEther(noteDetails[1].amount) : fee.add(ethers.utils.parseEther(noteDetails[1].amount));
 
+            if (erc20Address === "") {
+                //TODO: Remove this in prod
+                props.displayError("Some tokens don't work on testnet!")
+            }
+
+
             const ERC20Contract = await getContract(props.provider, erc20Address, "/ERC20.json");
             props.setDepositButtonDisabled(true);
             props.setShowApproval(false);
