@@ -82,7 +82,7 @@ export function downloadA4PDF(
 
     // and subtitle with string splitting
     doc.setFontSize(15);
-    const subtitleMaxLineWidth = 110;
+    const subtitleMaxLineWidth = 150;
     let splitSubtitle = doc.splitTextToSize(bearerText, subtitleMaxLineWidth);
     doc.text(splitSubtitle, 45, 28)
     // The commitment qr code 
