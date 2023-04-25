@@ -10,7 +10,7 @@ const ETH_N = "/imgs/eth_netwrokLogo.png";
 const ETH_A = "ETH";
 
 const BTTZKB = "0x72b5bD690A3253e4B6cCB7A4bAe53EC34b1e8Df2"
-const BSCZKB = "";
+const BSCZKB = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7";
 //CARDS DATA:
 // All contract addresses are the same per network now!!
 export function getCardPropsData(cardType: "Bunny Note", netId: string): Array<SelectableCardsParams> {
