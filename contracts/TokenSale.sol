@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
 /**
- * @title ZKB Token Sale
+ * @title ZKB Token Sale using the OpenZeppelin Crowdsale contract.
  * The rate calculation makes the assumption that 50 000 000 ZKB tokens will be sold from the total supply of 100 million at the rate of 15000 ZKB for 1 BNB
 
  * @dev Crowdsale is the base contract for managing this token crowdsale,
