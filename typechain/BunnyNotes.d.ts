@@ -30,7 +30,6 @@ interface BunnyNotesInterface extends ethers.utils.Interface {
     "feeDivider()": FunctionFragment;
     "feelessToken()": FunctionFragment;
     "isSpent(bytes32)": FunctionFragment;
-    "isSpentArray(bytes32[])": FunctionFragment;
     "nullifierHashes(bytes32)": FunctionFragment;
     "setFeelessToken(address)": FunctionFragment;
     "verifier()": FunctionFragment;
@@ -63,10 +62,6 @@ interface BunnyNotesInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "isSpent", values: [BytesLike]): string;
-  encodeFunctionData(
-    functionFragment: "isSpentArray",
-    values: [BytesLike[]]
-  ): string;
   encodeFunctionData(
     functionFragment: "nullifierHashes",
     values: [BytesLike]
@@ -115,10 +110,6 @@ interface BunnyNotesInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "isSpent", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "isSpentArray",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "nullifierHashes",
     data: BytesLike
@@ -264,11 +255,6 @@ export class BunnyNotes extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    isSpentArray(
-      _nullifierHashes: BytesLike[],
-      overrides?: CallOverrides
-    ): Promise<[boolean[]] & { spent: boolean[] }>;
-
     nullifierHashes(
       arg0: BytesLike,
       overrides?: CallOverrides
@@ -353,11 +339,6 @@ export class BunnyNotes extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  isSpentArray(
-    _nullifierHashes: BytesLike[],
-    overrides?: CallOverrides
-  ): Promise<boolean[]>;
-
   nullifierHashes(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
   setFeelessToken(
@@ -438,11 +419,6 @@ export class BunnyNotes extends BaseContract {
       _nullifierHash: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
-
-    isSpentArray(
-      _nullifierHashes: BytesLike[],
-      overrides?: CallOverrides
-    ): Promise<boolean[]>;
 
     nullifierHashes(
       arg0: BytesLike,
@@ -598,11 +574,6 @@ export class BunnyNotes extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    isSpentArray(
-      _nullifierHashes: BytesLike[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     nullifierHashes(
       arg0: BytesLike,
       overrides?: CallOverrides
@@ -665,11 +636,6 @@ export class BunnyNotes extends BaseContract {
 
     isSpent(
       _nullifierHash: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    isSpentArray(
-      _nullifierHashes: BytesLike[],
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

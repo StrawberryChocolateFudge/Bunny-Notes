@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
 interface IVerifier {
     function verifyProof(
         uint256[2] memory a,
@@ -195,17 +196,5 @@ contract BunnyNotes is ReentrancyGuard {
 
     function isSpent(bytes32 _nullifierHash) public view returns (bool) {
         return nullifierHashes[_nullifierHash];
-    }
-
-    /** Whether an array of BunnyNotes is already spent */
-    function isSpentArray(
-        bytes32[] calldata _nullifierHashes
-    ) external view returns (bool[] memory spent) {
-        spent = new bool[](_nullifierHashes.length);
-        for (uint256 i = 0; i < _nullifierHashes.length; i++) {
-            if (isSpent(_nullifierHashes[i])) {
-                spent[i] = true;
-            }
-        }
     }
 }
