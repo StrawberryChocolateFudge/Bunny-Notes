@@ -1,10 +1,12 @@
 # Bunny Notes
 
-This is the full implementation of Bunny Notes, a zero-knowledge proof based Gift Card and Cash Note protocol.
+This is the full implementation of Bunny Notes, a zero-knowledge proof based crypto note protocol.
 
 The repository contains the zero-knowledge circuits, the solidity smart contracts and a front-end created with parcel.
 
 It uses the same repository for all for easy testing. 
+
+Note: When using npm install , you might need to run it with --force due to different react dependency versions!
 
 ## Node Version:
 Use 18.12.1 !!
@@ -17,7 +19,7 @@ To run the tests run
 
 ## Circom
 
-Run the `compile.sh` from the /circuits directory to recompile the Verifier
+I used `compile.sh` from the /circuits directory to recompile the Verifier. DO NOT RUN THIS ANYMORE, IT WILL GENRATE A BRAND NEW VERIFIER!
 ## Powers of Tau
 
 The ptau file was downloaded from  Hermez Protocol Ceremony from their dropbox [here](https://www.dropbox.com/sh/mn47gnepqu88mzl/AACaJkBU7mmCq8uU8ml0-0fma?dl=0)

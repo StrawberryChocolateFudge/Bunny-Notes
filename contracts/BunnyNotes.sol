@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+// The interface of the WithdrawVerifier contract generated from the circuit
 interface IVerifier {
     function verifyProof(
         uint256[2] memory a,
@@ -15,7 +16,7 @@ interface IVerifier {
         uint256[3] memory _input
     ) external returns (bool);
 }
-
+// The BunnyNote commitments are stored in this struct
 struct CommitmentStore {
     bool used;
     address creator;
@@ -31,15 +32,15 @@ contract BunnyNotes is ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    IVerifier public immutable verifier;
+    IVerifier public immutable verifier; // The verifier address
 
-    address payable public _owner;
+    address payable public _owner; // The owner of the contract that can update the feeless token's address
 
     address public feelessToken; // The owner can specify one token that has no fees!
 
     uint256 public constant feeDivider = 100; // 1% fee will be used. This is the amount to divide the denomination to calculate the fee
 
-    mapping(bytes32 => bool) public nullifierHashes;
+    mapping(bytes32 => bool) public nullifierHashes; // Nuffifier Hashes are used to nullify a BunnyNote so we know they have been spent
     // We store all the commitments to make sure there are no accidental deposits twice and this allows us to query for transaction details later
     mapping(bytes32 => CommitmentStore) public commitments;
 
@@ -73,10 +74,21 @@ contract BunnyNotes is ReentrancyGuard {
         feelessToken = _feelessToken;
     }
 
+    /**
+       @dev : SetFeelessToken sets the token the contract uses without calculating fees
+       @param newFeelesstoken is the token to use without fees
+     */
+
     function setFeelessToken(address newFeelesstoken) external {
         require(msg.sender == _owner, "Only owner");
         feelessToken = newFeelesstoken;
     }
+
+    /**
+      @dev : Create a BunnyNote by depositing ETH
+      @param _commitment is the poseidon hash created for the note on client side
+      @param denomination that is the value of the note. Denomination argument does not contain the fee
+    */
 
     function depositEth(
         bytes32 _commitment,
@@ -86,7 +98,7 @@ contract BunnyNotes is ReentrancyGuard {
         require(denomination > 0, "Invalid denomination");
         uint256 fee = calculateFee(denomination);
         require(msg.value == denomination + fee, "Invalid Value");
-
+        // Record the BunnyNote and the value that was deposited into the contract
         commitments[_commitment].used = true;
         commitments[_commitment].creator = msg.sender;
         commitments[_commitment].createdDate = block.timestamp;
@@ -103,6 +115,12 @@ contract BunnyNotes is ReentrancyGuard {
         );
     }
 
+    /**
+   @dev : depositToken is for creating a bunnyNote by depositing tokens, the wallet calling this function must approve ERC20 spend first
+   @param _commitment is the poseidon hash of the note
+   @param denomination is the amount of token transferred to the contract that represents the note's value. Deposit does not contain the fee
+   @param token is the ERC20 token that is used for this deposits  
+    */
     function depositToken(
         bytes32 _commitment,
         uint256 denomination,
@@ -136,12 +154,24 @@ contract BunnyNotes is ReentrancyGuard {
         );
     }
 
+    /**
+     @dev calculate the fee used for the denomination
+     @param denomination is the amount of value transferred to the cotnract to make a deposit and create a bunny note
+   */
     function calculateFee(
         uint256 denomination
     ) public pure returns (uint256 fee) {
         fee = denomination.div(feeDivider);
     }
 
+    /**
+       @dev withdraw the value deposited to back the bunny note to withdraw the value
+       @param _proof is the zkSnark generated on the clinet side
+       @param _nullifierHash is the poseidon hash of the nullifier used for nullifying the note and verifying the secret
+       @param _commitment is how the bunnyNote is identified, it's a poseidon hash generated client side from a secret + nullifier;
+       @param _recipient is the address that will recieve the withdraw amount. 
+       The recipient is incldued in the ZkSnark so a client could create the proof and give it to a third party relayer who could submit it in his behalf to abstract gas costs, but never alter the arguments due to the zkSnark so it is trustless
+    */
     function withdraw(
         uint256[8] calldata _proof,
         bytes32 _nullifierHash,
@@ -166,11 +196,12 @@ contract BunnyNotes is ReentrancyGuard {
             ),
             "Invalid Withdraw proof"
         );
-
+        // Nullify the BunnyNote, invalidating it
         nullifierHashes[_nullifierHash] = true;
         commitments[_commitment].recipient = _recipient;
         commitments[_commitment].spentDate = block.timestamp;
 
+        // Process the withdraw
         if (commitments[_commitment].usesToken) {
             //Transfer the token
             commitments[_commitment].token.safeTransfer(
@@ -192,7 +223,9 @@ contract BunnyNotes is ReentrancyGuard {
         );
     }
 
-    /** @dev whether a BunnyNote is already spent */
+    /** @dev whether a BunnyNote is already spent
+        @param _nullifierHash is used to check if a note has been spent
+     */
 
     function isSpent(bytes32 _nullifierHash) public view returns (bool) {
         return nullifierHashes[_nullifierHash];
