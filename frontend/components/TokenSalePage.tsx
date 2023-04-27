@@ -11,6 +11,7 @@ function Body2(txt) {
     return <Typography component="div" variant="body2">{txt}</Typography>
 }
 
+
 export function TokenSalePage(props: any) {
     const [bnbToSpend, setBnbToSpend] = React.useState("");
 
@@ -107,6 +108,7 @@ export function TokenSalePage(props: any) {
             </li>
             <li>
                 {Body1("Token Description")}
+
                 {Body2("The ZKB Token is a digital asset that is used for feeless transactions on bunnynotes.finance platform. The Token is not a registered security in the United States, nor is it intended to be treated as such. The tokens may not be bought or sold in the United States and are not an investment of any kind.")}
             </li>
             <li>
@@ -136,14 +138,15 @@ export function TokenSalePage(props: any) {
                 <div style={{ marginBottom: "20px", paddingLeft: "5px" }} />
                 <TextField value={bnbToSpend} onChange={setBnBToSpendChange} autoComplete="off" type="number" label="Amount (BNB)"></TextField>
             </Stack>
-            <Button variant="contained" sx={{ marginLeft: "10px" }} onClick={buyTokens_action}>Buy</Button>
+            <Button variant="contained" sx={{ fontSize: "20px",marginLeft: "10px", backgroundColor: "red","&:hover" :{backgroundColor: "white",color: "black"} }} onClick={buyTokens_action}>Buy  <img style={{marginLeft: "10px"}} src="/imgs/zkbLogo.png" width="50px" height="50px" /></Button>
+
 
         </Stack>
         <Stack direction="row" justifyContent="center">
             {Body1("Enter the amount of BNB you wish to spend and the price indicator above will update.")}
         </Stack>
         <Stack direction="row" justifyContent="center">
-            <Button onClick={() => addAsset()}>Add to wallet</Button>
+            <Button onClick={() => addAsset()}>Click here to add to the token to your wallet</Button>
         </Stack>
     </Paper>
 }

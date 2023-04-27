@@ -44,14 +44,14 @@ export function SelectableCards(props: SelectableCardsProps) {
   </OverlayImgs>
   const getContent = () => {
     return <Stack direction="column" alignItems="center">
-      <Typography gutterBottom variant="subtitle1" component="div">
+
+      {props.isFeeless ? <Typography sx={{ color: "grey" }} variant="subtitle1">
+        Feeless
+      </Typography> : <Typography gutterBottom variant="subtitle1" component="div">
         {props.currency}
       </Typography>
+      }
 
-      {props.isFeeless ?
-        <Typography sx={{ marginTop: "10px", color: "grey" }} variant="subtitle1">
-          Feeless
-        </Typography> : null}
     </Stack>
   }
   return (

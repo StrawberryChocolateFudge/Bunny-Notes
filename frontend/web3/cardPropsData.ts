@@ -31,7 +31,7 @@ export function getCardPropsData(cardType: "Bunny Note", netId: string): Array<S
             return [
                 { isFeeless: false, isCustom: true, networkAlt: "", networkLogo: "", imageLink: "/imgs/questionMark.png", imageAlt: "Custom Token", currency: "Custom Token", cardType, erc20Address: "", },
                 { isFeeless: false, isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/bnb-chain-binance-smart-chain-logo.svg", imageAlt: "BNB", currency: "BNB", cardType, erc20Address: ZEROADDRESS },
-                { isFeeless: true, isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/BunnyLogo.jpg", imageAlt: "ZKB", currency: "ZKB", cardType, erc20Address: BSCZKB, },
+                { isFeeless: true, isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/zkbLogo.png", imageAlt: "ZKB", currency: "ZKB", cardType, erc20Address: BSCZKB, },
             ]
         // case FANTOMTESTNETID:
         //     return [
