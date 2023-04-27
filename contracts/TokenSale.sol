@@ -13,15 +13,6 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
  * @title ZKB Token Sale using the OpenZeppelin Crowdsale contract.
  * The rate calculation makes the assumption that 50 000 000 ZKB tokens will be sold from the total supply of 100 million at the rate of 15000 ZKB for 1 BNB
 
- * @dev Crowdsale is the base contract for managing this token crowdsale,
- * allowing investors to purchase tokens with ether. This contract implements
- * such functionality in its most fundamental form and can be extended to provide additional
- * functionality and/or custom behavior.
- * The external interface represents the basic interface for purchasing tokens, and conforms
- * the base architecture for crowdsales. It is *not* intended to be modified / overridden.
- * The internal interface conforms the extensible and modifiable surface of crowdsales. Override
- * the methods to add functionality. Consider using 'super' where appropriate to concatenate
- * behavior.
  */
 
 contract TokenSale is Context, ReentrancyGuard {
