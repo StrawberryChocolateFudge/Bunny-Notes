@@ -361,10 +361,6 @@ export async function bunnyNoteIsSpent(contract: any, nullifierHash: any) {
     return await contract.isSpent(nullifierHash);
 }
 
-export async function bunnyNoteIsSpentArray(contract: any, nullifierHashesArray: Array<string>) {
-    return await contract.isSpent(nullifierHashesArray);
-}
-
 export async function getFeelessToken(contract: any) {
     return await contract.feelessToken();
 }
