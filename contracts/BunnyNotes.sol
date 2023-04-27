@@ -16,7 +16,7 @@ interface IVerifier {
         uint256[3] memory _input
     ) external returns (bool);
 }
-// The BunnyNote commitments are stored in this struct
+// The BunnyNotes data are stored in this struct
 struct CommitmentStore {
     bool used;
     address creator;
@@ -41,7 +41,7 @@ contract BunnyNotes is ReentrancyGuard {
     uint256 public constant feeDivider = 100; // 1% fee will be used. This is the amount to divide the denomination to calculate the fee
 
     mapping(bytes32 => bool) public nullifierHashes; // Nuffifier Hashes are used to nullify a BunnyNote so we know they have been spent
-    // We store all the commitments to make sure there are no accidental deposits twice and this allows us to query for transaction details later
+    // We store all the Bunny Notes data and make sure there are no accidental deposits twice and this allows us to query for transaction details later
     mapping(bytes32 => CommitmentStore) public commitments;
 
     event DepositETH(
