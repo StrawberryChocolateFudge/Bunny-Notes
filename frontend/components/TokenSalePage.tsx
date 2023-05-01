@@ -3,6 +3,7 @@ import { BigNumber } from "ethers/lib/ethers";
 import { formatEther, parseEther } from "ethers/lib/utils";
 import React from "react";
 import { BSCTESTNETID, BUNNYNOTES_TOKENSALE_TESTNET, buyTokens, getContract, handleNetworkSelect, tokensalePriceCalculator, tokensLeft, watchAsset, ZKBTokenAddress_BSC } from "../web3/web3";
+import { default as MuiLink } from "@mui/material/Link";
 
 function Body1(txt) {
     return <Typography component="div" variant="body1">{txt}</Typography>
@@ -104,11 +105,24 @@ export function TokenSalePage(props: any) {
         <ol>
             <li>
                 {Body1("Introduction")}
-                {Body2("These Terms and Conditions(“Agreement”) govern the sale and purchase of the ZKB token (“Token”) by you (“Purchaser”) from BunnyNotes.Finance (“Issuer”) via a smart contract. By purchasing ZKB, you agree to be bound by this Agreement, as well as any additional terms and conditions set forth by the Issuer.")}
+                {Body2("These Terms and Conditions(“Agreement”) govern the sale and purchase of the ZKB token (“Token”) by you (“Purchaser”) from BunnyNotes.Finance (“Issuer”) via a smart contract. ZKB is an ERC-20 smart contract created based on the OpenZeppelin library. The Crowdsale contract was also created using the OpenZeppelin (2.0) Crowdsale contract.  By purchasing ZKB, you agree to be bound by this Agreement, as well as any additional terms and conditions set forth by the Issuer.")}
+            </li>
+            <li>
+                {Body1("Source Code")}
+                <Typography variant="body2" color="text.secondary" align="left">
+                    <MuiLink color="inherit" href="https://raw.githubusercontent.com/StrawberryChocolateFudge/Bunny-Notes/bunnyNotesOnly/contracts/ZKBToken.sol">
+                        Token Contract
+                    </MuiLink>
+
+                </Typography>
+                <Typography variant="body2" color="text.secondary" align="left">
+                    <MuiLink color="inherit" href="https://raw.githubusercontent.com/StrawberryChocolateFudge/Bunny-Notes/bunnyNotesOnly/contracts/TokenSale.sol">
+                        Crowdsale Contract
+                    </MuiLink>
+                </Typography>
             </li>
             <li>
                 {Body1("Token Description")}
-
                 {Body2("The ZKB Token is a digital asset that is used for feeless transactions on bunnynotes.finance platform. The Token is not a registered security in the United States, nor is it intended to be treated as such. The tokens may not be bought or sold in the United States and are not an investment of any kind.")}
             </li>
             <li>
@@ -129,7 +143,7 @@ export function TokenSalePage(props: any) {
             </li>
             <li>
                 {Body1("Tokenomics")}
-                {Body2("The total supply of the tokens is 100 million ZKB and all have been minted. This tokensale sells 50% of the tokens while the remaining will be allocated for Dex Liquidity, Bridges and stored in a Treasury. The tokens are minted on the Binance Smart Chain and will be avaiable on the BitTorrent chain via Token Mapping.")}
+                {Body2("The total supply of the tokens is 100 million ZKB and all have been minted. This tokensale sells 50% of the tokens while the remaining will be allocated for the Development team. The tokens are minted on the Binance Smart Chain and will be avaiable on the BitTorrent chain via Token Mapping.")}
             </li>
         </ol>
         <Stack direction="row" justifyContent="center">
@@ -138,7 +152,7 @@ export function TokenSalePage(props: any) {
                 <div style={{ marginBottom: "20px", paddingLeft: "5px" }} />
                 <TextField value={bnbToSpend} onChange={setBnBToSpendChange} autoComplete="off" type="number" label="Amount (BNB)"></TextField>
             </Stack>
-            <Button variant="contained" sx={{ fontSize: "20px",marginLeft: "10px", backgroundColor: "red","&:hover" :{backgroundColor: "white",color: "black"} }} onClick={buyTokens_action}>Buy  <img style={{marginLeft: "10px"}} src="/imgs/zkbLogo.png" width="50px" height="50px" /></Button>
+            <Button variant="contained" sx={{ fontSize: "20px", marginLeft: "10px", backgroundColor: "#FF7377", "&:hover": { backgroundColor: "white", color: "black" } }} onClick={buyTokens_action}>Buy  <img style={{ marginLeft: "10px" }} src="/imgs/zkbLogo.png" width="50px" height="50px" /></Button>
 
 
         </Stack>

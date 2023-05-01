@@ -1,4 +1,4 @@
-import { Button, Divider, IconButton, Typography } from "@mui/material";
+import { Button, IconButton, Typography } from "@mui/material";
 import Paper from "@mui/material/Paper/Paper";
 import React from "react";
 import Close from "@mui/icons-material/Close";
@@ -87,7 +87,11 @@ export function TermsPage() {
                     Smart Contract
                 </MuiLink>
             </Typography>
-
+            <Typography variant="body2" color="text.secondary" align="left">
+                <MuiLink color="inherit" href="imgs/Audit_Report_BunnyNotes.pdf">
+                    Audit
+                </MuiLink>
+            </Typography>
             <p>The following terms and conditions apply to the use of Bunny Notes on the website bunnynotes.finance:</p>
             <ol>
                 <li>
