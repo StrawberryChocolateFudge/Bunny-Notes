@@ -1,4 +1,4 @@
-import { Button, IconButton, Typography } from "@mui/material";
+import { Button, IconButton, Stack, Typography } from "@mui/material";
 import Paper from "@mui/material/Paper/Paper";
 import React from "react";
 import Close from "@mui/icons-material/Close";
@@ -82,16 +82,23 @@ export function TermsPage() {
             </ol>
 
             <h4>Bunny Notes</h4>
-            <Typography variant="body2" color="text.secondary" align="left">
-                <MuiLink color="inherit" href="https://raw.githubusercontent.com/StrawberryChocolateFudge/Bunny-Notes/bunnyNotesOnly/contracts/BunnyNotes.sol">
-                    Smart Contract
-                </MuiLink>
-            </Typography>
-            <Typography variant="body2" color="text.secondary" align="left">
-                <MuiLink color="inherit" href="imgs/Audit_Report_BunnyNotes.pdf">
-                    Audit
-                </MuiLink>
-            </Typography>
+            <Stack display="flex" flexDirection="row" justifyContent="space-around" sx={{ gap: "20px" }}>
+                <Typography variant="body2" color="text.secondary" align="left">
+                    <MuiLink color="inherit" href="https://raw.githubusercontent.com/StrawberryChocolateFudge/Bunny-Notes/bunnyNotesOnly/contracts/BunnyNotes.sol">
+                        Smart Contract
+                    </MuiLink>
+                </Typography>
+                <Typography variant="body2" color="text.secondary" align="left">
+                    <MuiLink color="inherit" href="imgs/Audit_Report_BunnyNotes.pdf">
+                        Audit
+                    </MuiLink>
+                </Typography>
+                <Typography variant="body2" color="text.secondary" align="left">
+                    <MuiLink color="inherit" href="/imgs/BunnyNotesWhitePaper.pdf">
+                        White Paper
+                    </MuiLink>
+                </Typography>
+            </Stack>
             <p>The following terms and conditions apply to the use of Bunny Notes on the website bunnynotes.finance:</p>
             <ol>
                 <li>
