@@ -12,7 +12,7 @@
  circom withdraw.circom --r1cs --wasm --sym
 
 # get the .zkey
-snarkjs groth16 setup withdraw.r1cs ../pot15_final.ptau withdraw_0000.zkey
+snarkjs groth16 setup withdraw.r1cs ../powersOfTau28_hez_final_15.ptau withdraw_0000.zkey
 
 # Contribute to the phase 2 ceremony, Add your name if you are not me XD
 snarkjs zkey contribute withdraw_0000.zkey withdraw_0001.zkey --name="StrawberryChocolateFudge" -v
