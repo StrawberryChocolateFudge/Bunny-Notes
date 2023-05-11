@@ -1,4 +1,4 @@
-import { Button, Card, Dialog, DialogContent, DialogContentText, DialogTitle, Divider, FormControl, MenuItem, Select, SelectChangeEvent, Stack, styled, Tooltip, Typography } from "@mui/material";
+import { Link, Button, Card, Dialog, DialogContent, DialogContentText, DialogTitle, Divider, FormControl, MenuItem, Select, SelectChangeEvent, Stack, styled, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { setTermsAcceptedToLS } from "../../storage/local";
 import { setSelectedNToSS } from "../../storage/session";
@@ -104,6 +104,14 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
         </Stack>
     }
 
+    const TwitterButton = () => {
+        return <Stack justifyContent={"center"} flexDirection="column" sx={{ paddingTop: "20px" }}>
+            <Stack justifyContent="center" flexDirection="row">
+                <Link target="_blank" href="https://twitter.com/BunnyNotes_Guy"><img height={"20px"} src="/imgs/twitterLogo.svg" /></Link>
+            </Stack>
+        </Stack>
+    }
+
     return <Dialog open={props.showNetworkSelect} onClose={handleClose}>
         <CheckWebsiteURLWarning />
 
@@ -120,7 +128,8 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
             <Divider light />
             <TermsCheckbox termsAccepted={props.termsAccepted} onTermsChecked={onTermsChecked}></TermsCheckbox>
             {availableWallets()}
-
+            <Divider light />
+            {TwitterButton()}
         </DialogContent>
 
     </Dialog>
