@@ -9,14 +9,17 @@ export const FANTOMTESTNETID = "0xfa2";
 
 export const BSCTESTNETID = "0x61";
 
+export const BTTMAINNETID = "0xc7"//199(0xc7)	
+
 export const BTT_BUNNYNOTES_DONAU = "0x3bc314B9448E1E33921a9E146bFdA16639a11e4F";
 
 export const BUNNYNOTES_BSC_TESTNET = "0xF273919f7e9239D5C8C70f49368fF80c0a91064A";
 
 export const BUNNYNOTES_TOKENSALE_TESTNET = "0x57ca49c07328da62335Fc450176C274157C01eB6";
 
-export const ZKBTokenAddress_BSC = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7"
+export const ZKBTokenAddress_BSC = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7" //TESTNET!!
 
+export const BTT_BUNNYNOTES_MAINNET = "0x3Cad43A3038F0E657753C0129ce7Ea4a5801EC90";
 
 export const tokensalePriceCalculator = (bnbAmount: string) => {
     return parseEther(bnbAmount).mul(15000);
@@ -30,7 +33,10 @@ export function getNoteContractAddress(netId: any) {
             return BTT_BUNNYNOTES_DONAU;
         case BSCTESTNETID:
             return BUNNYNOTES_BSC_TESTNET;
+        case BTTMAINNETID:
+            return BTT_BUNNYNOTES_MAINNET;
         default:
+            // Falling back to testnet address for now
             return BTT_BUNNYNOTES_DONAU;
     }
 }
@@ -47,6 +53,8 @@ export const FANTOMTESTNETNETWORKURL = "https://xapi.testnet.fantom.network/lach
 
 export const BSCTESTNETNETWORKURL = "https://data-seed-prebsc-1-s3.binance.org:8545";
 
+export const BTTMAINNETURL = "https://rpc.bittorrentchain.io";
+
 export function getExplorer(txId: string, network: string | undefined): string {
     if (!network) {
         return "";
@@ -58,6 +66,8 @@ export function getExplorer(txId: string, network: string | undefined): string {
             return `https://testnet.ftmscan.com/tx/${txId}`
         case BSCTESTNETID:
             return `https://testnet.bscscan.com/address/${txId}`
+        case BTTMAINNETID:
+            return `https://bttcscan.com/tx/${txId}`;
         default:
             return "";
     }
@@ -71,6 +81,8 @@ export function getNetworkNameFromId(netId: any): string {
             return "Fantom Testnet"
         case BSCTESTNETID:
             return "Binance Smart Chain Testnet"
+        case BTTMAINNETID:
+            return "BitTorrent Chain"
         default:
             return "INVALID"
     }
@@ -85,6 +97,8 @@ export function getJsonRpcProvider(network: string): any {
             return new ethers.providers.JsonRpcProvider(FANTOMTESTNETNETWORKURL)
         case BSCTESTNETID:
             return new ethers.providers.JsonRpcProvider(BSCTESTNETNETWORKURL)
+        case BTTMAINNETID:
+            return new ethers.providers.JsonRpcProvider(BTTMAINNETURL)
         default:
             return undefined;
     }
@@ -100,6 +114,8 @@ export function getWalletCurrencyFromFetchedChainId(chainId: number): string {
             return "FTM"
         case 0x61:
             return "BNB"
+        case 0xc7:
+            return "BTT"
         default:
             return "ETH"
     }
@@ -216,6 +232,9 @@ export async function onboardOrSwitchNetwork(networkId: any, handleError: any) {
         case BSCTESTNETID:
             await switchToBSCTestnet();
             return true;
+        case BTTMAINNETID:
+            await switchToBTTMainet();
+            return true;
         default:
             return false;
     }
@@ -246,6 +265,20 @@ async function ethereumRequestAddChain(
             },
         ],
     });
+}
+
+
+export async function switchToBTTMainet() {
+    const chainId = BTTMAINNETID;
+    const chainName = "BTT Mainnet";
+    const rpcUrls = [BTTMAINNETURL];
+    const blockExplorerUrls = ["https://bttcscan.com"];
+    const switched = await switch_to_Chain(chainId);
+    if (!switched) {
+        // IfI cannot switch to it, I try to add it
+        await ethereumRequestAddChain(chainId, chainName, "BTT", "BTT", 18, rpcUrls, blockExplorerUrls);
+    }
+
 }
 
 export async function switchToDonauTestnet() {

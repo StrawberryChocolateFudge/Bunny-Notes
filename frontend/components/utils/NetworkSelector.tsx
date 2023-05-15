@@ -116,7 +116,7 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
         <CheckWebsiteURLWarning />
 
         <DialogTitle sx={{ paddingBottom: "0", marginBottom: "0", display: "flex", justifyContent: "center" }}><IMG alt="Bunny Notes Title" src="/imgs/BunnyNotes.svg" /></DialogTitle>
-        <Button href="/tokensale" sx={{ margin: "0 auto" }}>Visit the Token Sale Page (on BSC)</Button>
+        {/* <Button href="/tokensale" sx={{ margin: "0 auto" }}>Visit the Token Sale Page (on BSC)</Button> */}
         <DialogContent>
             <DialogContentText sx={{ textAlign: "center" }}>
                 Select the network to continue

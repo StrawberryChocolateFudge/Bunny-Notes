@@ -80,8 +80,6 @@ export function downloadNote(props: DownloadNoteProps) {
                 props.displayError("Underlying error changed! Refresh the application!")
                 return;
             }
-
-
             props.displayError("Unable to deposit ERC20 Note");
             props.setDepositButtonDisabled(false);
         });
