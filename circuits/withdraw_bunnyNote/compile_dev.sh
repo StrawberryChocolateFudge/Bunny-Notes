@@ -1,4 +1,4 @@
- # Compiling the circuits
+ # Compiling the circuits during development, this does not include the BEACON and only 1 contribution is added to the ceremony
  # First we remove the extra files from the directory
 
  rm -rf withdraw_js

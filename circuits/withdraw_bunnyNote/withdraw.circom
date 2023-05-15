@@ -12,7 +12,7 @@ template Withdraw(){
    signal input secret;
 
 
-   // hidden signals to make sure the recipient and fee cannot be tampered with later
+   // hidden signals to make sure the recipient cannot be tampered with later
    signal recipientSquare;
 
   // Hashing the commitment and the nullifier

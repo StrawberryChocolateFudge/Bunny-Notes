@@ -53,6 +53,10 @@ const config: HardhatUserConfig = {
     //   url: process.env.BSC_TESTNET_API || "",
     //   accounts: process.env.KEY_DONAU !== undefined ? [process.env.KEY_DONAU] : [],
     // }
+    // bttmainnet: {
+    //   url: process.env.BTT_MAINNET_API || "",
+    //   accounts: process.env.KEY_DONAU !== undefined ? [process.env.KEY_DONAU] : [],
+    // }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

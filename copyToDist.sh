@@ -1,4 +1,4 @@
-cp circuits/withdraw_bunnyNote/withdraw_0001.zkey dist/withdraw_0001.zkey
+cp circuits/withdraw_bunnyNote/withdraw_final.zkey dist/withdraw_final.zkey
 
 cp circuits/withdraw_bunnyNote/withdraw_js/withdraw.wasm dist/withdraw.wasm
 

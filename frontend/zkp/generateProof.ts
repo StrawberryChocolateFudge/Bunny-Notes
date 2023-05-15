@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === "development") {
 
 
 
-export const snarkArtifacts = { wasmFilePath: urlBASE + "/withdraw.wasm", zkeyFilePath: urlBASE + "/withdraw_0001.zkey" };
+export const snarkArtifacts = { wasmFilePath: urlBASE + "/withdraw.wasm", zkeyFilePath: urlBASE + "/withdraw_final.zkey" };
 
 export type NoteDetails = [
     string, ParsedNote

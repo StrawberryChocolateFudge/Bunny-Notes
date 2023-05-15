@@ -20,7 +20,7 @@ export async function generateNoteWithdrawProof({ deposit, recipient, snarkArtif
     if (!snarkArtifacts) {
         snarkArtifacts = {
             wasmFilePath: `circuits/withdraw_bunnyNote/withdraw_js/withdraw.wasm`,
-            zkeyFilePath: `circuits/withdraw_bunnyNote/withdraw_0001.zkey`
+            zkeyFilePath: `circuits/withdraw_bunnyNote/withdraw_final.zkey`
         }
     }
 
