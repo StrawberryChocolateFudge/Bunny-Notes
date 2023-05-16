@@ -58,7 +58,6 @@ const combineHashes = (leavesToCombine: Array<bigint>, leafIndex: number) => {
     const combinedHashes: bigint[] = [];
     let pair = {};
     let key = BigInt("0");
-    // let proofPath;
 
     for (let i = 0; i < leavesToCombine.length; i += 2) {
         // I need to duplicate the last leaf if the tree is uneven
@@ -111,7 +110,7 @@ const getLeafPairs = (tree: any, leaf: any) => {
     return { pairedLeaves, keys }
 }
 
-const convertToProofFormat = (keys: any, pairedLeaves: any) => {
+const convertToProofFormat = (keys: any, pairedLeaves: any, leaf: any) => {
     let proof: { hash: bigint, direction: HashDirection }[] = [];
     // A quick iteration over the keys to sort out the mapping
     // This converts the paired leaves to a data structure more suited for using as a proof
@@ -122,9 +121,15 @@ const convertToProofFormat = (keys: any, pairedLeaves: any) => {
         const pair = pairedLeaves.get(key);
         if (i === 0) {
             // the first will have hard coded directions!
-            proof.push({ hash: pair[0], direction: HashDirection.LEFT })
+            // I make sure the first key is the leaf I'm creating the proof for!!
+            if (leaf === pair[0]) {
+                proof.push({ hash: pair[0], direction: HashDirection.LEFT })
+                proof.push({ hash: pair[1], direction: HashDirection.RIGHT })
+            } else {
+                proof.push({ hash: pair[1], direction: HashDirection.RIGHT })
+                proof.push({ hash: pair[0], direction: HashDirection.LEFT })
+            }
 
-            proof.push({ hash: pair[1], direction: HashDirection.RIGHT })
         } else {
             // Use the previous key, which was a hash to figure out the direction
             // This is needed because the previous key is always the product of hashing
@@ -151,7 +156,7 @@ export function generateMerkleProof(leaf: bigint, leaves: Array<bigint>): any {
 
     const { keys, pairedLeaves } = getLeafPairs(tree, leaf);
 
-    return convertToProofFormat(keys, pairedLeaves);
+    return convertToProofFormat(keys, pairedLeaves, leaf);
 }
 
 // Reduce the merkle proof to a root by hashing the leaves and determining direction!
