@@ -2,8 +2,8 @@ pragma circom 2.0.0;
 
 include "../../node_modules/circomlib/circuits/poseidon.circom";
 
-
-template HasherLeftRight(){
+// Updated hashed to use Poseidon
+template HashLeftRight(){
   signal input left;
   signal input right;
   signal output hash;
@@ -16,6 +16,7 @@ template HasherLeftRight(){
   hash <== hasher.out;
 }
 
+
 // if s == 0 returns [in[0], in[1]]
 // if s == 1 returns [in[1], in[0]]
 template DualMux() {
@@ -23,16 +24,15 @@ template DualMux() {
     signal input s;
     signal output out[2];
 
-    s * (1 - s) === 0
+    s * (1 - s) === 0;
     out[0] <== (in[1] - in[0])*s + in[0];
     out[1] <== (in[0] - in[1])*s + in[1];
 }
 
-//TODO: THIS TREE CHECKER IS NOT IMPLEMENTED YET FOR BUNNY BUNDLES AND WAS JUST USED FROM ANOTHER PROJECT!
-//WIP.
 
-// Verifies that merkle proof is correct for given merkle root and a leaf
-// pathIndices input is an array of 0/1 selectors telling whether given pathElement is on the left or right side of merkle path
+// Verifies that a merkle proof is correct for given root and leaf
+// pathIndices input in an array of 0/1 selectors telling whether 
+// given pathElement is on the left or right side of the merkle path
 template MerkleTreeChecker(levels) {
     signal input leaf;
     signal input root;
@@ -42,16 +42,23 @@ template MerkleTreeChecker(levels) {
     component selectors[levels];
     component hashers[levels];
 
-    for (var i = 0; i < levels; i++) {
-        selectors[i] = DualMux();
-        selectors[i].in[0] <== i == 0 ? leaf : hashers[i - 1].hash;
-        selectors[i].in[1] <== pathElements[i];
-        selectors[i].s <== pathIndices[i];
+    signal levelHashes[levels + 1];
 
+   levelHashes[0] <== leaf;
+
+    for (var i = 1; i < levels; i++) {
+        selectors[i] = DualMux();
         hashers[i] = HashLeftRight();
+
+        selectors[i].in[0] <== levelHashes[i - 1];
+        selectors[i].in[1] <== pathElements[i];
+        selectors[i].s <== pathIndices[i-1];
+
         hashers[i].left <== selectors[i].out[0];
         hashers[i].right <== selectors[i].out[1];
+        levelHashes[i] <== hashers[i].hash;
     }
+    
 
-    root === hashers[levels - 1].hash;
+    root === levelHashes[levels-1];
 }
