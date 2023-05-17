@@ -1,5 +1,5 @@
 include "../../node_modules/circomlib/circuits/comparators.circom";
-
+// NOTICE: THIS IS NOT TESTED AND IT"S NOT IN USE, I JUST DIDN"T WANT TO THROW IT OUT!
 // This function takes an array input and an index and outputs the value of in[index]
 // CHECK IF AN ARRAY CONTAINS AN ELEMENT AT INDEX
 // We cannot use an if statement with unknowns so this quinSelector is used

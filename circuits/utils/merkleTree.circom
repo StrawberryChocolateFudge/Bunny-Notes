@@ -2,7 +2,7 @@ pragma circom 2.0.0;
 
 include "../../node_modules/circomlib/circuits/poseidon.circom";
 
-// Updated hashed to use Poseidon
+n
 template HashLeftRight(){
   signal input left;
   signal input right;
