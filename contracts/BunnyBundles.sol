@@ -26,6 +26,7 @@ struct BundleStore {
     uint256 size; // Individual note value is totalValue / size
     uint256 totalValue; // The total value is the deposited value
     uint256 valueLeft;
+    uint256 bunnyNotesLeft;
     bool usesToken;
     IERC20 token;
     address[] recipients; // The addresses that withdraw the BunnyNote
@@ -113,6 +114,7 @@ contract BunnyBundles is ReentrancyGuard {
         bundles[root].creator = msg.sender;
         bundles[root].createdDate = block.timestamp;
         bundles[root].size = size;
+        bundles[root].bunnyNotesLeft = size;
         bundles[root].totalValue = totalValue;
         bundles[root].valueLeft = totalValue;
         bundles[root].usesToken = false;
@@ -209,6 +211,8 @@ contract BunnyBundles is ReentrancyGuard {
         );
         require(bundles[_root].used, "Unused note!");
         require(bundles[_root].valueLeft > 0, "No value left");
+        // The notes left should be zero when the value left but for now I require both
+        require(bundles[_root].bunnyNotesLeft > 0, "No more");
         require(
             verifier.verifyProof(
                 [_proof[0], _proof[1]],
@@ -227,15 +231,17 @@ contract BunnyBundles is ReentrancyGuard {
         nullifierHashes[_root][_nullifierHash] = true;
         bundles[_root].recipients.push(_recipient);
         bundles[_root].usedCommitments.push(_commitment);
+        bundles[_root].bunnyNotesLeft -= 1;
 
         uint256 noteValue = getNoteValue(
             bundles[_root].totalValue,
             bundles[_root].size
         );
+
         // Decrement the value left indicator
         bundles[_root].valueLeft = bundles[_root].valueLeft.sub(noteValue);
 
-        //    Proces the withdraw
+        //    Process the withdraw
         if (bundles[_root].usesToken) {
             // Transfer the token
             bundles[_root].token.safeTransfer(_recipient, noteValue);
