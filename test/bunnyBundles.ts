@@ -6,7 +6,7 @@ import fs from "fs";
 
 describe("Bunny bundles", function () {
     it("Create a bunny bundle", async function () {
-        const { bunnyBundle, leaves, root, tree } = await createBundle({ currency: "ETH", amount: "100", netId: 1337, size: 10 });
+        const { bunnyBundle, leaves, root, tree } = await createBundle({ currency: "ETH", amount: "100", netId: 1337, size: 1000 });
         expect(bunnyBundle.length).to.equal(leaves.length);
         expect(tree.layers[tree.layers.length - 1][0]).to.equal(root);
         // const root = BigInt("7134383530342203357968476074048993474625910172954766458200609505033693831543");
@@ -35,7 +35,7 @@ describe("Bunny bundles", function () {
         //     '18306423483821184725905123467730820563265191461766826620994043720518603630031'
         // ].map((l) => BigInt(l));
 
-        const leafIndex = 8;
+        const leafIndex = 353;
 
         const proofForLeaf = leaves[leafIndex];
         const proof = generateMerkleProof(proofForLeaf, leaves) as MerkleProof;
@@ -48,10 +48,10 @@ describe("Bunny bundles", function () {
         const encoded = encodeForCircuit(proof);
         expect(encoded.pathElements[0]).to.equal(proofForLeaf);
 
-
         //   Now create a proof with circom
         const noteToWithdraw = bunnyBundle[leafIndex];
         const parsedNote = await parseBundleNote(noteToWithdraw);
+        expect(BigInt(parsedNote.root)).to.equal(root);
         const { proof: zkProof, publicSignals } = await generateBundleWithdrawProof({
             deposit: parsedNote.deposit,
             root,
@@ -59,14 +59,10 @@ describe("Bunny bundles", function () {
             recipient: "0x0000000000000000000000000000000000000000"
         });
         // then verify the proof
-
-        // verify the proof!
         const verificationKeyFile = fs.readFileSync("circuits/withdraw_bunnyBundle/withdrawBundledNote_verificationKey.json", "utf-8");
         const verificationKey = JSON.parse(verificationKeyFile);
         const res = await verifyFourPublicSignals(verificationKey, { proof: zkProof, publicSignals });
         expect(res).to.be.true;
-
-
     })
 
 
