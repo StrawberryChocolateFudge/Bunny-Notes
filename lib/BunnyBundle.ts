@@ -1,9 +1,11 @@
 import { formatEther, parseEther } from "ethers/lib/utils";
 import { createDeposit, toNoteHex } from "../lib/BunnyNote";
-import { generateMerkleRoot, generateMerkleTree } from "./generateCommitmentHash";
+
 import { rbigint } from "./random";
 //@ts-ignore
 import { utils } from "ffjavascript";
+import { generateMerkleTree } from "./merkleTree";
+
 
 // Bunny Bundles are bulk Bunny Notes
 // Instead of storing the Bunny Note commitment on chain we store a merkle tree
@@ -33,6 +35,8 @@ export async function createBundle(
     const notes: Array<string> = [];
     const leaves: Array<bigint> = []
 
+
+
     const parsedAmount = parseEther(amount);
     const amountPerNote = parsedAmount.div(size);
     const perNote = formatEther(amountPerNote);
@@ -41,9 +45,7 @@ export async function createBundle(
     for (let i = 0; i < size; i++) {
         const deposit = await createDeposit({ nullifier: rbigint(), secret: rbigint() });
         const note = toNoteHex(deposit.preimage, 62);
-        //TODO: notestrings need to contain the root hash also!! maybe instead of size!
-        const noteString = `bunnybundle-${currency}-${perNote}-${netId}-${size}-${note}`
-        notes.push(noteString);
+        notes.push(note);
         const commitment = deposit.commitment;
         // The commitments are the merkle tree leaves!
         leaves.push(commitment);
@@ -51,9 +53,12 @@ export async function createBundle(
 
     const { root, tree } = generateMerkleTree(leaves);
 
+    const bunnyBundle: Array<string> = notes.map(n => `bunnybundle-${currency}-${perNote}-${netId}-${size}-${n}-${root.toString()}`)
+
+
     // return the notes, the leaves and the root and convert both the root and the leaves to hex string
     return {
-        notes,
+        bunnyBundle,
         leaves,
         root,
         tree
@@ -67,7 +72,7 @@ export function fromNoteHex(hex: string) {
 
 
 export async function parseBundleNote(noteString: string) {
-    const noteRegex = /bunnybundle-(?<currency>\w+)-(?<amount>[\d.]+)-(?<netId>\d+)-(?<bundleSize>\d+)-0x(?<note>[0-9a-fA-F]{124})/g
+    const noteRegex = /bunnybundle-(?<currency>\w+)-(?<amount>[\d.]+)-(?<netId>\d+)-(?<bundleSize>\d+)-0x(?<note>[0-9a-fA-F]{124})-(?<root>\d+)/g
     const match = noteRegex.exec(noteString);
     if (!match) {
         throw new Error("Invalid Note!")
@@ -80,6 +85,6 @@ export async function parseBundleNote(noteString: string) {
     //@ts-ignore
     const netId = Number(match.groups.netId);
     //@ts-ignore
-    return { currency: match.groups.currency, amount: match.groups.amount, netId, deposit, size: match.groups.bundleSize }
+    return { currency: match.groups.currency, amount: match.groups.amount, netId, deposit, size: match.groups.bundleSize, root: match.groups.root }
 }
 
