@@ -42,7 +42,7 @@ template MerkleTreeChecker(levels) {
     component selectors[levels];
     component hashers[levels];
 
-    signal levelHashes[levels + 1];
+    signal levelHashes[levels];
 
    levelHashes[0] <== leaf;
 
@@ -50,15 +50,15 @@ template MerkleTreeChecker(levels) {
         selectors[i] = DualMux();
         hashers[i] = HashLeftRight();
 
-        selectors[i].in[0] <== levelHashes[i - 1];
-        selectors[i].in[1] <== pathElements[i];
-        selectors[i].s <== pathIndices[i-1];
+        selectors[i].in[1] <== levelHashes[i - 1];
+        selectors[i].in[0] <== pathElements[i];
+        selectors[i].s <== pathIndices[i];
 
         hashers[i].left <== selectors[i].out[0];
         hashers[i].right <== selectors[i].out[1];
+        
         levelHashes[i] <== hashers[i].hash;
     }
     
-
-    root === levelHashes[levels-1];
+    root === levelHashes[levels -1];
 }
