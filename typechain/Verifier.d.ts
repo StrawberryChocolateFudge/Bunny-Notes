@@ -20,7 +20,7 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface VerifierInterface extends ethers.utils.Interface {
   functions: {
-    "verifyProof(uint256[2],uint256[2][2],uint256[2],uint256[3])": FunctionFragment;
+    "verifyProof(uint256[2],uint256[2][2],uint256[2],uint256[4])": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -29,7 +29,7 @@ interface VerifierInterface extends ethers.utils.Interface {
       [BigNumberish, BigNumberish],
       [[BigNumberish, BigNumberish], [BigNumberish, BigNumberish]],
       [BigNumberish, BigNumberish],
-      [BigNumberish, BigNumberish, BigNumberish]
+      [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
     ]
   ): string;
 
@@ -89,7 +89,7 @@ export class Verifier extends BaseContract {
       a: [BigNumberish, BigNumberish],
       b: [[BigNumberish, BigNumberish], [BigNumberish, BigNumberish]],
       c: [BigNumberish, BigNumberish],
-      input: [BigNumberish, BigNumberish, BigNumberish],
+      input: [BigNumberish, BigNumberish, BigNumberish, BigNumberish],
       overrides?: CallOverrides
     ): Promise<[boolean] & { r: boolean }>;
   };
@@ -98,7 +98,7 @@ export class Verifier extends BaseContract {
     a: [BigNumberish, BigNumberish],
     b: [[BigNumberish, BigNumberish], [BigNumberish, BigNumberish]],
     c: [BigNumberish, BigNumberish],
-    input: [BigNumberish, BigNumberish, BigNumberish],
+    input: [BigNumberish, BigNumberish, BigNumberish, BigNumberish],
     overrides?: CallOverrides
   ): Promise<boolean>;
 
@@ -107,7 +107,7 @@ export class Verifier extends BaseContract {
       a: [BigNumberish, BigNumberish],
       b: [[BigNumberish, BigNumberish], [BigNumberish, BigNumberish]],
       c: [BigNumberish, BigNumberish],
-      input: [BigNumberish, BigNumberish, BigNumberish],
+      input: [BigNumberish, BigNumberish, BigNumberish, BigNumberish],
       overrides?: CallOverrides
     ): Promise<boolean>;
   };
@@ -119,7 +119,7 @@ export class Verifier extends BaseContract {
       a: [BigNumberish, BigNumberish],
       b: [[BigNumberish, BigNumberish], [BigNumberish, BigNumberish]],
       c: [BigNumberish, BigNumberish],
-      input: [BigNumberish, BigNumberish, BigNumberish],
+      input: [BigNumberish, BigNumberish, BigNumberish, BigNumberish],
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
@@ -129,7 +129,7 @@ export class Verifier extends BaseContract {
       a: [BigNumberish, BigNumberish],
       b: [[BigNumberish, BigNumberish], [BigNumberish, BigNumberish]],
       c: [BigNumberish, BigNumberish],
-      input: [BigNumberish, BigNumberish, BigNumberish],
+      input: [BigNumberish, BigNumberish, BigNumberish, BigNumberish],
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
