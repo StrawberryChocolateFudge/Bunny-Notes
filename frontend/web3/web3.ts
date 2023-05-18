@@ -3,23 +3,132 @@ import { BigNumber, ethers } from "ethers";
 import { formatEther, parseEther } from "ethers/lib/utils";
 import { setCurrentNToSS } from "../storage/session";
 
-export const BTTCTESTNETID = "0x405";
+enum NetworkNames {
+    BTT_TESTNET = "BTT Donau Testnet",
+    BSC_TESTNET = "Binance Smart Chain Testnet",
 
-export const FANTOMTESTNETID = "0xfa2";
+    // Mainnets
+    BTT_MAINNET = "BitTorrent Chain",
+    ETH_MAINNET = "Ethereum"
+}
 
-export const BSCTESTNETID = "0x61";
+enum NetworkTickers {
+    BTT_TESTNET = "BTT",
+    BSC_TESTNET = "BNB",
 
-export const BTTMAINNETID = "0xc7"//199(0xc7)	
+    // Mainnets
+    ETH_MAINNET = "ETH",
+    BTT_MAINNET = "BTT"
+}
 
-export const BTT_BUNNYNOTES_DONAU = "0x3bc314B9448E1E33921a9E146bFdA16639a11e4F";
+export enum ChainIds {
+    BTT_TESTNET_ID = "0x405",
+    BSC_TESTNET_ID = "0x61",
 
-export const BUNNYNOTES_BSC_TESTNET = "0xF273919f7e9239D5C8C70f49368fF80c0a91064A";
+    // MAINNETS
+    BTT_MAINNET_ID = "0xc7",
+    ETH_MAINNET = "0x1"
+}
 
-export const BUNNYNOTES_TOKENSALE_TESTNET = "0x57ca49c07328da62335Fc450176C274157C01eB6";
+enum BunnyNotesContractAddress {
+    BTT_DONAU_TESTNET = "0x3bc314B9448E1E33921a9E146bFdA16639a11e4F",
+    BSC_TESTNET = "0xF273919f7e9239D5C8C70f49368fF80c0a91064A",
 
-export const ZKBTokenAddress_BSC = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7" //TESTNET!!
+    //MAINNETS:
+    BTT_MAINNET = "0x3Cad43A3038F0E657753C0129ce7Ea4a5801EC90",
+    ETH_MAINNET = ""
+}
 
-export const BTT_BUNNYNOTES_MAINNET = "0x3Cad43A3038F0E657753C0129ce7Ea4a5801EC90";
+enum RPCURLS {
+    BTT_TESTNET = "https://pre-rpc.bt.io/",
+    BSC_TESTNET = "https://data-seed-prebsc-1-s3.binance.org:8545",
+
+    // MAINNETS:
+    BTT_MAINNET = "https://rpc.bittorrentchain.io",
+    ETH_MAINNET = "https://eth.llamarpc.com"
+}
+
+enum EXPORERURLS {
+    BTT_TESTNET = "https://testscan.bt.io/",
+    BSC_TESTNET = "https://testnet.bscscan.com/",
+
+    // Mainnets
+    BTT_MAINNET = "https://bttcscan.com",
+    ETH_MAINNET = "https://etherscan.io/tx/"
+}
+
+// TODO: UPDATE THIS TO START TOKENSALE ON MAINNET!
+export const ZKBTokenAddress_BSC_TESTNET = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7" //TESTNET!!
+
+export const getCurrentTokenSold = () => ZKBTokenAddress_BSC_TESTNET;
+
+export const ZKBTokenSaleURL_BSC_TESTNET = "0x57ca49c07328da62335Fc450176C274157C01eB6";
+
+export const getCurrentTokenSaleAddress = () => ZKBTokenSaleURL_BSC_TESTNET;
+
+export const getCurrentTokenSaleNetwork = () => ChainIds.BSC_TESTNET_ID;
+
+export enum FeelessTokens {
+    BTT_TESTNET = "",
+    BSC_TESTNET = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7", //ZKB deployed on testnet
+
+    BTT_MAINNET = "",
+    ETH_MAINNET = ""
+}
+
+const noteContractAddresses: { [key in ChainIds]: BunnyNotesContractAddress } = {
+    [ChainIds.BTT_TESTNET_ID]: BunnyNotesContractAddress.BTT_DONAU_TESTNET,
+    [ChainIds.BSC_TESTNET_ID]: BunnyNotesContractAddress.BSC_TESTNET,
+    // Mainnets
+    [ChainIds.BTT_MAINNET_ID]: BunnyNotesContractAddress.BTT_MAINNET,
+    [ChainIds.ETH_MAINNET]: BunnyNotesContractAddress.ETH_MAINNET
+}
+
+const networkNameFromId: { [key in ChainIds]: NetworkNames } = {
+    [ChainIds.BTT_TESTNET_ID]: NetworkNames.BTT_TESTNET,
+    [ChainIds.BSC_TESTNET_ID]: NetworkNames.BSC_TESTNET,
+    // Mainnets
+    [ChainIds.BTT_MAINNET_ID]: NetworkNames.BTT_MAINNET,
+    [ChainIds.ETH_MAINNET]: NetworkNames.ETH_MAINNET
+}
+
+const rpcUrl: { [key in ChainIds]: RPCURLS } = {
+    [ChainIds.BTT_TESTNET_ID]: RPCURLS.BTT_TESTNET,
+    [ChainIds.BSC_TESTNET_ID]: RPCURLS.BSC_TESTNET,
+
+    // Mainnets
+    [ChainIds.BTT_MAINNET_ID]: RPCURLS.BTT_MAINNET,
+    [ChainIds.ETH_MAINNET]: RPCURLS.ETH_MAINNET
+}
+
+const explorerUrl: { [key in ChainIds]: EXPORERURLS } = {
+    [ChainIds.BTT_TESTNET_ID]: EXPORERURLS.BTT_TESTNET,
+    [ChainIds.BSC_TESTNET_ID]: EXPORERURLS.BSC_TESTNET,
+
+    // Mainnets
+    [ChainIds.BTT_MAINNET_ID]: EXPORERURLS.BTT_MAINNET,
+    [ChainIds.ETH_MAINNET]: EXPORERURLS.ETH_MAINNET
+}
+
+
+const walletCurrency: { [key in ChainIds]: NetworkTickers } = {
+    [ChainIds.BTT_TESTNET_ID]: NetworkTickers.BTT_TESTNET,
+    [ChainIds.BSC_TESTNET_ID]: NetworkTickers.BSC_TESTNET,
+
+    // Mainnets
+    [ChainIds.BTT_MAINNET_ID]: NetworkTickers.BTT_MAINNET,
+    [ChainIds.ETH_MAINNET]: NetworkTickers.ETH_MAINNET
+}
+
+export const feelessTokens: { [key in ChainIds]: FeelessTokens } = {
+    [ChainIds.BTT_TESTNET_ID]: FeelessTokens.BTT_TESTNET,
+    [ChainIds.BSC_TESTNET_ID]: FeelessTokens.BSC_TESTNET,
+
+    // Mainnets
+    [ChainIds.BTT_MAINNET_ID]: FeelessTokens.BTT_MAINNET,
+    [ChainIds.ETH_MAINNET]: FeelessTokens.ETH_MAINNET
+}
+
 
 export const tokensalePriceCalculator = (bnbAmount: string) => {
     return parseEther(bnbAmount).mul(15000);
@@ -28,97 +137,41 @@ export const tokensalePriceCalculator = (bnbAmount: string) => {
 export const ZEROADDRESS = "0x0000000000000000000000000000000000000000"
 
 export function getNoteContractAddress(netId: any) {
-    switch (netId) {
-        case BTTCTESTNETID:
-            return BTT_BUNNYNOTES_DONAU;
-        case BSCTESTNETID:
-            return BUNNYNOTES_BSC_TESTNET;
-        case BTTMAINNETID:
-            return BTT_BUNNYNOTES_MAINNET;
-        default:
-            // Falling back to testnet address for now
-            return BTT_BUNNYNOTES_DONAU;
+    const addr = noteContractAddresses[netId as ChainIds];
+    if (!addr) {
+        // falling back to testnet if the netId is not found included!
+        return BunnyNotesContractAddress.BTT_DONAU_TESTNET;
     }
-}
-
-let RELAYERURL = "https://relayer.bunnynotes.finance"
-
-if (process.env.NODE_ENV === "development") {
-    RELAYERURL = "http://localhost:3000"
-}
-
-export const BTTCTESTNETNETWORKURL = "https://pre-rpc.bt.io/";
-
-export const FANTOMTESTNETNETWORKURL = "https://xapi.testnet.fantom.network/lachesis";
-
-export const BSCTESTNETNETWORKURL = "https://data-seed-prebsc-1-s3.binance.org:8545";
-
-export const BTTMAINNETURL = "https://rpc.bittorrentchain.io";
-
-export function getExplorer(txId: string, network: string | undefined): string {
-    if (!network) {
-        return "";
-    }
-    switch (network) {
-        case BTTCTESTNETID:
-            return `http://testscan.bt.io/#/transaction/${txId}`
-        case FANTOMTESTNETID:
-            return `https://testnet.ftmscan.com/tx/${txId}`
-        case BSCTESTNETID:
-            return `https://testnet.bscscan.com/address/${txId}`
-        case BTTMAINNETID:
-            return `https://bttcscan.com/tx/${txId}`;
-        default:
-            return "";
-    }
+    return addr;
 }
 
 export function getNetworkNameFromId(netId: any): string {
-    switch (netId) {
-        case BTTCTESTNETID:
-            return "BTTC Donau Testnet"
-        case FANTOMTESTNETID:
-            return "Fantom Testnet"
-        case BSCTESTNETID:
-            return "Binance Smart Chain Testnet"
-        case BTTMAINNETID:
-            return "BitTorrent Chain"
-        default:
-            return "INVALID"
+    const name = networkNameFromId[netId as ChainIds];
+    if (!name) {
+        return "INVALID";
     }
+    return name;
 }
 
 
 export function getJsonRpcProvider(network: string): any {
-    switch (network) {
-        case BTTCTESTNETID:
-            return new ethers.providers.JsonRpcProvider(BTTCTESTNETNETWORKURL)
-        case FANTOMTESTNETID:
-            return new ethers.providers.JsonRpcProvider(FANTOMTESTNETNETWORKURL)
-        case BSCTESTNETID:
-            return new ethers.providers.JsonRpcProvider(BSCTESTNETNETWORKURL)
-        case BTTMAINNETID:
-            return new ethers.providers.JsonRpcProvider(BTTMAINNETURL)
-        default:
-            return undefined;
+    const getProvider = (url: RPCURLS) => new ethers.providers.JsonRpcProvider(url);
+    const url = rpcUrl[network as ChainIds];
+    if (!url) {
+        return undefined;
     }
+    return getProvider(url);
 }
 
 export function getWalletCurrencyFromFetchedChainId(chainId: number): string {
-    switch (chainId) {
-        case 1:
-            return "ETH"
-        case 0x405:
-            return "BTT"
-        case 0xfa2:
-            return "FTM"
-        case 0x61:
-            return "BNB"
-        case 0xc7:
-            return "BTT"
-        default:
-            return "ETH"
+    const hexchainId = "0x" + chainId.toString(16) as ChainIds;
+
+    const currency = walletCurrency[hexchainId];
+
+    if (!currency) {
+        return NetworkTickers.ETH_MAINNET;
     }
+    return currency;
 }
 
 export function web3Injected(): boolean {
@@ -222,22 +275,7 @@ export async function onboardOrSwitchNetwork(networkId: any, handleError: any) {
         await doOnBoarding();
         return false;
     }
-    switch (networkId) {
-        case BTTCTESTNETID:
-            await switchToDonauTestnet();
-            return true;
-        case FANTOMTESTNETID:
-            await switchToFantomTestnet();
-            return true;
-        case BSCTESTNETID:
-            await switchToBSCTestnet();
-            return true;
-        case BTTMAINNETID:
-            await switchToBTTMainet();
-            return true;
-        default:
-            return false;
-    }
+    return switchNetworkByChainId(networkId);
 }
 
 async function ethereumRequestAddChain(
@@ -267,54 +305,25 @@ async function ethereumRequestAddChain(
     });
 }
 
+export async function switchNetworkByChainId(netId: ChainIds) {
+    const name = networkNameFromId[netId];
+    if (!name) {
+        // If I can't find the name, the rest will fail too
+        return false;
+    }
+    const curr = walletCurrency[netId];
+    const rpcs = [rpcUrl[netId]];
+    const blockExplorerUrls = [explorerUrl[netId]]
+    const switched = await switch_to_Chain(netId);
 
-export async function switchToBTTMainet() {
-    const chainId = BTTMAINNETID;
-    const chainName = "BTT Mainnet";
-    const rpcUrls = [BTTMAINNETURL];
-    const blockExplorerUrls = ["https://bttcscan.com"];
-    const switched = await switch_to_Chain(chainId);
     if (!switched) {
-        // IfI cannot switch to it, I try to add it
-        await ethereumRequestAddChain(chainId, chainName, "BTT", "BTT", 18, rpcUrls, blockExplorerUrls);
+        // If I can't switch to it, I try to add it!
+        await ethereumRequestAddChain(netId, name, curr, curr, 18, rpcs, blockExplorerUrls);
     }
 
+    return true;
 }
 
-export async function switchToDonauTestnet() {
-    const chainId = 1029;
-    const hexchainId = "0x" + chainId.toString(16);
-    const chainName = "BTT Donau testnet"
-    const rpcUrls = ["https://pre-rpc.bt.io/"];
-    const blockExplorerUrls = ["https://testscan.bt.io/"];
-    const switched = await switch_to_Chain(hexchainId);
-    if (!switched) {
-        // If I cannot switch to it I try to add it!
-        await ethereumRequestAddChain(hexchainId, chainName, "BTT", "BTT", 18, rpcUrls, blockExplorerUrls);
-    }
-}
-
-export async function switchToBSCTestnet() {
-    const hexChainId = BSCTESTNETID;
-    const chainName = "Binance Chain Testnet";
-    const rpcUrls = ["https://data-seed-prebsc-1-s3.binance.org:8545/"];
-    const blockExplorerUrls = ["https://testnet.bscscan.com/"];
-    const switched = await switch_to_Chain(hexChainId);
-    if (!switched) {
-        await ethereumRequestAddChain(hexChainId, chainName, "BNB", "BNB", 18, rpcUrls, blockExplorerUrls);
-    }
-}
-
-export async function switchToFantomTestnet() {
-    const hexChainId = FANTOMTESTNETID;
-    const chainName = "Fantom testnet";
-    const rpcUrls = ["https://xapi.testnet.fantom.network/lachesis"]
-    const blockExplorerUrls = ["https://testnet.ftmscan.com/"]
-    const switched = await switch_to_Chain(hexChainId);
-    if (!switched) {
-        await ethereumRequestAddChain(hexChainId, chainName, "FTM", "FTM", 18, rpcUrls, blockExplorerUrls)
-    }
-}
 
 async function switch_to_Chain(chainId: string) {
     try {
