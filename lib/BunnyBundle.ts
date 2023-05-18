@@ -20,24 +20,21 @@ function isEven(size: number) {
 export async function createBundle(
     {
         currency,
-        amount, // Amount is the overall bundle price
+        totalValue, // Amount is the overall bundle price
         netId,
         size }: {
             currency: string,
-            amount: string,
+            totalValue: string,
             netId: number,
             size: number
         }) {
-    if (!isEven(size)) {
-        throw new Error("Invalid Tree Size!")
-    }
 
     const notes: Array<string> = [];
     const leaves: Array<bigint> = []
 
 
 
-    const parsedAmount = parseEther(amount);
+    const parsedAmount = parseEther(totalValue);
     const amountPerNote = parsedAmount.div(size);
     const perNote = formatEther(amountPerNote);
 

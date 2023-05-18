@@ -134,7 +134,7 @@ interface BunnyBundlesInterface extends ethers.utils.Interface {
   events: {
     "DepositETH(bytes32,address,uint256,uint256,uint256,uint256)": EventFragment;
     "DepositToken(bytes32,address,uint256,uint256,uint256,uint256,address)": EventFragment;
-    "WithdrawFromBundle(address,address,bytes32)": EventFragment;
+    "WithdrawFromBundle(address,address,bytes32,bytes32)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "DepositETH"): EventFragment;
@@ -166,7 +166,12 @@ export type DepositTokenEvent = TypedEvent<
 >;
 
 export type WithdrawFromBundleEvent = TypedEvent<
-  [string, string, string] & { from: string; to: string; root: string }
+  [string, string, string, string] & {
+    from: string;
+    to: string;
+    root: string;
+    commitment: string;
+  }
 >;
 
 export class BunnyBundles extends BaseContract {
@@ -585,22 +590,24 @@ export class BunnyBundles extends BaseContract {
       }
     >;
 
-    "WithdrawFromBundle(address,address,bytes32)"(
+    "WithdrawFromBundle(address,address,bytes32,bytes32)"(
       from?: null,
       to?: null,
-      root?: null
+      root?: null,
+      commitment?: null
     ): TypedEventFilter<
-      [string, string, string],
-      { from: string; to: string; root: string }
+      [string, string, string, string],
+      { from: string; to: string; root: string; commitment: string }
     >;
 
     WithdrawFromBundle(
       from?: null,
       to?: null,
-      root?: null
+      root?: null,
+      commitment?: null
     ): TypedEventFilter<
-      [string, string, string],
-      { from: string; to: string; root: string }
+      [string, string, string, string],
+      { from: string; to: string; root: string; commitment: string }
     >;
   };
 

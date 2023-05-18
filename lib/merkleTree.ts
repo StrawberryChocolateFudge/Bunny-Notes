@@ -63,7 +63,7 @@ const getLeafNodeDirectionInMerkleTree = (leaf: bigint, merkleTree: bigint[][]) 
     return hashIndex % 2 === 0 ? HashDirection.LEFT : HashDirection.RIGHT;
 };
 
-export function generateMerkleProof(leaf: bigint, leaves: Array<bigint>) {
+export function generateMerkleProof(leaf: bigint, leaves: Array<bigint>): MerkleProof | null {
     if (!leaf || !leaves || leaves.length === 0) {
         return null;
     }

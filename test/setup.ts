@@ -83,7 +83,9 @@ export async function setUpBunnyBundles(): Promise<SetUpBundlesType> {
     const bunnyBundlesDeploy = await BunnyBundlesFactory.deploy(Verifier.address, feelesstoken.address);
     const bunnyBundles = await bunnyBundlesDeploy.deployed();
 
-    return { owner, alice, bob, attacker, bunnyBundles, USDTM, feelesstoken };
+    const provider = ethers.provider;
+
+    return { owner, alice, bob, attacker, bunnyBundles, USDTM, feelesstoken, Verifier, provider };
 }
 type SetUpBundlesType = {
     owner: SignerWithAddress,
@@ -92,5 +94,7 @@ type SetUpBundlesType = {
     attacker: SignerWithAddress,
     bunnyBundles: BunnyBundles,
     USDTM: MOCKERC20,
-    feelesstoken: MOCKERC20
+    feelesstoken: MOCKERC20,
+    Verifier: Contract,
+    provider: any
 }
