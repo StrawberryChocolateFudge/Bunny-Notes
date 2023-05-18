@@ -7,7 +7,6 @@ import Typography from '@mui/material/Typography';
 import Header from './Header';
 import VerifyNoteTab from './VerifyNoteTab';
 import CashOutGiftCardTab from './CashOutGiftCardTab';
-import PaymentRequestTab from './PaymentRequestTab';
 import Snackbar from '@mui/material/Snackbar';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
@@ -171,16 +170,16 @@ export default function Base() {
                 return <VerifyNoteTab {...genericProps} {...noteStringProps} />
             case 2:
                 return <CashOutGiftCardTab {...genericProps} {...noteStringProps}></CashOutGiftCardTab>
-            case 3:
-                return <PaymentRequestTab {...genericProps} {...paymentRequestProps}></PaymentRequestTab>;
             default:
                 break;
         }
     }
 
+    const getTabDisplay = () => selectedNetwork === "" ? "none" : "flex";
+
     function mainRoute() {
         return <React.Fragment>
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ flex: 1, display: getTabDisplay(), flexDirection: 'column' }}>
                 <Header withTabs={true} selectedTab={selectedTab} onTabToggle={onTabToggle} />
                 <Box component="main" sx={{ flex: 1, }}>
                     {getTabContent()}
