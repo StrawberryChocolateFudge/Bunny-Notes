@@ -1,11 +1,11 @@
-import { AppBar, Button, ButtonBase, Grid, Paper, Stack, styled, Toolbar, Tooltip, Typography } from "@mui/material";
+import { AppBar, Button, Grid, Paper, Stack, Toolbar, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { toNoteHex } from "../../lib/BunnyNote";
-import { downloadA4PDF, downloadPDF } from "../pdf";
+import { downloadA4PDF } from "../pdf";
 import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
 import { ethers } from "ethers";
-import { bunnyNotesCommitments, calculateFee, depositETH, depositToken, ERC20Approve, getChainId, getContract, getFeelessToken, getNetworkNameFromId, isFeelessToken, onboardOrSwitchNetwork, requestAccounts, ZEROADDRESS } from "../web3/web3";
+import { bunnyNotesCommitments, calculateFee, depositETH, depositToken, ERC20Approve, getChainId, getContract, getNetworkNameFromId, ZEROADDRESS } from "../web3/web3";
 import { parseEther } from "ethers/lib/utils";
 import { commitmentQR } from "../qrcode/create";
 
