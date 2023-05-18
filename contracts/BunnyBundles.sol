@@ -29,8 +29,6 @@ struct BundleStore {
     uint256 bunnyNotesLeft;
     bool usesToken;
     IERC20 token;
-    address[] recipients; // The addresses that withdraw the BunnyNote
-    bytes32[] usedCommitments; // The commitments that were used by the recipients
 }
 
 contract BunnyBundles is ReentrancyGuard {
@@ -68,7 +66,12 @@ contract BunnyBundles is ReentrancyGuard {
         address token
     );
 
-    event WithdrawFromBundle(address from, address to, bytes32 root);
+    event WithdrawFromBundle(
+        address from,
+        address to,
+        bytes32 root,
+        bytes32 commitment
+    );
 
     /**
         @dev : the constructor
@@ -107,7 +110,7 @@ contract BunnyBundles is ReentrancyGuard {
         require(totalValue > 0, "Invalid totalValue");
         require(size > 0, "Invalid Size");
         uint256 fee = calculateFee(totalValue);
-        require(msg.value == totalValue + fee, "Invalid value");
+        require(msg.value == totalValue.add(fee), "Invalid value");
 
         // Record the BunnyBundle creation
         bundles[root].used = true;
@@ -146,7 +149,9 @@ contract BunnyBundles is ReentrancyGuard {
         bundles[root].creator = msg.sender;
         bundles[root].createdDate = block.timestamp;
         bundles[root].size = size;
+        bundles[root].bunnyNotesLeft = size;
         bundles[root].totalValue = totalValue;
+        bundles[root].valueLeft = totalValue;
         bundles[root].usesToken = true;
         bundles[root].token = IERC20(token);
         uint256 fee = calculateFee(totalValue);
@@ -209,9 +214,9 @@ contract BunnyBundles is ReentrancyGuard {
             !nullifierHashes[_root][_nullifierHash],
             "The note has already been spent!"
         );
-        require(bundles[_root].used, "Unused note!");
+        require(bundles[_root].used, "Unused root!");
+
         require(bundles[_root].valueLeft > 0, "No value left");
-        // The notes left should be zero when the value left but for now I require both
         require(bundles[_root].bunnyNotesLeft > 0, "No more");
         require(
             verifier.verifyProof(
@@ -229,8 +234,6 @@ contract BunnyBundles is ReentrancyGuard {
         );
         // Nullify the BunnyBundle, invalidating it!
         nullifierHashes[_root][_nullifierHash] = true;
-        bundles[_root].recipients.push(_recipient);
-        bundles[_root].usedCommitments.push(_commitment);
         bundles[_root].bunnyNotesLeft -= 1;
 
         uint256 noteValue = getNoteValue(
@@ -249,7 +252,12 @@ contract BunnyBundles is ReentrancyGuard {
             Address.sendValue(payable(_recipient), noteValue);
         }
 
-        emit WithdrawFromBundle(bundles[_root].creator, _recipient, _root);
+        emit WithdrawFromBundle(
+            bundles[_root].creator,
+            _recipient,
+            _root,
+            _commitment
+        );
     }
 
     /**
