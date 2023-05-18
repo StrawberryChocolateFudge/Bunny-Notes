@@ -17,6 +17,7 @@ async function deployOnBTTMAINNET() {
 
 }
 
+//TODO: DEPLOY ON BSC MAINNET
 
 async function main() {
     await deployOnBTTMAINNET();

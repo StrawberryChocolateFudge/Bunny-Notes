@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 
-
+// /?TODO: DEPLOY ON BSC MAINNET!!
 async function main() {
 
 

@@ -2,6 +2,10 @@ import { ethers } from "hardhat";
 
 const tokenOwnerWallet = "0x71A713135d57911631Bb54259026Eaa030F7B881";
 const tokenAddress = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7" // BSC address
+
+// TODO:  I NEED TO REFACTOR THIS TO USE BSC MAINNET!!!
+// AFTER I DEPLOY I NEED TO APPROVE TOO
+
 async function main() {
     const TokenSaleFactory = await ethers.getContractFactory("TokenSale");
     const tokenSaleDeploy = await TokenSaleFactory.deploy(tokenOwnerWallet, tokenAddress);
