@@ -3,7 +3,7 @@ import React from "react";
 import { setTermsAcceptedToLS } from "../../storage/local";
 import { setSelectedNToSS } from "../../storage/session";
 import { networkButtons, NetworkSelectProps } from "../../web3/cardPropsData";
-import { BTTCTESTNETID, handleNetworkSelect } from "../../web3/web3";
+import { handleNetworkSelect } from "../../web3/web3";
 import { CheckWebsiteURLWarning } from "./CheckWebsiteURLWarning";
 import { TermsCheckbox } from "./TermsCheckbox";
 
@@ -23,26 +23,19 @@ const IMG = styled("img")({
     alignSelf: 'center'
 })
 
-export function SelectNetwork(props: SelectNetworkProps) {
-    const handleNetworkChange = (event: SelectChangeEvent) => {
-        props.setSelectedNetwork(event.target.value);
-    }
+const WALLETICON = styled("img")({
+    marginLeft: "25px",
+    marginRight: "25px"
+})
 
-    return <Stack direction="row" justifyContent={"flex-end"}>
-        <FormControl variant="standard" sx={{ width: "200px" }}>
-            <Select
-                id="network-select"
-                value={props.selectedNetwork}
-                label="Network"
-                onChange={handleNetworkChange}
-            >
-                <MenuItem value={BTTCTESTNETID}>Bittorrent Chain</MenuItem>
-            </Select>
-        </FormControl>
-    </Stack>;
-}
-
-
+const EXPLAINER = styled("video")({
+    boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
+    alignSelf: "center",
+    marginBottom: "20px",
+    width: "300px",
+    height: '300px',
+    borderRadius: "25px"
+})
 
 type NetworkSelectButtonBuilderProps = {
     networks: NetworkSelectProps[],
@@ -51,8 +44,8 @@ type NetworkSelectButtonBuilderProps = {
 
 export function NetworkSelectButtonBuilder(props: NetworkSelectButtonBuilderProps): React.ReactElement[] {
     return props.networks.map(network => <Tooltip key={network.chainId} arrow title={network.tooltipTitle}>
-        <Button onClick={props.networkSelected(network.chainId)}>
-            <Card sx={{ padding: "5px" }}>
+        <Button onClick={props.networkSelected(network.chainId)} >
+            <Card sx={{ padding: "5px", width: "200px", paddingTop: "20px" }}>
                 <img width="50px" alt={network.imageAlt} src={network.imageSrc} />
                 <Typography gutterBottom variant="subtitle1" component="div" >{network.cardTypography}</Typography>
             </Card>
@@ -97,10 +90,10 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
 
     const availableWallets = () => {
 
-        return <Stack justifyContent={"space-around"} flexDirection="row">
-            <img width="35px" src="/imgs/metamaskFox.svg" />
-            <img width="60px" src="/imgs/trustWalletLogo.svg" />
-            <img width="30px" src="/imgs/braveLogo.svg" />
+        return <Stack justifyContent={"center"} flexDirection="row" sx={{ width: "300px", margin: "0 auto" }}>
+            <WALLETICON width="35px" src="/imgs/metamaskFox.svg" />
+            <WALLETICON width="60px" src="/imgs/trustWalletLogo.svg" />
+            <WALLETICON width="30px" src="/imgs/braveLogo.svg" />
         </Stack>
     }
 
@@ -112,25 +105,35 @@ export function SelectNetworkDialog(props: SelectNetworkProps) {
         </Stack>
     }
 
-    return <Dialog open={props.showNetworkSelect} onClose={handleClose}>
+    return <Dialog fullScreen open={props.showNetworkSelect} onClose={handleClose}>
         <CheckWebsiteURLWarning />
 
-        <DialogTitle sx={{ paddingBottom: "0", marginBottom: "0", display: "flex", justifyContent: "center" }}><IMG alt="Bunny Notes Title" src="/imgs/BunnyNotes.svg" /></DialogTitle>
-        {/* <Button href="/tokensale" sx={{ margin: "0 auto" }}>Visit the Token Sale Page (on BSC)</Button> */}
+        <Button href="/tokensale" sx={{ margin: "0 auto" }}>Visit the Token Sale Page (on BSC)</Button>
         <DialogContent>
+            <Stack direction="column" justifyContent="center">
+                {BunnyNotesExplainerVideo()}
+                <IMG alt="Bunny Notes Title" src="/imgs/BunnyNotes.svg" />
+            </Stack>
+
             <DialogContentText sx={{ textAlign: "center" }}>
                 Select the network to continue
             </DialogContentText>
-            <Divider light />
-            <Stack direction={"row"} justifyContent="center">
+            <TermsCheckbox termsAccepted={props.termsAccepted} onTermsChecked={onTermsChecked}></TermsCheckbox>
+            {/* <Stack direction={"column"} justifyContent="center" alignContent={"center"}> */}
+            <Stack direction={"row"} justifyContent="center" flexWrap="wrap">
                 {NetworkSelectButtonBuilder({ networks: networkButtons, networkSelected })}
             </Stack>
-            <Divider light />
-            <TermsCheckbox termsAccepted={props.termsAccepted} onTermsChecked={onTermsChecked}></TermsCheckbox>
+            {/* </Stack> */}
+            <DialogContentText sx={{ textAlign: "center" }}>
+                Supported wallets:
+            </DialogContentText>
             {availableWallets()}
-            <Divider light />
-            {TwitterButton()}
+
         </DialogContent>
 
     </Dialog>
+}
+
+function BunnyNotesExplainerVideo() {
+    return <EXPLAINER controls poster="/imgs/BunnyLogo.jpg" src="/imgs/BunnyNotes_video.mp4"></EXPLAINER>
 }
