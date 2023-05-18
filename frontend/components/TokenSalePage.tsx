@@ -2,7 +2,7 @@ import { Paper, Stack, TextField, Typography, Button, } from "@mui/material";
 import { BigNumber } from "ethers/lib/ethers";
 import { formatEther, parseEther } from "ethers/lib/utils";
 import React from "react";
-import { BSCTESTNETID, BUNNYNOTES_TOKENSALE_TESTNET, buyTokens, getContract, handleNetworkSelect, tokensalePriceCalculator, tokensLeft, watchAsset, ZKBTokenAddress_BSC } from "../web3/web3";
+import { buyTokens, getContract, handleNetworkSelect, tokensalePriceCalculator, tokensLeft, watchAsset, getCurrentTokenSold, getCurrentTokenSaleAddress, getCurrentTokenSaleNetwork } from "../web3/web3";
 import { default as MuiLink } from "@mui/material/Link";
 
 function Body1(txt) {
@@ -42,8 +42,8 @@ export function TokenSalePage(props: any) {
             props.displayError("Invalid amount");
             return;
         }
-        const provider = await handleNetworkSelect(BSCTESTNETID, props.displayError);
-        const tokenSaleContract = await getContract(provider, BUNNYNOTES_TOKENSALE_TESTNET, "/TokenSale.json");
+        const provider = await handleNetworkSelect(getCurrentTokenSaleNetwork(), props.displayError);
+        const tokenSaleContract = await getContract(provider, getCurrentTokenSaleAddress(), "/TokenSale.json");
 
         const tokensLeftAmount: BigNumber = await tokensLeft(tokenSaleContract).catch(err => {
             props.displayError("Network error. Check your wallet.");
@@ -83,7 +83,7 @@ export function TokenSalePage(props: any) {
 
     async function addAsset() {
         await watchAsset({
-            address: ZKBTokenAddress_BSC,
+            address: getCurrentTokenSold(),
             symbol: "ZKB",
             decimals: 18
         }, () => props.handleError("Unable to add token to wallet"));
