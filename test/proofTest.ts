@@ -17,11 +17,19 @@ describe("Bunny ZKP", function () {
     })
 
     it("Create a bunny bundle, choose a note and verify it's in the bundle", async function () {
-        const bundleSize = 10000;
+        const bundleSize = 10001;
         console.time(`${bundleSize} bunnybundles generated in: `);
-        const { bunnyBundle, leaves, root, tree } = await createBundle({ currency: "ETH", amount: "100", netId: 1337, size: bundleSize });
+        const { bunnyBundle, leaves, root, tree } = await createBundle({ currency: "ETH", totalValue: "100", netId: 1337, size: bundleSize });
         console.timeEnd(`${bundleSize} bunnybundles generated in: `);
-        expect(bunnyBundle.length).to.equal(leaves.length);
+
+        // The bundleSize is Event, then the leaves length is the same
+        if (bundleSize % 2 === 0) {
+            expect(bunnyBundle.length).to.equal(leaves.length);
+        } else {
+            // if bundleSize is odd, then the leaves are +1 because they are duplicated!
+            expect(bunnyBundle.length + 1).to.equal(leaves.length);
+        }
+
         expect(tree.layers[tree.layers.length - 1][0]).to.equal(root);
         // const root = BigInt("7134383530342203357968476074048993474625910172954766458200609505033693831543");
         // const bunnyBundle = [
