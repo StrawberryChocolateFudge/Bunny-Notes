@@ -37,7 +37,7 @@ const EXPLAINER = styled("video")({
 })
 
 function BunnyNotesExplainerVideo() {
-    return <EXPLAINER controls poster="/imgs/BunnyLogo.jpg" src="/imgs/BunnyNotes_video.mp4"></EXPLAINER>
+    return <EXPLAINER controls poster="/imgs/BunnyLogo.jpg" src="https://tio5nkhyzsqo3wedf4novipuspwvch4t6szdxuqq55noxtnbmp5q.arweave.net/mh3WqPjMoO3Ygy8a6qH0k-1RH5P0sjvSEO9a682hY_s"></EXPLAINER>
 }
 
 
