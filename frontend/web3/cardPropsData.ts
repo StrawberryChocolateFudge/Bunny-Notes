@@ -73,19 +73,20 @@ export const networkButtons: NetworkSelectProps[] = [
         imageSrc: "/imgs/bttLogo.svg",
         cardTypography: "BitTorrent Chain"
     }
-    ,
-    {
-        tooltipTitle: "Select Binance Smart Chain Testnet",
-        chainId: ChainIds.BSC_TESTNET_ID,
-        imageAlt: "Binance Smart Chain",
-        imageSrc: "/imgs/bnb-chain-binance-smart-chain-logo.svg",
-        cardTypography: "Binance Smart Chain Testnet"
-    }
-    , {
-        tooltipTitle: "Select Bittorrent Chain Testnet",
-        chainId: ChainIds.BTT_TESTNET_ID,
-        imageAlt: "Bittorrent Testnet",
-        imageSrc: "/imgs/bttLogo.svg",
-        cardTypography: "BitTorrent Testnet"
-    }
+    //,
+    // {
+    //     tooltipTitle: "Select Binance Smart Chain Testnet",
+    //     chainId: ChainIds.BSC_TESTNET_ID,
+    //     imageAlt: "Binance Smart Chain",
+    //     imageSrc: "/imgs/bnb-chain-binance-smart-chain-logo.svg",
+    //     cardTypography: "Binance Smart Chain Testnet"
+    // }
+    // ,
+    // {
+    //     tooltipTitle: "Select Bittorrent Chain Testnet",
+    //     chainId: ChainIds.BTT_TESTNET_ID,
+    //     imageAlt: "Bittorrent Testnet",
+    //     imageSrc: "/imgs/bttLogo.svg",
+    //     cardTypography: "BitTorrent Testnet"
+    // }
 ]
