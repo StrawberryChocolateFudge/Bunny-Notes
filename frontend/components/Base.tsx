@@ -3,7 +3,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import { styled } from "@mui/material";
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Header from './Header';
 import VerifyNoteTab from './VerifyNoteTab';
 import CashOutGiftCardTab from './CashOutGiftCardTab';
@@ -18,7 +17,7 @@ import {
     Route,
 } from "react-router-dom";
 import { NotFoundPage } from './404page';
-import BunnyNotesTab from './BunnyNotesTab';
+import { BunnyNotesTab, onSelectedNetworkEmpty } from './BunnyNotesTab';
 import { getSelectedNFromSS } from '../storage/session';
 import { NoteDetails } from '../zkp/generateProof';
 import { TermsPage } from './TermsPage';
@@ -50,7 +49,7 @@ export default function Base() {
     // Handling if the dialog to select network should show
     const selectedN = getSelectedNFromSS();
 
-    let selectedNetworkInit = selectedN === null ? "" : selectedN;
+    let selectedNetworkInit = selectedN === null ? onSelectedNetworkEmpty("") : selectedN;
 
     const [selectedNetwork, setSelectedNetwork] = React.useState(selectedNetworkInit);
 
