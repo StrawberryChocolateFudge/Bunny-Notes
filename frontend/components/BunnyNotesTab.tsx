@@ -42,7 +42,7 @@ function BunnyNotesExplainerVideo() {
 
 
 
-export default function BunnyNotesTab(props: BunnyNotesPageProps) {
+export function BunnyNotesTab(props: BunnyNotesPageProps) {
 
     const [renderDownloadPage, setRenderDownloadPage] = React.useState(false);
 
@@ -90,7 +90,6 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
     const handleAcceptDenominationDialog = async (denomination, tokencurrency, tokenAddress) => {
         let currency = selectedCard.isCustom ? tokencurrency : selectedCard.currency;
         let token = selectedCard.isCustom ? tokenAddress : selectedCard.tokenAddress;
-        // await importAddress();
         const { noteDetails, fee } = await calculateFeeAndNote(denomination, currency, props.selectedNetwork);
         setShowDenominationInput(false);
         const noteContractAddr = getNoteContractAddress(props.selectedNetwork);
@@ -139,9 +138,9 @@ export default function BunnyNotesTab(props: BunnyNotesPageProps) {
                     <Typography component="p" variant="subtitle1">Bunny Notes are verifiable claims for value that was deposited into a smart contract. Select the currency, enter the denomination, download the printable note and make a deposit to create one. By using the application you accept the <Link href="/terms" target="_blank"> Terms and Conditions.</Link>
                     </Typography>
                 </Stack>
-                <Stack direction="row" justifyContent="center">
+                {/* <Stack direction="row" justifyContent="center">
                     <Button href="/tokensale" sx={{ margin: "0 auto" }}>Visit the Token Sale Page (on BSC)</Button>
-                </Stack>
+                </Stack> */}
                 <Stack direction={"row"} justifyContent="center">
                     {NetworkSelectorDropdown(
                         {
@@ -165,7 +164,7 @@ export interface SelectNetworkProps {
     displayError: (err: string) => void;
 }
 
-function onSelectedNetworkEmpty(selectedNetwork: string) {
+export function onSelectedNetworkEmpty(selectedNetwork: string) {
     return selectedNetwork === "" ? networkButtons[0].chainId : selectedNetwork;
 }
 
