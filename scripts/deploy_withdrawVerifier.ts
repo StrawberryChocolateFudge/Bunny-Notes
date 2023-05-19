@@ -9,9 +9,9 @@ async function main() {
     const verifier = await VerifierDeploy.deployed();
 
     console.log('Verifier is deployed to :', verifier.address);
-    // Verifier is deployed to : 0xAca78197856E90985949DaBFA2B687f42D9d0Aa2 on Donau testnet
-    // Verifier is deployed to : 0xD98F9B6AB4fbA9b7173Cfe92Ae1Eb9A3F3F91751 on BSC Testnet!!
-    // Verifier is deployed to : 0x5586938a2fC4489661E868c5800769Fb10847fC5 on BTT MAINNET!!
+    // Verifier is deployed to : 0x02B721A1dB666CE9E6dF903BE2664872D9F98345 on Donau testnet // Latest
+    // Verifier is deployed to : 0x18a8C98DBfe92d739f4134493F39cE8b692f323B on BSC Testnet!! 
+    // Verifier is deployed to : 0x5586938a2fC4489661E868c5800769Fb10847fC5 on BTT MAINNET!!// latest
 }
 
 

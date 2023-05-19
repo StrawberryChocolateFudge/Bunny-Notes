@@ -11,10 +11,11 @@ import { Base, Spacer } from './Base';
 import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { styled, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
-import { bunnyNoteIsSpent, bunnyNotesCommitments, getJsonRpcProvider, getNoteContractAddress, getRpcContract } from '../web3/web3';
+import { bunnyNoteIsSpent, bunnyNotesCommitments, ChainIds, getJsonRpcProvider, getNetworkNameFromId, getNoteContractAddress, getRpcContract } from '../web3/web3';
 import { getLoading } from './LoadingIndicator';
 import { commitmentQRStringParser } from '../qrcode/create';
 import { ParsedNote } from '../zkp/generateProof';
+
 interface VerifyNoteTabProps extends Base {
       noteString: string
       setMyNoteString: (newValue: string) => void;
@@ -28,7 +29,8 @@ export type Commitment = {
       denomination: string,
       erc20Address: string,
       noteAddress: string,
-      usesToken: boolean
+      usesToken: boolean,
+      network: string
 }
 
 const IMG = styled("img")({
@@ -39,6 +41,8 @@ const IMG = styled("img")({
 export const shortenAddress = (address: string) => <Tooltip title={address}><div>{address.substring(0, 6)}...{address.substring(address.length - 6)}</div></Tooltip>
 
 export const evalQRCodeType = async (qrString) => {
+      //TODO: ADD BUNNY BUNDLE HERE!
+      // COMMITMENT FOR BUNNY BUNDLE ALSO!
       let cryptoNoteParseError = false;
       let commitmentParseError = false;
       let errorMessage = "";
@@ -73,13 +77,13 @@ const getDetails = ({ type, code, err }: { type: string, code: any, err: string 
             const note = code as ParsedNote;
             const nullifierHash = toNoteHex(note.deposit.nullifierHash);
             const commitment = toNoteHex(note.deposit.commitment);
-            return [commitment, nullifierHash, note.amount, note.currency];
+            return { commitment, nullifierHash, amount: note.amount, currency: note.currency, netId: code.netId };
       } else if (type === "commitmentQR") {
             const nullifierHash = code.nullifierHash;
             const commitment = code.commitment;
-            return [commitment, nullifierHash, code.amount, code.currency];
+            return { commitment, nullifierHash, amount: code.amount, currency: code.currency, netId: code.netId };
       }
-      return [];
+      return null;
 }
 
 export default function VerifyNoteTab(props: VerifyNoteTabProps) {
@@ -91,11 +95,10 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
       }
 
       const onVerify = async () => {
-            const provider = getJsonRpcProvider(props.selectedNetwork);
-            await fetchCommitment(provider)
+            await fetchCommitment().catch(err => props.displayError(err.message));
       }
 
-      const fetchCommitment = async (provider: any) => {
+      const fetchCommitment = async () => {
 
             const evalResult = await evalQRCodeType(props.noteString);
 
@@ -104,10 +107,19 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                   return;
             }
 
-            const [commitment, nullifierHash, amount, currency] = getDetails(evalResult);
-
+            const details = getDetails(evalResult);
+            if (!details) {
+                  props.displayError("Unable to parse note!");
+                  return;
+            }
+            const { commitment, nullifierHash, amount, currency, netId } = details;
+            const chainId = "0x" + netId.toString(16) as ChainIds;
             setLoading(true);
-            const contractAddress = getNoteContractAddress(props.selectedNetwork);
+
+            const contractAddress = getNoteContractAddress(chainId);
+
+            const provider = getJsonRpcProvider(chainId);
+
             const contract = await getRpcContract(provider, contractAddress, "/BunnyNotes.json");
             // get the commitment data
 
@@ -127,14 +139,15 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
             let erc20Address = commitments.usesToken ? commitments.token : "Native Token";
 
             setCommitmentDetails({
+
                   validText: !isSpent ? "Valid!" : "The Note has been spent!",
                   creator: commitments.creator,
                   recipient: recipient,
                   denomination: `${amount} ${currency}`,
                   noteAddress: contractAddress,
                   erc20Address,
-                  usesToken: commitments.usesToken
-
+                  usesToken: commitments.usesToken,
+                  network: getNetworkNameFromId(chainId)
             })
             setLoading(false);
       }
@@ -175,12 +188,17 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                                     <Button variant="contained" id="verifyNoteButton" onClick={onVerify} sx={{ mr: 1, fontSize: "20px" }}>
                                           Verify
                                     </Button>
-                              </Tooltip> </React.Fragment>)
+                              </Tooltip>
+                        </React.Fragment>)
                         : <React.Fragment>
                               <Typography sx={{ textAlign: "center" }}>{commitmentDetails.validText}</Typography>
                               <TableContainer component={Paper}>
                                     <Table aria-label="Note details">
                                           <TableBody>
+                                                <TableRow>
+                                                      <TableCell align="left">Network:</TableCell>
+                                                      <TableCell align="right">{commitmentDetails.network}</TableCell>
+                                                </TableRow>
                                                 <TableRow>
                                                       <TableCell align="left">Denomination:</TableCell>
                                                       <TableCell size='small' align="right">{commitmentDetails.denomination}</TableCell>

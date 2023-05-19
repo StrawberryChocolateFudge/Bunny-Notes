@@ -1,7 +1,6 @@
 import MetaMaskOnboarding from "@metamask/onboarding";
 import { BigNumber, ethers } from "ethers";
 import { formatEther, parseEther } from "ethers/lib/utils";
-import { setCurrentNToSS } from "../storage/session";
 
 enum NetworkNames {
     BTT_TESTNET = "BTT Donau Testnet",
@@ -31,8 +30,8 @@ export enum ChainIds {
 }
 
 enum BunnyNotesContractAddress {
-    BTT_DONAU_TESTNET = "0x3bc314B9448E1E33921a9E146bFdA16639a11e4F",
-    BSC_TESTNET = "0xF273919f7e9239D5C8C70f49368fF80c0a91064A",
+    BTT_DONAU_TESTNET = "0x859576e721404004dab525EB2Da0865E949eA717",
+    BSC_TESTNET = "0x29EbE72886d007cC4F2c3F43c9f899ab242Cc917",
 
     //MAINNETS:
     BTT_MAINNET = "0x3Cad43A3038F0E657753C0129ce7Ea4a5801EC90",
@@ -58,11 +57,10 @@ enum EXPORERURLS {
 }
 
 // TODO: UPDATE THIS TO START TOKENSALE ON MAINNET!
-export const ZKBTokenAddress_BSC_TESTNET = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7" //TESTNET!!
 
-export const getCurrentTokenSold = () => ZKBTokenAddress_BSC_TESTNET;
+export const getCurrentTokenSold = () => FeelessTokens.BSC_TESTNET;
 
-export const ZKBTokenSaleURL_BSC_TESTNET = "0x57ca49c07328da62335Fc450176C274157C01eB6";
+export const ZKBTokenSaleURL_BSC_TESTNET = "0x6d54302F99BEe568a903AcA3A58B51c91809bB78";
 
 export const getCurrentTokenSaleAddress = () => ZKBTokenSaleURL_BSC_TESTNET;
 
@@ -70,7 +68,7 @@ export const getCurrentTokenSaleNetwork = () => ChainIds.BSC_TESTNET_ID;
 
 export enum FeelessTokens {
     BTT_TESTNET = "",
-    BSC_TESTNET = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7", //ZKB deployed on testnet
+    BSC_TESTNET = "0xeDc320436A3d390B65Dfc0dc868909c914F431cA", //ZKB deployed on testnet
 
     BTT_MAINNET = "",
     ETH_MAINNET = ""
@@ -154,9 +152,9 @@ export function getNetworkNameFromId(netId: any): string {
 }
 
 
-export function getJsonRpcProvider(network: string): any {
+export function getJsonRpcProvider(chainId: string): any {
     const getProvider = (url: RPCURLS) => new ethers.providers.JsonRpcProvider(url);
-    const url = rpcUrl[network as ChainIds];
+    const url = rpcUrl[chainId as ChainIds];
     if (!url) {
         return undefined;
     }
@@ -225,8 +223,6 @@ function getWeb3Provider() {
         // Handle the new chain.
         // Correctly handling chain changes can be complicated.
         // We recommend reloading the page unless you have good reason not to.
-        setCurrentNToSS(chainId);
-        window.location.reload();
     });
     return provider;
 }

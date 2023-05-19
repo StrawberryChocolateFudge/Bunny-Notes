@@ -5,12 +5,11 @@ import { downloadA4PDF } from "../pdf";
 import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
 import { ethers } from "ethers";
-import { bunnyNotesCommitments, calculateFee, depositETH, depositToken, ERC20Approve, getChainId, getContract, getNetworkNameFromId, ZEROADDRESS } from "../web3/web3";
+import { bunnyNotesCommitments, calculateFee, depositETH, depositToken, ERC20Approve, getChainId, getContract, getNetworkNameFromId, handleNetworkSelect, onboardOrSwitchNetwork, ZEROADDRESS } from "../web3/web3";
 import { parseEther } from "ethers/lib/utils";
 import { commitmentQR } from "../qrcode/create";
 
 interface DownloadNoteProps {
-    provider: any,
     cardType: CardType,
     noteDetails: NoteDetails | undefined,
     qrCodeDataUrl: any,
@@ -20,7 +19,6 @@ interface DownloadNoteProps {
     showApproval: boolean
     setShowApproval: (to: boolean) => void;
     setRenderDownloadPage: (to: boolean) => void;
-    myAddress: string;
     noteAddresses: [string, string];
     selectedNetwork: string;
     noteFee: string;
@@ -80,14 +78,15 @@ export function downloadNote(props: DownloadNoteProps) {
                 props.displayError("Underlying error changed! Refresh the application!")
                 return;
             }
+            console.log(err);
             props.displayError("Unable to deposit ERC20 Note");
             props.setDepositButtonDisabled(false);
         });
         await handleDepositTx(tx);
     }
 
-    const depositWithOwnerAddress = async () => {
-        const notesContract = await getContract(props.provider, noteAddress, "/BunnyNotes.json");
+    const depositWithOwnerAddress = async (provider) => {
+        const notesContract = await getContract(provider, noteAddress, "/BunnyNotes.json");
         const deposit = noteDetails[1].deposit;
         const commitments = await bunnyNotesCommitments(notesContract, toNoteHex(deposit.commitment));
         if (commitments.used) {
@@ -101,12 +100,11 @@ export function downloadNote(props: DownloadNoteProps) {
             const approveAmount = props.isFeeless ? ethers.utils.parseEther(noteDetails[1].amount) : fee.add(ethers.utils.parseEther(noteDetails[1].amount));
 
             if (erc20Address === "") {
-                //TODO: Remove this in prod
-                props.displayError("Some tokens don't work on testnet!")
+                props.displayError("Token address missing. Maybe you are on testnet?")
             }
 
 
-            const ERC20Contract = await getContract(props.provider, erc20Address, "/ERC20.json");
+            const ERC20Contract = await getContract(provider, erc20Address, "/ERC20.json");
             props.setDepositButtonDisabled(true);
             props.setShowApproval(false);
             const tx = await ERC20Approve(ERC20Contract, noteAddress, approveAmount).catch((err) => {
@@ -124,6 +122,7 @@ export function downloadNote(props: DownloadNoteProps) {
                     props.setDepositButtonDisabled(false);
 
                 }).catch(err => {
+                    console.log(err);
                     {
                         if (err.message.includes("underlying network changed")) {
                             props.displayError("Underlying error changed! Refresh the application!")
@@ -145,18 +144,10 @@ export function downloadNote(props: DownloadNoteProps) {
             props.displayError("You need to download the Note before you can make a deposit!");
             return;
         }
-
-        // Check if we are on the correct network!
-        const chainId = await getChainId(props.provider);
-
-        if (chainId !== parseInt(props.selectedNetwork)) {
-            props.displayError("You are on the wrong network!")
-            return;
-        }
-
-        await depositWithOwnerAddress();
+        // I'm gonna onboard here and switch to the selected network and return the provider!
+        const provider = await handleNetworkSelect(props.selectedNetwork, props.displayError)
+        await depositWithOwnerAddress(provider);
     }
-
 
 
     const downloadClick = async () => {
@@ -165,7 +156,7 @@ export function downloadNote(props: DownloadNoteProps) {
         // start the download of the PDF!
         const commitment = toNoteHex(commitmentBigint);
         const nullifierHash = toNoteHex(nullifierHashBigint);
-        const commitmentQRData = await commitmentQR({ amount, currency, commitment, nullifierHash });
+        const commitmentQRData = await commitmentQR({ amount, currency, commitment, nullifierHash, netId: props.selectedNetwork });
 
         downloadA4PDF({
             bearerText,
@@ -221,8 +212,8 @@ export function downloadNote(props: DownloadNoteProps) {
                         <Grid item sx={{ textAlign: "center", paddingBottom: "20px", marginTop: "20px" }}>
 
                             {props.showApproval && !isNativeToken ? <Tooltip arrow title={"Approve spending " + denominationAndCurr + ` (plus ${displayedFee} fee)`}>
-                                <span><Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend</Button></span></Tooltip> : <Tooltip arrow title={"Deposit " + denominationAndCurr + ` (plus ${displayedFee} fee)`}>
-                                <span><Button disabled={props.depositButtonDisabled} onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Deposit</Button></span></Tooltip>}
+                                <span><Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend<img width="35px" src="/imgs/metamaskFox.svg" /></Button></span></Tooltip> : <Tooltip arrow title={"Deposit " + denominationAndCurr + ` (plus ${displayedFee} fee)`}>
+                                <span><Button disabled={props.depositButtonDisabled} onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Deposit<img width="35px" src="/imgs/metamaskFox.svg" /></Button></span></Tooltip>}
                             <Typography variant="subtitle1" component="div">
                                 Make sure to download the note before making the deposit! If you loose the note we cannot recover the deposit for you!
                             </Typography>

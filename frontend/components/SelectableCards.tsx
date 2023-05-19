@@ -45,13 +45,11 @@ export function SelectableCards(props: SelectableCardsProps) {
   const getContent = () => {
     return <Stack direction="column" alignItems="center">
 
-      {props.isFeeless ? <Typography sx={{ color: "grey" }} variant="subtitle1">
-        Feeless
-      </Typography> : <Typography gutterBottom variant="subtitle1" component="div">
+      <React.Fragment><Typography gutterBottom variant="subtitle1" component="div">
         {props.currency}
-      </Typography>
-      }
-
+      </Typography> {props.isFeeless ? <Typography sx={{ color: "grey" }} variant="subtitle1">
+        (Feeless)
+      </Typography> : null}</React.Fragment>
     </Stack>
   }
   return (

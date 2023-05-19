@@ -19,18 +19,12 @@ import {
 } from "react-router-dom";
 import { NotFoundPage } from './404page';
 import BunnyNotesTab from './BunnyNotesTab';
-import { SelectNetworkDialog } from './utils/NetworkSelector';
-import { getCurrenttNetworkFromSS, getSelectedNFromSS } from '../storage/session';
+import { getSelectedNFromSS } from '../storage/session';
 import { NoteDetails } from '../zkp/generateProof';
 import { TermsPage } from './TermsPage';
-import { getTermsAcceptedInit } from './utils/TermsCheckbox';
 import { TokenSalePage } from './TokenSalePage';
 
 export interface Base {
-    myAddress: string,
-    setMyAddress: (newValue: string) => void
-    provider: any,
-    setProvider: any,
     displayError: any,
     selectedNetwork: string,
     setSelectedNetwork: (n: string) => void;
@@ -42,13 +36,6 @@ export interface Base {
 export function Copyright() {
     return (
         <React.Fragment>
-            <Typography variant="body2" color="text.secondary" align="center">
-                {"\n"}
-                <MuiLink color="inherit" href="https://zkptech.solutions">
-                    Created by zkptech.solutions {" "}
-                </MuiLink>
-                {new Date().getFullYear()}
-            </Typography >
         </React.Fragment>
     );
 }
@@ -61,18 +48,9 @@ export const Spacer = styled("div")({
 
 export default function Base() {
     // Handling if the dialog to select network should show
-    const currentN = getCurrenttNetworkFromSS();
     const selectedN = getSelectedNFromSS();
 
-    let showNetworkSelectInit = true;
-    let selectedNetworkInit = "";
-
-    if (currentN === selectedN && currentN !== null) {
-        showNetworkSelectInit = false;
-        selectedNetworkInit = currentN;
-    }
-
-    const [showNetworkSelect, setShowNetworkSelect] = React.useState(showNetworkSelectInit);
+    let selectedNetworkInit = selectedN === null ? "" : selectedN;
 
     const [selectedNetwork, setSelectedNetwork] = React.useState(selectedNetworkInit);
 
@@ -82,20 +60,14 @@ export default function Base() {
 
     const [selectedTab, setSelectedTab] = React.useState(0);
 
-    const [myAddress, setMyAddress] = React.useState("");
-
     const [noteString, setMyNoteString] = React.useState("");
 
     const [paymentRequest, setPaymentRequest] = React.useState({ price: "", payTo: "" })
-
-    const [provider, setProvider] = React.useState(null);
 
     // Track if the deposit button is disabled with state stored here
     const [depositButtonDisabled, setDepositButtonDisabled] = React.useState(false);
 
     // Initialize the terms accepted from local storage
-
-    const [termsAccepted, setTermsAccepted] = React.useState(getTermsAcceptedInit());
 
     const openSnackbar = (msg: string) => {
         setSnackbarOpen(true);
@@ -130,10 +102,6 @@ export default function Base() {
 
     const genericProps = {
         displayError: openSnackbar,
-        provider,
-        setProvider,
-        setMyAddress,
-        myAddress,
         selectedNetwork,
         setSelectedNetwork,
         navigateToVerifyPage,
@@ -154,12 +122,7 @@ export default function Base() {
     const networkSelectProps = {
         displayError: openSnackbar,
         selectedNetwork,
-        setSelectedNetwork,
-        showNetworkSelect,
-        setShowNetworkSelect,
-        setProvider,
-        termsAccepted,
-        setTermsAccepted
+        setSelectedNetwork
     }
 
     const getTabContent = () => {
@@ -175,11 +138,9 @@ export default function Base() {
         }
     }
 
-    const getTabDisplay = () => selectedNetwork === "" ? "none" : "flex";
-
     function mainRoute() {
         return <React.Fragment>
-            <Box sx={{ flex: 1, display: getTabDisplay(), flexDirection: 'column' }}>
+            <Box sx={{ flex: 1, display: "flex", flexDirection: 'column' }}>
                 <Header withTabs={true} selectedTab={selectedTab} onTabToggle={onTabToggle} />
                 <Box component="main" sx={{ flex: 1, }}>
                     {getTabContent()}
@@ -188,7 +149,6 @@ export default function Base() {
                     <Copyright />
                 </Box>
             </Box>
-            <SelectNetworkDialog {...networkSelectProps}></SelectNetworkDialog>
         </React.Fragment>
     }
 

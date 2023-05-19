@@ -93,9 +93,6 @@ export function TokenSalePage(props: any) {
         <Stack direction="row" justifyContent="flex-start">
             <Button href="/">Go Back</Button>
         </Stack>
-        <Stack direction="row" justifyContent="center">
-            <img src="/imgs/BunnyLogo.jpg" width="100px" />
-        </Stack>
         <Typography component="div" variant="h4" sx={{ textAlign: "center" }}>
             Token Sale
         </Typography>
@@ -152,7 +149,7 @@ export function TokenSalePage(props: any) {
                 <div style={{ marginBottom: "20px", paddingLeft: "5px" }} />
                 <TextField value={bnbToSpend} onChange={setBnBToSpendChange} autoComplete="off" type="number" label="Amount (BNB)"></TextField>
             </Stack>
-            <Button variant="contained" sx={{ fontSize: "20px", marginLeft: "10px", backgroundColor: "#FF7377", "&:hover": { backgroundColor: "white", color: "black" } }} onClick={buyTokens_action}>Buy  <img style={{ marginLeft: "10px" }} src="/imgs/zkbLogo.png" width="50px" height="50px" /></Button>
+            <Button variant="contained" sx={{ fontSize: "20px", marginLeft: "10px", "&:hover": { backgroundColor: "white", color: "black" } }} onClick={buyTokens_action}>Buy  <img style={{ marginLeft: "10px" }} src="/imgs/BunnyNotesCircle.png" width="50px" height="50px" /></Button>
 
 
         </Stack>

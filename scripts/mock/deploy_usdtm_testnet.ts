@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
 //THIS IS A TOKEN ONLY USED FOR TESTING AS ANYONE CAN MINT IT TO THEIR ADDRESS!!
-
+// DO NOT USE IN PRODUCTION!!
 async function main() {
     const USDTMFActory = await ethers.getContractFactory("MOCKERC20");
     const USDTMDeploy = await USDTMFActory.deploy();

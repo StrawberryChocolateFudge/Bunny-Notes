@@ -31,7 +31,7 @@ export function getCardPropsData(cardType: "Bunny Note", netId: string): Array<S
             return [
                 { isFeeless: false, isCustom: true, networkAlt: "", networkLogo: "", imageLink: "/imgs/questionMark.png", imageAlt: "Custom Token", currency: "Custom Token", cardType, erc20Address: "", },
                 { isFeeless: false, isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/bnb-chain-binance-smart-chain-logo.svg", imageAlt: "BNB", currency: "BNB", cardType, erc20Address: ZEROADDRESS },
-                { isFeeless: true, isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/zkbLogo.png", imageAlt: "ZKB", currency: "ZKB", cardType, erc20Address: FeelessTokens.BSC_TESTNET, },
+                { isFeeless: true, isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/BunnyNotesCircle.png", imageAlt: "ZKB", currency: "ZKB", cardType, erc20Address: FeelessTokens.BSC_TESTNET, },
             ]
         //##############################################
         // MAINNETS!!
@@ -61,6 +61,10 @@ export type NetworkSelectProps = {
     cardTypography: string,
 }
 
+export function networkbuttonWhere(chainId) {
+    return networkButtons.filter(btn => btn.chainId === chainId)[0]
+}
+
 export const networkButtons: NetworkSelectProps[] = [
     {
         tooltipTitle: "Select BitTorrent Chain",
@@ -69,19 +73,19 @@ export const networkButtons: NetworkSelectProps[] = [
         imageSrc: "/imgs/bttLogo.svg",
         cardTypography: "BitTorrent Chain"
     }
-    //,
-    // {
-    //     tooltipTitle: "Select Binance Smart Chain Testnet",
-    //     chainId: ChainIds.BSC_TESTNET_ID,
-    //     imageAlt: "Binance Smart Chain",
-    //     imageSrc: "/imgs/bnb-chain-binance-smart-chain-logo.svg",
-    //     cardTypography: "Binance Smart Chain"
-    // }
-    // , {
-    //     tooltipTitle: "Select Bittorrent Chain Testnet",
-    //     chainId: ChainIds.BTT_TESTNET_ID,
-    //     imageAlt: "Bittorrent Testnet",
-    //     imageSrc: "/imgs/bttLogo.svg",
-    //     cardTypography: "BitTorrent Testnet"
-    // }
+    ,
+    {
+        tooltipTitle: "Select Binance Smart Chain Testnet",
+        chainId: ChainIds.BSC_TESTNET_ID,
+        imageAlt: "Binance Smart Chain",
+        imageSrc: "/imgs/bnb-chain-binance-smart-chain-logo.svg",
+        cardTypography: "Binance Smart Chain Testnet"
+    }
+    , {
+        tooltipTitle: "Select Bittorrent Chain Testnet",
+        chainId: ChainIds.BTT_TESTNET_ID,
+        imageAlt: "Bittorrent Testnet",
+        imageSrc: "/imgs/bttLogo.svg",
+        cardTypography: "BitTorrent Testnet"
+    }
 ]

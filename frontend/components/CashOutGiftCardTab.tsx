@@ -11,16 +11,12 @@ import { Base } from './Base';
 import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { generateZKProof, packSolidityProof } from '../zkp/generateProof';
-import { getChainId, getContract, getNoteContractAddress, onBoardOrGetProvider, requestAccounts, withdraw } from '../web3/web3';
-import { styled, Typography } from '@mui/material';
+import { getContract, getNoteContractAddress, handleNetworkSelect, requestAccounts, withdraw } from '../web3/web3';
+import { Typography } from '@mui/material';
 interface CashOutGiftCardTabProps extends Base {
     noteString: string
     setMyNoteString: (newValue: string) => void;
 }
-const IMG = styled("img")({
-    margin: "0 auto",
-    width: "130px"
-})
 
 export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
 
@@ -29,17 +25,6 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
     }
 
     const cashOutAction = async () => {
-        if (props.provider === null) {
-            const provider = await onBoardOrGetProvider(props.displayError);
-            if (provider) {
-                await doCashOut(provider);
-            }
-        } else {
-            await doCashOut(props.provider);
-        }
-    }
-
-    const doCashOut = async (provider: any) => {
         let parsedNote;
 
         try {
@@ -48,16 +33,17 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
             props.displayError(err.message);
             return;
         }
-
-        // Check if we are on the correct network!
-        const chainId = await getChainId(props.provider);
-
-        if (chainId !== parseInt(props.selectedNetwork)) {
-            props.displayError("You are on the wrong network!")
+        const chainId = "0x" + parsedNote.netId.toString(16);
+        const provider = await handleNetworkSelect(chainId, props.displayError);
+        if (!provider) {
+            props.displayError("Unable to connect to provider!")
             return;
         }
 
+        doCashOut(provider, parsedNote);
+    }
 
+    const doCashOut = async (provider: any, parsedNote: any) => {
         const nullifierHash = toNoteHex(parsedNote.deposit.nullifierHash);
         const commitment = toNoteHex(parsedNote.deposit.commitment);
 
@@ -105,7 +91,7 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
             <Typography component="p" variant="subtitle1">You can withdraw the Bunny Note balance to your wallet.</Typography>
             <Tooltip arrow title="Withdraw the Bunny Note">
                 <Button variant="contained" onClick={cashOutAction} sx={{ mr: 1, fontSize: "20px" }}>
-                    Withdraw
+                    Withdraw <img width="35px" src="/imgs/metamaskFox.svg" />
                 </Button>
             </Tooltip>
         </Box>
