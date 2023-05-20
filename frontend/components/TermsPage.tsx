@@ -13,7 +13,7 @@ export function TermsPage() {
     }
 
 
-    return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden', padding: "20px",fontFamily: "sans-serif" }} >
+    return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden', padding: "20px", fontFamily: "sans-serif" }} >
         <IconButton onClick={() => {
             window.close();
         }}><Close /></IconButton>
@@ -84,20 +84,26 @@ export function TermsPage() {
             <h4>Bunny Notes</h4>
             <Stack display="flex" flexDirection="row" justifyContent="space-around" sx={{ gap: "20px" }}>
                 <Typography variant="body2" color="text.secondary" align="left">
-                    <MuiLink color="inherit" href="https://raw.githubusercontent.com/StrawberryChocolateFudge/Bunny-Notes/bunnyNotesOnly/contracts/BunnyNotes.sol">
-                        Smart Contract
+                    <MuiLink color="inherit" target="_blank" href="https://bttcscan.com/address/0x3Cad43A3038F0E657753C0129ce7Ea4a5801EC90#code">
+                        Smart Contract on BitTorrent Chain
                     </MuiLink>
                 </Typography>
                 <Typography variant="body2" color="text.secondary" align="left">
-                    <MuiLink color="inherit" href="imgs/Audit_Report_BunnyNotes.pdf">
+                    <MuiLink color="inherit" target="_blank" href="https://bscscan.com/address/0x3Cad43A3038F0E657753C0129ce7Ea4a5801EC90#code">
+                        Smart Contract on Binance Smart Chain
+                    </MuiLink>
+                </Typography>
+                <Typography variant="body2" color="text.secondary" align="left">
+                    <MuiLink color="inherit" target="_blank" href="imgs/Audit_Report_BunnyNotes.pdf">
                         Audit
                     </MuiLink>
                 </Typography>
                 <Typography variant="body2" color="text.secondary" align="left">
-                    <MuiLink color="inherit" href="/imgs/BunnyNotesWhitePaper.pdf">
+                    <MuiLink color="inherit" target="_blank" href="/imgs/BunnyNotesWhitePaper.pdf">
                         White Paper
                     </MuiLink>
                 </Typography>
+
             </Stack>
             <p>The following terms and conditions apply to the use of Bunny Notes on the website bunnynotes.finance:</p>
             <ol>
