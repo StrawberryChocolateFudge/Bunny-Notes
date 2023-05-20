@@ -1,6 +1,6 @@
 {
   "name": "bunny-notes",
-   "browserslist": "> 0.5%, last 2 versions, not dead",
+  "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
     "dev": "parcel frontend/index.html",
     "build": "parcel build frontend/index.html && npm run copy",
@@ -53,6 +53,8 @@
   "dependencies": {
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
+    "@fontsource/acme": "^4.5.10",
+    "@fontsource/finger-paint": "^4.5.10",
     "@fontsource/roboto": "^4.5.8",
     "@metamask/onboarding": "^1.0.1",
     "@mui/icons-material": "^5.11.9",
