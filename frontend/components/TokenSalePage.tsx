@@ -6,10 +6,10 @@ import { buyTokens, getContract, handleNetworkSelect, tokensalePriceCalculator, 
 import { default as MuiLink } from "@mui/material/Link";
 
 function Body1(txt) {
-    return <Typography component="div" variant="body1">{txt}</Typography>
+    return <Typography sx={{ fontFamily: "sans-serif" }} component="div" variant="body1">{txt}</Typography>
 }
 function Body2(txt) {
-    return <Typography component="div" variant="body2">{txt}</Typography>
+    return <Typography sx={{ fontFamily: "sans-serif" }} component="div" variant="body2">{txt}</Typography>
 }
 
 
@@ -93,10 +93,10 @@ export function TokenSalePage(props: any) {
         <Stack direction="row" justifyContent="flex-start">
             <Button href="/">Go Back</Button>
         </Stack>
-        <Typography component="div" variant="h4" sx={{ textAlign: "center" }}>
+        <Typography component="div" variant="h4" sx={{ textAlign: "center", fontFamily: "sans-serif" }}>
             Token Sale
         </Typography>
-        <Typography component="div" variant="h5" sx={{ textAlign: "center" }}>
+        <Typography component="div" variant="h5" sx={{ textAlign: "center", fontFamily: "sans-serif" }}>
             Terms and conditions
         </Typography>
         <ol>
@@ -149,8 +149,7 @@ export function TokenSalePage(props: any) {
                 <div style={{ marginBottom: "20px", paddingLeft: "5px" }} />
                 <TextField value={bnbToSpend} onChange={setBnBToSpendChange} autoComplete="off" type="number" label="Amount (BNB)"></TextField>
             </Stack>
-            <Button variant="contained" sx={{ fontSize: "20px", marginLeft: "10px", "&:hover": { backgroundColor: "white", color: "black" } }} onClick={buyTokens_action}>Buy  <img style={{ marginLeft: "10px" }} src="/imgs/BunnyNotesCircle.png" width="50px" height="50px" /></Button>
-
+            <Button variant="contained" sx={{ fontFamily: "Sans-Serif", fontWeight: 600, fontSize: "20px", marginLeft: "10px", "&:hover": { backgroundColor: "white", color: "black", fontWeight: 800, boxShadow: "rgba(0, 0, 0, 0.1) 0px 4px 12px" } }} onClick={buyTokens_action}>Buy  <img style={{ marginLeft: "10px" }} src="/imgs/BunnyNotesCircle.png" width="50px" height="50px" /></Button>
 
         </Stack>
         <Stack direction="row" justifyContent="center">

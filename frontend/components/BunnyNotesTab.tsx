@@ -135,12 +135,12 @@ export function BunnyNotesTab(props: BunnyNotesPageProps) {
                     </Stack>
                 </Stack>
                 <Stack sx={{ padding: "30px" }} direction={"row"} justifyContent="center">
-                    <Typography component="p" variant="subtitle1">Bunny Notes are verifiable claims for value that was deposited into a smart contract. Select the currency, enter the denomination, download the printable note and make a deposit to create one. By using the application you accept the <Link href="/terms" target="_blank"> Terms and Conditions.</Link>
+                    <Typography sx={{ fontFamily: `Sans-Serif`, fontWeight: 600 }} component="div" variant="h6">Bunny Notes are verifiable claims for value that was deposited into a smart contract. Select the currency, enter the denomination, download the printable note and make a deposit to create one. By using the application you accept the <Link href="/terms" target="_blank"> Terms and Conditions.</Link>
                     </Typography>
                 </Stack>
-                {/* <Stack direction="row" justifyContent="center">
+                <Stack direction="row" justifyContent="center">
                     <Button href="/tokensale" sx={{ margin: "0 auto" }}>Visit the Token Sale Page (on BSC)</Button>
-                </Stack> */}
+                </Stack>
                 <Stack direction={"row"} justifyContent="center">
                     {NetworkSelectorDropdown(
                         {
@@ -184,7 +184,8 @@ export function NetworkSelectorDropdown(props: SelectNetworkProps) {
     return <React.Fragment>
         <Select onChange={onSelected} value={onSelectedNetworkEmpty(props.selectedNetwork)} renderValue={(value: string) => {
             const btn = networkbuttonWhere(value);
-            return <React.Fragment><img width="15px" style={{ paddingRight: "10px" }} alt={btn.imageAlt} src={btn.imageSrc} />{btn.cardTypography}</React.Fragment>
+
+            return <div  ><img width="15px" style={{ paddingRight: "10px" }} alt={btn.imageAlt} src={btn.imageSrc} />{btn.cardTypography}</div>
         }} id="networkSelect">
             {networkButtons.map(n => <MenuItem key={n.chainId} value={n.chainId}>{<img width="30px" style={{ paddingRight: "10px" }} alt={n.imageAlt} src={n.imageSrc} />}{n.cardTypography}</MenuItem>)}
         </Select>

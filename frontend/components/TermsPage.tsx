@@ -13,7 +13,7 @@ export function TermsPage() {
     }
 
 
-    return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden', padding: "20px" }} >
+    return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden', padding: "20px",fontFamily: "sans-serif" }} >
         <IconButton onClick={() => {
             window.close();
         }}><Close /></IconButton>
