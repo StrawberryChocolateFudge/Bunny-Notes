@@ -20,7 +20,7 @@ export default function Header(props: HeaderProps) {
                     <Tab label="Bunny Notes" />
                     <Tab label="Verify a Note" />
                     <Tab label="Withdraw" />
-                    {/* <Tab label="Request Payment" /> */}
+                    <Tab label="Roadmap" />
                 </Tabs>
             </AppBar> : <React.Fragment></React.Fragment>}
 

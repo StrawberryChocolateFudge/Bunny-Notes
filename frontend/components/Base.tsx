@@ -22,6 +22,7 @@ import { getSelectedNFromSS } from '../storage/session';
 import { NoteDetails } from '../zkp/generateProof';
 import { TermsPage } from './TermsPage';
 import { TokenSalePage } from './TokenSalePage';
+import { Roadmap } from './Roadmap';
 
 export interface Base {
     displayError: any,
@@ -113,16 +114,6 @@ export default function Base() {
         setMyNoteString
     }
 
-    const paymentRequestProps = {
-        paymentRequest,
-        setPaymentRequest
-    }
-
-    const networkSelectProps = {
-        displayError: openSnackbar,
-        selectedNetwork,
-        setSelectedNetwork
-    }
 
     const getTabContent = () => {
         switch (selectedTab) {
@@ -132,6 +123,8 @@ export default function Base() {
                 return <VerifyNoteTab {...genericProps} {...noteStringProps} />
             case 2:
                 return <CashOutGiftCardTab {...genericProps} {...noteStringProps}></CashOutGiftCardTab>
+            case 3:
+                return <Roadmap></Roadmap>
             default:
                 break;
         }
