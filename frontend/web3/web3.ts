@@ -62,15 +62,14 @@ enum EXPORERURLS {
     BSC_MAINNET = "https://bscscan.com"
 }
 
-// TODO: UPDATE THIS TO START TOKENSALE ON MAINNET!
 
-export const getCurrentTokenSold = () => FeelessTokens.BSC_TESTNET;
+export const getCurrentTokenSold = () => FeelessTokens.BSC_MAINNET;
 
 export const ZKBTokenSaleURL_BSC_MAINNET = "0xDCA75D59357Cc7d5AAdAfB4b335A7d3ac19b67bC";
 
 export const getCurrentTokenSaleAddress = () => ZKBTokenSaleURL_BSC_MAINNET;
 
-export const getCurrentTokenSaleNetwork = () => ChainIds.BSC_TESTNET_ID;
+export const getCurrentTokenSaleNetwork = () => ChainIds.BSC_MAINNET;
 
 export enum FeelessTokens {
     BTT_TESTNET = "",
