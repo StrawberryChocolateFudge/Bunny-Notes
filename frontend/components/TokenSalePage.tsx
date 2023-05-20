@@ -107,13 +107,13 @@ export function TokenSalePage(props: any) {
             <li>
                 {Body1("Source Code")}
                 <Typography variant="body2" color="text.secondary" align="left">
-                    <MuiLink color="inherit" href="https://raw.githubusercontent.com/StrawberryChocolateFudge/Bunny-Notes/bunnyNotesOnly/contracts/ZKBToken.sol">
+                    <MuiLink color="inherit" target="_blank" href="https://bscscan.com/address/0x5586938a2fC4489661E868c5800769Fb10847fC5#code">
                         Token Contract
                     </MuiLink>
 
                 </Typography>
                 <Typography variant="body2" color="text.secondary" align="left">
-                    <MuiLink color="inherit" href="https://raw.githubusercontent.com/StrawberryChocolateFudge/Bunny-Notes/bunnyNotesOnly/contracts/TokenSale.sol">
+                    <MuiLink color="inherit" target="_blank" href="https://bscscan.com/address/0xdca75d59357cc7d5aadafb4b335a7d3ac19b67bc#code">
                         Crowdsale Contract
                     </MuiLink>
                 </Typography>
