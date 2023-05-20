@@ -28,19 +28,29 @@ async function deployOnBSCTestnet() {
     const ZKB = "0xeE55e7A619343B2f045bfD9A720BF912e1FCfEC7" //BSC Testnet
 
     const BunnyNotesFactory = await ethers.getContractFactory("BunnyNotes");
-    // Deploying on BTT mainnet without a feeless token!
+
     const bunnyNotesDeploy = await BunnyNotesFactory.deploy(VERIFIERADDRESS, ZKB);
     const bunnyNotes = await bunnyNotesDeploy.deployed();
     console.log("Bunny notes was deployed to ", bunnyNotes.address);
 }
 
-//TODO: Deploy on BSC mainnet
+
+async function deployOnBSCMAINNET() {
+    const VERIFIERADDRESS = "0x26Cb79a592dC3F2F4e588Ed19A5A5314779fe80E";
+    const ZKB = "0x5586938a2fC4489661E868c5800769Fb10847fC5";
+    const BunnyNotesFactory = await ethers.getContractFactory("BunnyNotes");
+    // / Deploying on BSC mainnet with ZKB tokens
+    const bunnyNotesDeploy = await BunnyNotesFactory.deploy(VERIFIERADDRESS, ZKB);
+    const bunnyNotes = await bunnyNotesDeploy.deployed();
+    console.log("Bunny notes was deployed to :", bunnyNotes.address);
+}
 
 
 async function main() {
     // await deployOnBTTMAINNET();
     // await deployOnBTTTestnet();
     // await deployOnBSCTestnet();
+    // await deployOnBSCMAINNET()
 }
 
 
@@ -52,3 +62,4 @@ async function main() {
     // Bunny notes was deployed to  0x859576e721404004dab525EB2Da0865E949eA717 // on Donau testnet // latest verifier
     // Bunny notes was deployed to  0x29EbE72886d007cC4F2c3F43c9f899ab242Cc917 // on BSC testnet // latest verifier nows
     // Bunny notes was deployed to  0x3Cad43A3038F0E657753C0129ce7Ea4a5801EC90 ON BTT MAINNET!! // latest veriier
+    // Bunny notes was deployed to : 0x3Cad43A3038F0E657753C0129ce7Ea4a5801EC90 on BSC MAINNET // latest verifier
