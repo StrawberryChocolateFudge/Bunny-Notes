@@ -8,6 +8,7 @@ enum NetworkNames {
 
     // Mainnets
     BTT_MAINNET = "BitTorrent Chain",
+    BSC_MAINNET = "Binance Smart Chain",
     ETH_MAINNET = "Ethereum"
 }
 
@@ -17,6 +18,7 @@ enum NetworkTickers {
 
     // Mainnets
     ETH_MAINNET = "ETH",
+    BSC_MAINNET = "BSC",
     BTT_MAINNET = "BTT"
 }
 
@@ -26,6 +28,7 @@ export enum ChainIds {
 
     // MAINNETS
     BTT_MAINNET_ID = "0xc7",
+    BSC_MAINNET = "0x38",
     ETH_MAINNET = "0x1"
 }
 
@@ -35,6 +38,7 @@ enum BunnyNotesContractAddress {
 
     //MAINNETS:
     BTT_MAINNET = "0x3Cad43A3038F0E657753C0129ce7Ea4a5801EC90",
+    BSC_MAINNET = "0x3Cad43A3038F0E657753C0129ce7Ea4a5801EC90",
     ETH_MAINNET = ""
 }
 
@@ -44,25 +48,27 @@ enum RPCURLS {
 
     // MAINNETS:
     BTT_MAINNET = "https://rpc.bittorrentchain.io",
+    BSC_MAINNET = "https://bsc.publicnode.com",
     ETH_MAINNET = "https://eth.llamarpc.com"
 }
 
 enum EXPORERURLS {
-    BTT_TESTNET = "https://testscan.bt.io/",
-    BSC_TESTNET = "https://testnet.bscscan.com/",
+    BTT_TESTNET = "https://testscan.bt.io",
+    BSC_TESTNET = "https://testnet.bscscan.com",
 
     // Mainnets
     BTT_MAINNET = "https://bttcscan.com",
-    ETH_MAINNET = "https://etherscan.io/tx/"
+    ETH_MAINNET = "https://etherscan.io",
+    BSC_MAINNET = "https://bscscan.com"
 }
 
 // TODO: UPDATE THIS TO START TOKENSALE ON MAINNET!
 
 export const getCurrentTokenSold = () => FeelessTokens.BSC_TESTNET;
 
-export const ZKBTokenSaleURL_BSC_TESTNET = "0x6d54302F99BEe568a903AcA3A58B51c91809bB78";
+export const ZKBTokenSaleURL_BSC_MAINNET = "0xDCA75D59357Cc7d5AAdAfB4b335A7d3ac19b67bC";
 
-export const getCurrentTokenSaleAddress = () => ZKBTokenSaleURL_BSC_TESTNET;
+export const getCurrentTokenSaleAddress = () => ZKBTokenSaleURL_BSC_MAINNET;
 
 export const getCurrentTokenSaleNetwork = () => ChainIds.BSC_TESTNET_ID;
 
@@ -71,6 +77,7 @@ export enum FeelessTokens {
     BSC_TESTNET = "0xeDc320436A3d390B65Dfc0dc868909c914F431cA", //ZKB deployed on testnet
 
     BTT_MAINNET = "",
+    BSC_MAINNET = "0x5586938a2fC4489661E868c5800769Fb10847fC5",// ZKB deployed on mainnet
     ETH_MAINNET = ""
 }
 
@@ -79,7 +86,8 @@ const noteContractAddresses: { [key in ChainIds]: BunnyNotesContractAddress } = 
     [ChainIds.BSC_TESTNET_ID]: BunnyNotesContractAddress.BSC_TESTNET,
     // Mainnets
     [ChainIds.BTT_MAINNET_ID]: BunnyNotesContractAddress.BTT_MAINNET,
-    [ChainIds.ETH_MAINNET]: BunnyNotesContractAddress.ETH_MAINNET
+    [ChainIds.ETH_MAINNET]: BunnyNotesContractAddress.ETH_MAINNET,
+    [ChainIds.BSC_MAINNET]: BunnyNotesContractAddress.BSC_MAINNET
 }
 
 const networkNameFromId: { [key in ChainIds]: NetworkNames } = {
@@ -87,7 +95,8 @@ const networkNameFromId: { [key in ChainIds]: NetworkNames } = {
     [ChainIds.BSC_TESTNET_ID]: NetworkNames.BSC_TESTNET,
     // Mainnets
     [ChainIds.BTT_MAINNET_ID]: NetworkNames.BTT_MAINNET,
-    [ChainIds.ETH_MAINNET]: NetworkNames.ETH_MAINNET
+    [ChainIds.ETH_MAINNET]: NetworkNames.ETH_MAINNET,
+    [ChainIds.BSC_MAINNET]: NetworkNames.BSC_MAINNET
 }
 
 const rpcUrl: { [key in ChainIds]: RPCURLS } = {
@@ -96,7 +105,8 @@ const rpcUrl: { [key in ChainIds]: RPCURLS } = {
 
     // Mainnets
     [ChainIds.BTT_MAINNET_ID]: RPCURLS.BTT_MAINNET,
-    [ChainIds.ETH_MAINNET]: RPCURLS.ETH_MAINNET
+    [ChainIds.ETH_MAINNET]: RPCURLS.ETH_MAINNET,
+    [ChainIds.BSC_MAINNET]: RPCURLS.BSC_MAINNET
 }
 
 const explorerUrl: { [key in ChainIds]: EXPORERURLS } = {
@@ -105,7 +115,8 @@ const explorerUrl: { [key in ChainIds]: EXPORERURLS } = {
 
     // Mainnets
     [ChainIds.BTT_MAINNET_ID]: EXPORERURLS.BTT_MAINNET,
-    [ChainIds.ETH_MAINNET]: EXPORERURLS.ETH_MAINNET
+    [ChainIds.ETH_MAINNET]: EXPORERURLS.ETH_MAINNET,
+    [ChainIds.BSC_MAINNET]: EXPORERURLS.BSC_MAINNET
 }
 
 
@@ -115,7 +126,8 @@ const walletCurrency: { [key in ChainIds]: NetworkTickers } = {
 
     // Mainnets
     [ChainIds.BTT_MAINNET_ID]: NetworkTickers.BTT_MAINNET,
-    [ChainIds.ETH_MAINNET]: NetworkTickers.ETH_MAINNET
+    [ChainIds.ETH_MAINNET]: NetworkTickers.ETH_MAINNET,
+    [ChainIds.BSC_MAINNET]: NetworkTickers.BSC_MAINNET
 }
 
 export const feelessTokens: { [key in ChainIds]: FeelessTokens } = {
@@ -124,7 +136,8 @@ export const feelessTokens: { [key in ChainIds]: FeelessTokens } = {
 
     // Mainnets
     [ChainIds.BTT_MAINNET_ID]: FeelessTokens.BTT_MAINNET,
-    [ChainIds.ETH_MAINNET]: FeelessTokens.ETH_MAINNET
+    [ChainIds.ETH_MAINNET]: FeelessTokens.ETH_MAINNET,
+    [ChainIds.BSC_MAINNET]: FeelessTokens.BSC_MAINNET
 }
 
 
