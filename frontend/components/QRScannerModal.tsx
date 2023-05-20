@@ -94,7 +94,7 @@ export default function ScanNoteButton(props: ScanNoteButtonProps) {
         <div>
             <Tooltip arrow title="Scan a QR code">
                 <Button variant="contained"
-                    sx={{ height: "100%" }}
+                    sx={{ height: "100%", fontWeight: 800 }}
                     onClick={handleClickOpen}>
                     Scan
                 </Button>

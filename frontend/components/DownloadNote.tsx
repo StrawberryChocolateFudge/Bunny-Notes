@@ -195,7 +195,7 @@ export function downloadNote(props: DownloadNoteProps) {
                     </Grid>
                     <Grid item>
                         <Tooltip arrow title="Download the Note">
-                            <Button onClick={downloadClick} variant="contained" sx={{ mr: 1 }}>Download</Button>
+                            <Button onClick={downloadClick} variant="contained" sx={{ mr: 1,fontWeight: 800 }}>Download</Button>
                         </Tooltip>
                     </Grid>
 

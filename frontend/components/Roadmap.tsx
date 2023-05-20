@@ -48,7 +48,14 @@ export function Roadmap() {
             </li>
             <li>
                 <Typography sx={{ fontFamily: `"Finger Paint", cursive`, margin: "0 auto", padding: "30px", fontWeight: 300 }} variant="h5" component="div">SCALING!</Typography>
-                <Typography sx={{ fontFamily: `Sans-Serif`, margin: "0 auto", padding: "30px", fontWeight: 100 }} variant="h6" component="div">That's right, folks! We are developing Bunny Bundles! ✅ Bundles will allow you to deposit once and create thousands of bunny notes that you can transfer off-chain! Instead of deploying the notes one by one, you will have the potential to create 2^20 bunny notes with a single deposit! Isn't that mind-boggling? <strong>How? Merkle trees 🤝 Decentralized Storage!</strong> Our ZKP circuit ceremony is currently hosted at <Link href="https://snarkyceremonies.com" target="_blank">Snarky Ceremonies</Link> where you can contribute to cryptographic decentralization before we launch this feature!</Typography>
+                <Typography
+                    sx={{
+                        fontFamily: `Sans-Serif`,
+                        margin: "0 auto", padding: "30px", fontWeight: 100
+                    }}
+                    variant="h6"
+                    component="div">
+                    That's right, folks! We are developing Bunny Bundles! ✅ Bundles will allow you to deposit once and create thousands of bunny notes that you can transfer off-chain! Instead of deploying the notes one by one, you will have the potential to create 2^20 bunny notes with a single deposit! Isn't that mind-boggling? <strong>How? Merkle trees 🤝 Decentralized Storage!</strong> Our ZKP circuit ceremony is currently hosted at <Link href="https://snarkyceremonies.com" target="_blank">Snarky Ceremonies</Link> where you can contribute to cryptographic decentralization before we launch this feature! With Bunny Bundles you can do <strong>mass transfers with very low upfront gas fees</strong>, deposit tokens with a single transaction and the recipients pay for gas fees when they claim them!</Typography>
             </li>
         </ol>
     </Paper >

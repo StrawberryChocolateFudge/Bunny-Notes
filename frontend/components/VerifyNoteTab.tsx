@@ -185,7 +185,7 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                         (loading ? getLoading() : <React.Fragment>
                               <Typography component="div" variant="h6">Verify a Bunny Note. You can check if it's still valid and contains a balance!</Typography>
                               <Tooltip arrow title="Verify the Note">
-                                    <Button variant="contained" id="verifyNoteButton" onClick={onVerify} sx={{ mr: 1, fontSize: "20px" }}>
+                                    <Button variant="contained" id="verifyNoteButton" onClick={onVerify} sx={{ mr: 1, fontSize: "20px", fontWeight: 800 }}>
                                           Verify
                                     </Button>
                               </Tooltip>
