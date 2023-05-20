@@ -43,7 +43,7 @@ const config: HardhatUserConfig = {
     // donau: {
     //   url: process.env.BTT_DONAU_TESTNET_API || "",
     //   accounts:
-    //    process.env.KEY_DONAU !== undefined ? [process.env.KEY_DONAU] : [],
+    //    process.env.DEPLOY_KEY !== undefined ? [process.env.DEPLOY_KEY] : [],
     // },
     // fantomtestnet: {
     //   url: process.env.FANTOM_TESTNET_API || "",
@@ -51,11 +51,15 @@ const config: HardhatUserConfig = {
     // },
     // bsctestnet: {
     //   url: process.env.BSC_TESTNET_API || "",
-    //   accounts: process.env.KEY_DONAU !== undefined ? [process.env.KEY_DONAU] : [],
+    //   accounts: process.env.DEPLOY_KEY !== undefined ? [process.env.DEPLOY_KEY] : [],
     // }
     // bttmainnet: {
     //   url: process.env.BTT_MAINNET_API || "",
-    //   accounts: process.env.KEY_DONAU !== undefined ? [process.env.KEY_DONAU] : [],
+    //   accounts: process.env.DEPLOY_KEY !== undefined ? [process.env.DEPLOY_KEY] : [],
+    // }
+    // bscmainnet : {
+    //   url: process.env.BSC_MAINNET_API || "",
+    //   accounts: process.env.DEPLOY_KEY !== undefined ? [process.env.DEPLOY_KEY] : [],
     // }
   },
   gasReporter: {
