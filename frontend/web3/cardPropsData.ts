@@ -46,7 +46,11 @@ export function getCardPropsData(cardType: "Bunny Note", netId: string): Array<S
                 { isFeeless: false, isCustom: false, networkAlt: ETH_A, networkLogo: ETH_N, imageLink: "/imgs/tetherLogo.svg", imageAlt: "USDT_e", currency: "USDT_e", cardType, erc20Address: "0xE887512ab8BC60BcC9224e1c3b5Be68E26048B8B" }
 
             ]
-        //TODO: Add more network assets here
+        case ChainIds.BSC_MAINNET:
+            return [{ isFeeless: false, isCustom: true, networkAlt: "", networkLogo: "", imageLink: "/imgs/questionMark.png", imageAlt: "Custom Token", currency: "Custom Token", cardType, erc20Address: "", },
+            { isFeeless: false, isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/bnb-chain-binance-smart-chain-logo.svg", imageAlt: "BNB", currency: "BNB", cardType, erc20Address: ZEROADDRESS },
+            { isFeeless: true, isCustom: false, networkAlt: "", networkLogo: "", imageLink: "/imgs/BunnyNotesCircle.png", imageAlt: "ZKB", currency: "ZKB", cardType, erc20Address: FeelessTokens.BSC_MAINNET, },]
+        // Add more chains here!
         default:
             return []
     }
@@ -66,13 +70,22 @@ export function networkbuttonWhere(chainId) {
 }
 
 export const networkButtons: NetworkSelectProps[] = [
+
     {
+        tooltipTitle: "Select BSC",
+        chainId: ChainIds.BSC_MAINNET,
+        imageAlt: "Binance Smart Chain",
+        imageSrc: "/imgs/bnb-chain-binance-smart-chain-logo.svg",
+        cardTypography: "Binance Smart Chain"
+    }, {
         tooltipTitle: "Select BitTorrent Chain",
         chainId: ChainIds.BTT_MAINNET_ID,
         imageAlt: "Bittorrent Chain",
         imageSrc: "/imgs/bttLogo.svg",
         cardTypography: "BitTorrent Chain"
     }
+
+
     //,
     // {
     //     tooltipTitle: "Select Binance Smart Chain Testnet",
