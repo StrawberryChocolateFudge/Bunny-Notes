@@ -6,7 +6,7 @@ import { downloadNote } from './DownloadNote';
 import { NoteDetails } from '../zkp/generateProof';
 import { createQR } from '../qrcode/create';
 import { getNoteContractAddress, } from '../web3/web3';
-import { Button, Link, MenuItem, Select, SelectChangeEvent, Stack, styled, Typography } from '@mui/material';
+import { Button, Divider, Link, MenuItem, Select, SelectChangeEvent, Stack, styled, Typography } from '@mui/material';
 import { EnterDenominationDialog } from './utils/EnterDenominationDialog';
 import { calculateFeeAndNote } from '../web3/calculateFeeAndNote';
 import { setSelectedNToSS } from '../storage/session';
@@ -62,7 +62,7 @@ export function BunnyNotesTab(props: BunnyNotesPageProps) {
 
     const [showDenominationInput, setShowDenominationInput] = React.useState(false);
 
-    const [selectedCard, setSelectedCard] = React.useState({ tokenAddress: "", cardType: "", currency: "", isCustom: false, isFeeless: false });
+    const [selectedCard, setSelectedCard] = React.useState({ tokenAddress: "", cardType: "", currency: "", isCustom: false, isFeeless: false, description: "" });
 
     React.useEffect(() => {
         async function getQRCode() {
@@ -78,8 +78,8 @@ export function BunnyNotesTab(props: BunnyNotesPageProps) {
     }, [noteDetails])
 
 
-    const handleSelectBunnyNote = async (currency: string, cardType: CardType, tokenAddress: string, isCustom: boolean, isFeeless: boolean) => {
-        setSelectedCard({ currency, cardType, tokenAddress, isCustom, isFeeless });
+    const handleSelectBunnyNote = async (currency: string, cardType: CardType, tokenAddress: string, isCustom: boolean, isFeeless: boolean, description: string) => {
+        setSelectedCard({ currency, cardType, tokenAddress, isCustom, isFeeless, description });
         setShowDenominationInput(true);
     }
 
@@ -141,6 +141,7 @@ export function BunnyNotesTab(props: BunnyNotesPageProps) {
                 <Stack direction="row" justifyContent="center">
                     <Button href="/tokensale" sx={{ margin: "0 auto" }}>Visit the Token Sale Page (on BSC)</Button>
                 </Stack>
+                <div style={{ marginBottom: "20px" }} ></div>
                 <Stack direction={"row"} justifyContent="center">
                     {NetworkSelectorDropdown(
                         {
@@ -153,7 +154,7 @@ export function BunnyNotesTab(props: BunnyNotesPageProps) {
                 <CardGrid handleSelect={handleSelectBunnyNote} cardProps={getCardPropsData("Bunny Note", onSelectedNetworkEmpty(props.selectedNetwork))} ></CardGrid>
 
             </Paper>
-            <EnterDenominationDialog displayError={props.displayError} isFeeless={selectedCard.isFeeless} isCustom={selectedCard.isCustom} showDialog={showDenominationInput} handleClose={handleCloseDenominationDialog} handleOk={handleAcceptDenominationDialog}></EnterDenominationDialog>
+            <EnterDenominationDialog displayError={props.displayError} description={selectedCard.description} isFeeless={selectedCard.isFeeless} isCustom={selectedCard.isCustom} showDialog={showDenominationInput} handleClose={handleCloseDenominationDialog} handleOk={handleAcceptDenominationDialog}></EnterDenominationDialog>
         </React.Fragment>
     );
 }
@@ -182,13 +183,15 @@ export function NetworkSelectorDropdown(props: SelectNetworkProps) {
     };
 
     return <React.Fragment>
-        <Select onChange={onSelected} value={onSelectedNetworkEmpty(props.selectedNetwork)} renderValue={(value: string) => {
-            const btn = networkbuttonWhere(value);
+        <Stack direction="column">
+            <Typography sx={{ margin: "0 auto", color: "grey" }} component="div" variant="subtitle1">Selected Network</Typography>
+            <Select onChange={onSelected} value={onSelectedNetworkEmpty(props.selectedNetwork)} renderValue={(value: string) => {
+                const btn = networkbuttonWhere(value);
 
-            return <div  ><img width="15px" style={{ paddingRight: "10px" }} alt={btn.imageAlt} src={btn.imageSrc} />{btn.cardTypography}</div>
-        }} id="networkSelect">
-            {networkButtons.map(n => <MenuItem key={n.chainId} value={n.chainId}>{<img width="30px" style={{ paddingRight: "10px" }} alt={n.imageAlt} src={n.imageSrc} />}{n.cardTypography}</MenuItem>)}
-        </Select>
+                return <div  ><img width="15px" style={{ paddingRight: "10px" }} alt={btn.imageAlt} src={btn.imageSrc} />{btn.cardTypography}</div>
+            }} id="networkSelect">
+                {networkButtons.map(n => <MenuItem key={n.chainId} value={n.chainId}>{<img width="30px" style={{ paddingRight: "10px" }} alt={n.imageAlt} src={n.imageSrc} />}{n.cardTypography}</MenuItem>)}
+            </Select>
+        </Stack>
     </React.Fragment>
-
 }
