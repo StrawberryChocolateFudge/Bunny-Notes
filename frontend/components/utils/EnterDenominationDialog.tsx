@@ -8,6 +8,7 @@ interface EnterDenominationDialogProps {
     showDialog: boolean,
     isCustom: boolean,
     isFeeless: boolean
+    description: string
     displayError: CallableFunction
 }
 
@@ -62,7 +63,9 @@ export function EnterDenominationDialog(props: EnterDenominationDialogProps) {
 
     return <Dialog open={props.showDialog} onClose={handleClose}>
         <DialogContent>
-
+            <Stack sx={{ color: "grey" }} direction={"row"} justifyContent="center">
+                {props.description}
+            </Stack>
             <Divider sx={{ marginBottom: "10px" }} light />
             <Stack direction="column" justifyContent={"space-around"}>
                 {props.isCustom ? renderCustomInputs() : null}

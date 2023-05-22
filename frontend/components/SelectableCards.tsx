@@ -16,11 +16,12 @@ export interface SelectableCardsParams {
   cardType: CardType,
   erc20Address: string,
   isCustom: boolean,
-  isFeeless: boolean
+  isFeeless: boolean,
+  description: string
 }
 
 export interface SelectableCardsProps extends SelectableCardsParams {
-  handleSelect: (currency: string, cardType: CardType, tokenAddress: string, isCustom: boolean, isFeeless: boolean) => void
+  handleSelect: (currency: string, cardType: CardType, tokenAddress: string, isCustom: boolean, isFeeless: boolean, description: string) => void
 }
 
 
@@ -35,7 +36,7 @@ const OverlayImgs = styled("div")({
 export function SelectableCards(props: SelectableCardsProps) {
 
   const purchaseSelected = () => {
-    props.handleSelect(props.currency, props.cardType, props.erc20Address, props.isCustom, props.isFeeless)
+    props.handleSelect(props.currency, props.cardType, props.erc20Address, props.isCustom, props.isFeeless, props.description)
   }
 
   const OverlayedImage = () => <OverlayImgs>
@@ -45,9 +46,9 @@ export function SelectableCards(props: SelectableCardsProps) {
   const getContent = () => {
     return <Stack direction="column" alignItems="center">
 
-      <React.Fragment><Typography  sx={{ fontFamily: `"Finger Paint", cursive` }} gutterBottom variant="subtitle1" component="div">
+      <React.Fragment><Typography sx={{ fontFamily: `"Finger Paint", cursive` }} gutterBottom variant="subtitle1" component="div">
         {props.currency}
-      </Typography> {props.isFeeless ? <Typography  sx={{ fontFamily: `"Finger Paint", cursive`,color: "grey" }}variant="subtitle1">
+      </Typography> {props.isFeeless ? <Typography sx={{ fontFamily: `"Finger Paint", cursive`, color: "grey" }} variant="subtitle1">
         (Feeless)
       </Typography> : null}</React.Fragment>
     </Stack>

@@ -7,7 +7,7 @@ export type CardType = "Bunny Note" | "Spending Note" | "Payment Request";
 
 interface CardGridProps {
     cardProps: Array<SelectableCardsParams>
-    handleSelect: (currency: string, cardType: CardType, tokenAddress: string, isCustom: boolean, isFeeless: boolean) => void
+    handleSelect: (currency: string, cardType: CardType, tokenAddress: string, isCustom: boolean, isFeeless: boolean, description: string) => void
 
 }
 
