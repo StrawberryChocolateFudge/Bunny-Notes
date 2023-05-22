@@ -120,7 +120,7 @@ export function TokenSalePage(props: any) {
             </li>
             <li>
                 {Body1("Token Description")}
-                {Body2("The ZKB Token is a digital asset that is used for feeless transactions on bunnynotes.finance platform. The Token is not a registered security in the United States, nor is it intended to be treated as such. The tokens may not be bought or sold in the United States and are not an investment of any kind.")}
+                {Body2("The ZKB Token is a digital asset that is used for feeless transactions on bunnynotes.finance platform. The Token is intended to be used for storing and transfering value.It is not a registered security in the United States, nor is it intended to be treated as such. The tokens are not an investment of any kind. Purchasing them does not guarantee returns.")}
             </li>
             <li>
                 {Body1("Token Sale")}
