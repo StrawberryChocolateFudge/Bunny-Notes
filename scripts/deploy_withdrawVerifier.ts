@@ -12,6 +12,7 @@ async function main() {
     // Verifier is deployed to : 0x18a8C98DBfe92d739f4134493F39cE8b692f323B on BSC Testnet!! // Latest yeah
     // Verifier is deployed to : 0x5586938a2fC4489661E868c5800769Fb10847fC5 on BTT MAINNET!!// latest
     // Verifier is deployed to : 0x26Cb79a592dC3F2F4e588Ed19A5A5314779fe80E in BSC MAINNET // latest
+    // Verifier is deployed to : 0x5586938a2fC4489661E868c5800769Fb10847fC5 on Polygon MAINNET // latest
 }
 
 

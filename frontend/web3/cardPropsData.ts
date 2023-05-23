@@ -76,6 +76,11 @@ const tokenData: { [key in ChainIds]: SimplifiedTokenDataInput[] } = {
         { imageLink: "/imgs/multi-collateral-dai-dai-logo.svg", currency: "DAI", erc20Address: "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3", description: "Binance Peg DAI Stablecoin" }
 
     ],
+    [ChainIds.POLYGON_MAINNET]: [
+        { isCustom: true, imageLink: "/imgs/questionMark.png", currency: "Custom Token", erc20Address: "" },
+        { imageLink: "/imgs/polygon-matic-logo.svg", currency: "MATIC", erc20Address: ZEROADDRESS, description: "Matic is the native coin of the Polygon POS Chain" },
+        
+    ],
     [ChainIds.ETH_MAINNET]: []
 }
 
@@ -117,6 +122,13 @@ export const networkButtons: NetworkSelectProps[] = [
         imageSrc: "/imgs/bttLogo.svg",
         cardTypography: "BitTorrent Chain"
     },
+    {
+        tooltipTitle: "Select Polygon network",
+        chainId: ChainIds.POLYGON_MAINNET,
+        imageAlt: "Polygon Mainnet",
+        imageSrc: "/imgs/polygon-matic-logo.svg",
+        cardTypography: "Polygon Network"
+    }
     // {
     //     tooltipTitle: "Select Binance Smart Chain Testnet",
     //     chainId: ChainIds.BSC_TESTNET_ID,
