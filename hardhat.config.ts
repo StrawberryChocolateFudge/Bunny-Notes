@@ -61,6 +61,10 @@ const config: HardhatUserConfig = {
     //   url: process.env.BSC_MAINNET_API || "",
     //   accounts: process.env.DEPLOY_KEY !== undefined ? [process.env.DEPLOY_KEY] : [],
     // }
+    // polygonmainnet: {
+    //   url: process.env.POLYGON_MAINNET_API || "",
+    //   accounts: process.env.DEPLOY_KEY !== undefined ? [process.env.DEPLOY_KEY] : []
+    // }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
