@@ -1,12 +1,14 @@
-import { Paper, Stack, TextField, Typography, Button, } from "@mui/material";
+import { Paper, Stack, TextField, Typography, Button, Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import { BigNumber } from "ethers/lib/ethers";
 import { formatEther, parseEther } from "ethers/lib/utils";
 import React from "react";
 import { buyTokens, getContract, handleNetworkSelect, tokensalePriceCalculator, tokensLeft, watchAsset, getCurrentTokenSold, getCurrentTokenSaleAddress, getCurrentTokenSaleNetwork } from "../web3/web3";
 import { default as MuiLink } from "@mui/material/Link";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-function Body1(txt) {
-    return <Typography sx={{ fontFamily: "sans-serif" }} component="div" variant="body1">{txt}</Typography>
+function Body1(txt, color?, fontFamily?) {
+
+    return <Typography sx={{ fontFamily: fontFamily ? fontFamily : "sans-serif", color: color }} component="div" variant="body1">{txt}</Typography>
 }
 function Body2(txt) {
     return <Typography sx={{ fontFamily: "sans-serif" }} component="div" variant="body2">{txt}</Typography>
@@ -22,19 +24,19 @@ export function TokenSalePage(props: any) {
 
     function getTokensToRecieve() {
         if (bnbToSpend === "") {
-            return Body1("Buy 15000 ZKB for 1 BNB")
+            return Body1("Buy 15000 ZKB for 1 BNB", "black", `"Finger Paint", cursive`)
         }
 
         if (isNaN(parseFloat(bnbToSpend))) {
-            return Body1("Buy 15000 ZKB for 1 BNB");
+            return Body1("Buy 15000 ZKB for 1 BNB", "black", `"Finger Paint", cursive`);
         }
 
         if (parseFloat(bnbToSpend) < 0) {
-            return Body1("Buy 15000 ZKB for 1 BNB");
+            return Body1("Buy 15000 ZKB for 1 BNB", "black", `"Finger Paint", cursive`);
         }
 
         const salePrice = tokensalePriceCalculator(bnbToSpend);
-        return Body1(`Buy ${formatEther(salePrice)} ZKB for ${bnbToSpend} BNB`);
+        return Body1(`Buy ${formatEther(salePrice)} ZKB for ${bnbToSpend} BNB`, "black", `"Finger Paint", cursive`);
     }
 
     async function buyTokens_action() {
@@ -92,71 +94,81 @@ export function TokenSalePage(props: any) {
     return <Paper sx={{ maxWidth: 936, margin: "auto", padding: "20px" }}>
         <Stack direction="row" justifyContent="flex-start">
             <Button href="/">Go Back</Button>
+            <Button disabled variant="contained">Token Sale Page</Button>
         </Stack>
-        <Typography component="div" variant="h4" sx={{ textAlign: "center", fontFamily: "sans-serif" }}>
-            Token Sale
-        </Typography>
-        <Typography component="div" variant="h5" sx={{ textAlign: "center", fontFamily: "sans-serif" }}>
-            Terms and conditions
-        </Typography>
-        <ol>
-            <li>
-                {Body1("Introduction")}
-                {Body2("These Terms and Conditions(“Agreement”) govern the sale and purchase of the ZKB token (“Token”) by you (“Purchaser”) from BunnyNotes.Finance (“Issuer”) via a smart contract. ZKB is an ERC-20 smart contract created based on the OpenZeppelin library. The Crowdsale contract was also created using the OpenZeppelin (2.0) Crowdsale contract.  By purchasing ZKB, you agree to be bound by this Agreement, as well as any additional terms and conditions set forth by the Issuer.")}
-            </li>
-            <li>
-                {Body1("Source Code")}
-                <Typography variant="body2" color="text.secondary" align="left">
-                    <MuiLink color="inherit" target="_blank" href="https://bscscan.com/address/0x5586938a2fC4489661E868c5800769Fb10847fC5#code">
-                        Token Contract
-                    </MuiLink>
 
-                </Typography>
-                <Typography variant="body2" color="text.secondary" align="left">
-                    <MuiLink color="inherit" target="_blank" href="https://bscscan.com/address/0xdca75d59357cc7d5aadafb4b335a7d3ac19b67bc#code">
-                        Crowdsale Contract
-                    </MuiLink>
-                </Typography>
-            </li>
-            <li>
-                {Body1("Token Description")}
-                {Body2("The ZKB Token is a digital asset that is used for feeless transactions on bunnynotes.finance platform. The Token is intended to be used for storing and transfering value.It is not a registered security in the United States, nor is it intended to be treated as such. The tokens are not an investment of any kind. Purchasing them does not guarantee returns.")}
-            </li>
-            <li>
-                {Body1("Token Sale")}
-                {Body2("The Token sale will be conducted via a smart contract, which will automatically execute the purchase and transfer of Tokens to the Purchaser’s wallet address upon receipt of payment in the form of cryptocurrency. The price of each Token will be determined at the time of purchase, and will be denominated in the cryptocurrency used for payment.")}
-            </li>
-            <li>
-                {Body1("OFAC Sanctioned Countries")}
-                {Body2("By purchasing ZKB Tokens, the Purchaser certifies that they are not a resident or national of a country on the OFAC sanctioned countries list, which currently includes Cuba, Iran, North Korea, Syria, and the Crimea region of Ukraine,Russia and other countries. The Issuer reserves the right to refuse sale of Tokens to any individual or entity located in a sanctioned country and will refuse to communicate or work with a resident of a sanctioned country or a sanctioned entity.")}
-            </li>
-            <li>
-                {Body1("Disclaimer of Warranties")}
-                {Body2("THE TOKENS ARE SOLD “AS IS” AND WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY OR OTHERWISE, INCLUDING WITHOUT LIMITATION ANY WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE OR NON-INFRINGEMENT.")}
-            </li>
-            <li>
-                {Body1("Limitation of Liability")}
-                {Body2("IN NO EVENT SHALL THE ISSUER BE LIABLE FOR ANY INDIRECT, SPECIAL, INCIDENTAL, CONSEQUENTIAL, PUNITIVE, OR EXEMPLARY DAMAGES ARISING OUT OF OR IN CONNECTION WITH THE TOKEN SALE OR THE USE OF ZKB TOKENS.")}
-            </li>
-            <li>
-                {Body1("Tokenomics")}
-                {Body2("The total supply of the tokens is 100 million ZKB and all have been minted. This tokensale sells 50% of the tokens while the remaining will be allocated for the Development team. The tokens are minted on the Binance Smart Chain and will be avaiable on the BitTorrent chain via Token Mapping.")}
-            </li>
-        </ol>
         <Stack direction="row" justifyContent="center">
             <Stack direction="column" justifyContent="center">
                 {getTokensToRecieve()}
                 <div style={{ marginBottom: "20px", paddingLeft: "5px" }} />
                 <TextField value={bnbToSpend} onChange={setBnBToSpendChange} autoComplete="off" type="number" label="Amount (BNB)"></TextField>
             </Stack>
-            <Button variant="contained" sx={{ fontFamily: "Sans-Serif", fontWeight: 600, fontSize: "20px", marginLeft: "10px", "&:hover": { backgroundColor: "white", color: "black", fontWeight: 800, boxShadow: "rgba(0, 0, 0, 0.1) 0px 4px 12px" } }} onClick={buyTokens_action}>Buy  <img style={{ marginLeft: "10px" }} src="/imgs/BunnyNotesCircle.png" width="50px" height="50px" /></Button>
+            <Button variant="contained" sx={{ fontFamily: `"Finger Paint", cursive`, fontWeight: 600, fontSize: "20px", marginLeft: "10px", "&:hover": { backgroundColor: "white", color: "black", fontWeight: 800, boxShadow: "rgba(0, 0, 0, 0.1) 0px 4px 12px" } }} onClick={buyTokens_action}>Buy  <img style={{ marginLeft: "10px" }} src="/imgs/BunnyNotesCircle.png" width="50px" height="50px" /></Button>
 
         </Stack>
-        <Stack direction="row" justifyContent="center">
-            {Body1("Enter the amount of BNB you wish to spend and the price indicator above will update.")}
+        <Stack direction="row" justifyContent="center" sx={{marginTop: "10px"}}>
+            {Body1("Enter the amount of BNB you want to spend and the price indicator above will update.", "grey")}
         </Stack>
         <Stack direction="row" justifyContent="center">
             <Button onClick={() => addAsset()}>Click here to add to the token to your wallet</Button>
         </Stack>
+        <Accordion>
+            <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+            >
+                <Typography component="div" variant="body1" sx={{ textAlign: "center", fontFamily: "sans-serif" }}>
+                    By participating you agree to the terms and conditions. Click to expand.
+                </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+                <ol>
+                    <li>
+                        {Body1("Introduction")}
+                        {Body2("These Terms and Conditions(“Agreement”) govern the sale and purchase of the ZKB token (“Token”) by you (“Purchaser”) from BunnyNotes.Finance (“Issuer”) via a smart contract. ZKB is an ERC-20 smart contract created based on the OpenZeppelin library. The Crowdsale contract was also created using the OpenZeppelin (2.0) Crowdsale contract.  By purchasing ZKB, you agree to be bound by this Agreement, as well as any additional terms and conditions set forth by the Issuer.")}
+                    </li>
+                    <li>
+                        {Body1("Source Code")}
+                        <Typography variant="body2" color="text.secondary" align="left">
+                            <MuiLink color="inherit" target="_blank" href="https://bscscan.com/address/0x5586938a2fC4489661E868c5800769Fb10847fC5#code">
+                                Token Contract
+                            </MuiLink>
+
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" align="left">
+                            <MuiLink color="inherit" target="_blank" href="https://bscscan.com/address/0xdca75d59357cc7d5aadafb4b335a7d3ac19b67bc#code">
+                                Crowdsale Contract
+                            </MuiLink>
+                        </Typography>
+                    </li>
+                    <li>
+                        {Body1("Token Description")}
+                        {Body2("The ZKB Token is a digital asset that is used for feeless transactions on bunnynotes.finance platform. The Token is intended to be used for storing and transfering value.It is not a registered security in the United States, nor is it intended to be treated as such. The tokens are not an investment of any kind. Purchasing them does not guarantee returns.")}
+                    </li>
+                    <li>
+                        {Body1("Token Sale")}
+                        {Body2("The Token sale will be conducted via a smart contract, which will automatically execute the purchase and transfer of Tokens to the Purchaser’s wallet address upon receipt of payment in the form of cryptocurrency. The price of each Token will be determined at the time of purchase, and will be denominated in the cryptocurrency used for payment.")}
+                    </li>
+                    <li>
+                        {Body1("OFAC Sanctioned Countries")}
+                        {Body2("By purchasing ZKB Tokens, the Purchaser certifies that they are not a resident or national of a country on the OFAC sanctioned countries list, which currently includes Cuba, Iran, North Korea, Syria, and the Crimea region of Ukraine,Russia and other countries. The Issuer reserves the right to refuse sale of Tokens to any individual or entity located in a sanctioned country and will refuse to communicate or work with a resident of a sanctioned country or a sanctioned entity.")}
+                    </li>
+                    <li>
+                        {Body1("Disclaimer of Warranties")}
+                        {Body2("THE TOKENS ARE SOLD “AS IS” AND WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY OR OTHERWISE, INCLUDING WITHOUT LIMITATION ANY WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE OR NON-INFRINGEMENT.")}
+                    </li>
+                    <li>
+                        {Body1("Limitation of Liability")}
+                        {Body2("IN NO EVENT SHALL THE ISSUER BE LIABLE FOR ANY INDIRECT, SPECIAL, INCIDENTAL, CONSEQUENTIAL, PUNITIVE, OR EXEMPLARY DAMAGES ARISING OUT OF OR IN CONNECTION WITH THE TOKEN SALE OR THE USE OF ZKB TOKENS.")}
+                    </li>
+                    <li>
+                        {Body1("Tokenomics")}
+                        {Body2("The total supply of the tokens is 100 million ZKB and all have been minted. This tokensale sells 50% of the tokens while the remaining will be allocated for the Development team. The tokens are minted on the Binance Smart Chain and will be avaiable on the BitTorrent chain via Token Mapping.")}
+                    </li>
+                </ol>
+            </AccordionDetails>
+        </Accordion>
+
     </Paper>
 }
