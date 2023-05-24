@@ -131,7 +131,7 @@ export function TokenSalePage(props: any) {
                     <li>
                         {Body1("Source Code")}
                         <Typography variant="body2" color="text.secondary" align="left">
-                            <MuiLink color="inherit" target="_blank" href="https://bscscan.com/address/0x5586938a2fC4489661E868c5800769Fb10847fC5#code">
+                            <MuiLink color="inherit" target="_blank" href="https://bscscan.com/token/0x5586938a2fC4489661E868c5800769Fb10847fC5#balances">
                                 Token Contract
                             </MuiLink>
 

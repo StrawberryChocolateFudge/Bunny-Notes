@@ -73,13 +73,14 @@ const tokenData: { [key in ChainIds]: SimplifiedTokenDataInput[] } = {
         { isFeeless: true, imageLink: "/imgs/BunnyNotesCircle.png", currency: "ZKB", erc20Address: FeelessTokens.BSC_MAINNET, description: "ZKB tokens were created to transfer and store value. You can use these tokens without fees on BSC" },
         { imageLink: "/imgs/binance-usd-busd-logo.svg", currency: "BUSD", erc20Address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", description: "Binance-Peg BUSD Stablecoin" },
         { imageLink: "/imgs/btcLogo.svg", currency: "BTCB", erc20Address: "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c", description: "Binance-Peg Bitcoin" },
-        { imageLink: "/imgs/multi-collateral-dai-dai-logo.svg", currency: "DAI", erc20Address: "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3", description: "Binance Peg DAI Stablecoin" }
+        { imageLink: "/imgs/multi-collateral-dai-dai-logo.svg", currency: "DAI", erc20Address: "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3", description: "Binance Peg DAI Stablecoin" },
+        { imageLink: "/imgs/safemoon.svg", currency: "SFM", erc20Address: "0x42981d0bfbAf196529376EE702F2a9Eb9092fcB5", description: "SafeMoon! Nuff said!" }
 
     ],
     [ChainIds.POLYGON_MAINNET]: [
         { isCustom: true, imageLink: "/imgs/questionMark.png", currency: "Custom Token", erc20Address: "" },
         { imageLink: "/imgs/polygon-matic-logo.svg", currency: "MATIC", erc20Address: ZEROADDRESS, description: "Matic is the native coin of the Polygon POS Chain" },
-        
+
     ],
     [ChainIds.ETH_MAINNET]: []
 }
