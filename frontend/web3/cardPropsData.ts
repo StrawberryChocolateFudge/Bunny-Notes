@@ -80,6 +80,8 @@ const tokenData: { [key in ChainIds]: SimplifiedTokenDataInput[] } = {
     [ChainIds.POLYGON_MAINNET]: [
         { isCustom: true, imageLink: "/imgs/questionMark.png", currency: "Custom Token", erc20Address: "" },
         { imageLink: "/imgs/polygon-matic-logo.svg", currency: "MATIC", erc20Address: ZEROADDRESS, description: "Matic is the native coin of the Polygon POS Chain" },
+        { imageLink: "/imgs/uniswap-uni-logo.svg", currency: "UNI", erc20Address: "0xb33EaAd8d922B1083446DC23f610c2567fB5180f", description: "Uniswap on Polygon" },
+        { imageLink: "/imgs/weth-62277139.png", currency: "WETH", erc20Address: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619", description: "Wrapped Ether" }
 
     ],
     [ChainIds.ETH_MAINNET]: []
