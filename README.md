@@ -57,3 +57,20 @@ Export the verifier smart contract
 ` snarkjs zkey export solidityverifier withdraw_final.zkey WithdrawVerifier.sol`
 
 And finally the verifier was copied to the contracts library
+
+Bunny bundles flowchart!
+
+```flowchart LR
+ subgraph Deposit
+    A[Alice] -->|Creates Bunny Notes| B(Bulk Notes)
+    B --> C{Computes a merkle tree}
+    C -->|Uploads tree to decentralized storage| UploadTree(Tree is upladed) 
+    C --> |Merkle Root| G{SavesMerkle Root With deposit in smart contract}
+    A --> |Value Deposit| G
+   end 
+  subgraph Withdraw
+   A -->|Give a note| D(Bob)
+   D --> |Computes the commitment from the note and fetches the merkle tree| E{Computes merkle proof}
+   E -->|Merkle proof and merkle root| F{Computes ZKP}
+
+  end
