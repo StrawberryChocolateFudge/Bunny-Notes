@@ -11,14 +11,19 @@ import { Base } from './Base';
 import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { generateZKProof, packSolidityProof } from '../zkp/generateProof';
-import { getContract, getNoteContractAddress, handleNetworkSelect, requestAccounts, withdraw } from '../web3/web3';
-import { Typography } from '@mui/material';
+import { explorerURLWithTxPath, getContract, getNoteContractAddress, handleNetworkSelect, requestAccounts, withdraw } from '../web3/web3';
+import { Link, Typography } from '@mui/material';
+import { canRelayCheck, postWithdraw } from '../web3/relayer';
 interface CashOutGiftCardTabProps extends Base {
     noteString: string
     setMyNoteString: (newValue: string) => void;
 }
 
 export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
+    const [showtxId, setShowTxId] = React.useState(false);
+    const [txId, setTxId] = React.useState("")
+    const [explorerLink, setExplorerLink] = React.useState("");
+
 
     const noteStringSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         props.setMyNoteString(event.target.value);
@@ -53,6 +58,24 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
         const zkp = await generateZKProof(parsedNote.deposit, myAddress);
         const solidityProof = packSolidityProof(zkp.proof);
 
+        const [canRelay, canRelayErr] = await canRelayCheck({
+            provider,
+            contract,
+            myAddress,
+            solidityProof,
+            nullifierHash,
+            commitment
+        });
+
+        if (canRelay) {
+            await relayWithdraw(contract, solidityProof, nullifierHash, commitment, myAddress, parsedNote, props.displayError);
+        } else {
+            props.displayError("The relayer is not available for this transaction");
+            await walletWithdraw(contract, solidityProof, nullifierHash, commitment, myAddress, parsedNote)
+        }
+    }
+
+    async function walletWithdraw(contract, solidityProof, nullifierHash, commitment, myAddress, parsedNote) {
         const tx = await withdraw(contract, solidityProof, nullifierHash, commitment, myAddress).catch(err => {
             props.displayError("Unable to Withdraw");
             console.error(err);
@@ -65,7 +88,32 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
                 }
             })
         }
+    }
 
+    async function relayWithdraw(contract, solidityProof, nullifierHash, commitment, myAddress, parsedNote, handleError) {
+        // the network needs to be a hex string
+        const network = "0x" + parsedNote.netId.toString(16);
+        const [success, msg] = await postWithdraw({ proof: solidityProof, nullifierHash, commitment, recipient: myAddress, network });
+
+        if (!success) {
+            handleError(msg);
+            props.displayError("Transaction cannot be relayed.")
+            // An error occured so I prompt the user to withdraw with the wallet insteadl
+            await walletWithdraw(contract, solidityProof, nullifierHash, commitment, myAddress, parsedNote)
+        } else {
+            // relay success I display the transaction id and link to the explorer
+            // and show a button that will link to the verification page
+            setShowTxId(true);
+            setExplorerLink(explorerURLWithTxPath[network] + msg);
+            setTxId(msg);
+
+        }
+        return [success, msg];
+    }
+
+    async function verifyLinkAction() {
+        const parsedNote = await parseNote(props.noteString);
+        props.navigateToVerifyPage([props.noteString, parsedNote])
     }
 
     return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
@@ -87,13 +135,20 @@ export default function CashOutGiftCardTab(props: CashOutGiftCardTabProps) {
                 </Grid>
             </Toolbar>
         </AppBar>
-        <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center" }}>
-            <Typography component="div" variant="h6">You can withdraw the Bunny Note balance to your wallet.</Typography>
-            <Tooltip arrow title="Withdraw the Bunny Note">
-                <Button variant="contained" onClick={cashOutAction} sx={{ mr: 1, fontSize: "20px", fontWeight: 800 }}>
-                    Withdraw <img width="35px" src="/imgs/metamaskFox.svg" />
-                </Button>
-            </Tooltip>
-        </Box>
+        {showtxId ?
+            <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center",display: "flex",flexDirection: "column" }}>
+                <Typography component={"div"} variant="h6">Transaction Relayed!</Typography>
+                <Link href={explorerLink}>Link to explorer</Link>
+                <Button onClick={async () => await verifyLinkAction()} variant="contained" sx={{ mr: 1, fontSize: "20px", fontWeight: 800, width: "100px",margin: "0 auto" }}>Verify</Button>
+            </Box> :
+
+            <Box sx={{ marginTop: "20px", marginLeft: "20px", marginRight: "20px", marginBottom: "40px", textAlign: "center" }}>
+                <Typography component="div" variant="h6">You can withdraw the Bunny Note balance to your wallet.</Typography>
+                <Tooltip arrow title="Withdraw the Bunny Note">
+                    <Button variant="contained" onClick={cashOutAction} sx={{ mr: 1, fontSize: "20px", fontWeight: 800 }}>
+                        Withdraw <img width="35px" src="/imgs/metamaskFox.svg" />
+                    </Button>
+                </Tooltip>
+            </Box>}
     </Paper >
 }
