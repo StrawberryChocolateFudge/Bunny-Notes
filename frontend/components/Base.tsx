@@ -9,7 +9,6 @@ import CashOutGiftCardTab from './CashOutGiftCardTab';
 import Snackbar from '@mui/material/Snackbar';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
-import { default as MuiLink } from "@mui/material/Link";
 import getTheme from './theme';
 import {
     BrowserRouter,

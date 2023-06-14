@@ -78,7 +78,6 @@ export function downloadNote(props: DownloadNoteProps) {
                 props.displayError("Underlying error changed! Refresh the application!")
                 return;
             }
-            console.log(err);
             props.displayError("Unable to deposit ERC20 Note");
             props.setDepositButtonDisabled(false);
         });
@@ -122,7 +121,6 @@ export function downloadNote(props: DownloadNoteProps) {
                     props.setDepositButtonDisabled(false);
 
                 }).catch(err => {
-                    console.log(err);
                     {
                         if (err.message.includes("underlying network changed")) {
                             props.displayError("Underlying error changed! Refresh the application!")
