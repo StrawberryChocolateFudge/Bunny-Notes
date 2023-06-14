@@ -32,7 +32,7 @@ export type { IUniswapV3PoolImmutables } from "./IUniswapV3PoolImmutables";
 export type { IUniswapV3PoolOwnerActions } from "./IUniswapV3PoolOwnerActions";
 export type { IUniswapV3PoolState } from "./IUniswapV3PoolState";
 export type { ISwapRouter } from "./ISwapRouter";
-export type { BunnyBundles } from "./BunnyBundles";
+export type { BunnyDebit } from "./BunnyDebit";
 export type { IVerifier } from "./IVerifier";
 export type { BunnyNotes } from "./BunnyNotes";
 export type { MOCKERC20 } from "./MOCKERC20";
@@ -72,7 +72,7 @@ export { IUniswapV3PoolImmutables__factory } from "./factories/IUniswapV3PoolImm
 export { IUniswapV3PoolOwnerActions__factory } from "./factories/IUniswapV3PoolOwnerActions__factory";
 export { IUniswapV3PoolState__factory } from "./factories/IUniswapV3PoolState__factory";
 export { ISwapRouter__factory } from "./factories/ISwapRouter__factory";
-export { BunnyBundles__factory } from "./factories/BunnyBundles__factory";
+export { BunnyDebit__factory } from "./factories/BunnyDebit__factory";
 export { IVerifier__factory } from "./factories/IVerifier__factory";
 export { BunnyNotes__factory } from "./factories/BunnyNotes__factory";
 export { MOCKERC20__factory } from "./factories/MOCKERC20__factory";

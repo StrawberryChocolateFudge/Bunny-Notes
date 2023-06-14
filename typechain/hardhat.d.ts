@@ -141,9 +141,9 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ISwapRouter__factory>;
     getContractFactory(
-      name: "BunnyBundles",
+      name: "BunnyDebit",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.BunnyBundles__factory>;
+    ): Promise<Contracts.BunnyDebit__factory>;
     getContractFactory(
       name: "IVerifier",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -168,10 +168,6 @@ declare module "hardhat/types/runtime" {
       name: "TokenSale",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.TokenSale__factory>;
-    getContractFactory(
-      name: "Verifier",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Verifier__factory>;
     getContractFactory(
       name: "Verifier",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -342,10 +338,10 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ISwapRouter>;
     getContractAt(
-      name: "BunnyBundles",
+      name: "BunnyDebit",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.BunnyBundles>;
+    ): Promise<Contracts.BunnyDebit>;
     getContractAt(
       name: "IVerifier",
       address: string,
@@ -376,11 +372,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.TokenSale>;
-    getContractAt(
-      name: "Verifier",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Verifier>;
     getContractAt(
       name: "Verifier",
       address: string,
