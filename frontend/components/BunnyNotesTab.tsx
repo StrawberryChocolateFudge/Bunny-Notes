@@ -1,19 +1,20 @@
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import CardGrid, { CardType } from './CardGrid';
-import { Base } from './Base';
+import { BaseProps } from './Base';
 import { downloadNote } from './DownloadNote';
 import { NoteDetails } from '../zkp/generateProof';
 import { createQR } from '../qrcode/create';
 import { getNoteContractAddress, } from '../web3/web3';
-import { Button, Divider, Link, MenuItem, Select, SelectChangeEvent, Stack, styled, Typography } from '@mui/material';
+import { Button, Link, Stack, styled, Typography } from '@mui/material';
 import { EnterDenominationDialog } from './utils/EnterDenominationDialog';
 import { calculateFeeAndNote } from '../web3/calculateFeeAndNote';
-import { setSelectedNToSS } from '../storage/session';
-import { getCardPropsData, networkButtons, networkbuttonWhere } from '../web3/cardPropsData';
+import { NetworkSelectorDropdown, onSelectedNetworkEmpty } from './utils/NetworkSelectorDropdown';
+import { getCardPropsData } from '../web3/cardPropsData';
+import { paperBackgroundGradient } from './theme';
 
 
-interface BunnyNotesPageProps extends Base {
+interface BunnyNotesPageProps extends BaseProps {
 }
 
 export const Center = styled("div")({
@@ -64,6 +65,9 @@ export function BunnyNotesTab(props: BunnyNotesPageProps) {
 
     const [selectedCard, setSelectedCard] = React.useState({ tokenAddress: "", cardType: "", currency: "", isCustom: false, isFeeless: false, description: "" });
 
+    // Track if the deposit button is disabled with state stored here
+    const [depositButtonDisabled, setDepositButtonDisabled] = React.useState(true);
+
     React.useEffect(() => {
         async function getQRCode() {
             const details = noteDetails;
@@ -107,8 +111,8 @@ export function BunnyNotesTab(props: BunnyNotesPageProps) {
 
     if (renderDownloadPage) {
         return downloadNote({
-            depositButtonDisabled: props.depositButtonDisabled,
-            setDepositButtonDisabled: props.setDepositButtonDisabled,
+            depositButtonDisabled,
+            setDepositButtonDisabled,
             navigateToVerifyPage: props.navigateToVerifyPage,
             noteFee,
             selectedNetwork: props.selectedNetwork,
@@ -128,7 +132,7 @@ export function BunnyNotesTab(props: BunnyNotesPageProps) {
 
     return (
         <React.Fragment>
-            <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
+            <Paper elevation={3} sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden', background: paperBackgroundGradient }}>
                 <Stack direction="row" justifyContent={"center"}>
                     <Stack direction={"column"} justifyContent="center">
                         <BunnyNotesExplainerVideo></BunnyNotesExplainerVideo>
@@ -151,47 +155,17 @@ export function BunnyNotesTab(props: BunnyNotesPageProps) {
                         }
                     )}
                 </Stack>
-                <CardGrid handleSelect={handleSelectBunnyNote} cardProps={getCardPropsData("Bunny Note", onSelectedNetworkEmpty(props.selectedNetwork))} ></CardGrid>
+                <CardGrid handleSelect={handleSelectBunnyNote} cardProps={getCardPropsData("Bunny Note", onSelectedNetworkEmpty(props.selectedNetwork), false)} ></CardGrid>
 
             </Paper>
-            <EnterDenominationDialog displayError={props.displayError} description={selectedCard.description} isFeeless={selectedCard.isFeeless} isCustom={selectedCard.isCustom} showDialog={showDenominationInput} handleClose={handleCloseDenominationDialog} handleOk={handleAcceptDenominationDialog}></EnterDenominationDialog>
+            <EnterDenominationDialog
+                displayError={props.displayError}
+                description={selectedCard.description}
+                isFeeless={selectedCard.isFeeless}
+                isCustom={selectedCard.isCustom}
+                showDialog={showDenominationInput}
+                handleClose={handleCloseDenominationDialog}
+                handleOk={handleAcceptDenominationDialog}></EnterDenominationDialog>
         </React.Fragment>
     );
-}
-
-export interface SelectNetworkProps {
-    setSelectedNetwork: (n: string) => void;
-    selectedNetwork: string;
-    displayError: (err: string) => void;
-}
-
-export function onSelectedNetworkEmpty(selectedNetwork: string) {
-    return selectedNetwork === "" ? networkButtons[0].chainId : selectedNetwork;
-}
-
-export function NetworkSelectorDropdown(props: SelectNetworkProps) {
-
-    const networkSelected = (networkId: string) => {
-        setSelectedNToSS(networkId);
-        props.setSelectedNetwork(networkId)
-
-    }
-
-    const onSelected = (event: SelectChangeEvent<string>) => {
-        networkSelected(event.target.value);
-
-    };
-
-    return <React.Fragment>
-        <Stack direction="column">
-            <Typography sx={{ margin: "0 auto", color: "grey" }} component="div" variant="subtitle1">Selected Network</Typography>
-            <Select onChange={onSelected} value={onSelectedNetworkEmpty(props.selectedNetwork)} renderValue={(value: string) => {
-                const btn = networkbuttonWhere(value);
-
-                return <div  ><img width="15px" style={{ paddingRight: "10px" }} alt={btn.imageAlt} src={btn.imageSrc} />{btn.cardTypography}</div>
-            }} id="networkSelect">
-                {networkButtons.map(n => <MenuItem key={n.chainId} value={n.chainId}>{<img width="30px" style={{ paddingRight: "10px" }} alt={n.imageAlt} src={n.imageSrc} />}{n.cardTypography}</MenuItem>)}
-            </Select>
-        </Stack>
-    </React.Fragment>
 }
