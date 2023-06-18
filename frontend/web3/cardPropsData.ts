@@ -35,8 +35,12 @@ function getTokenData(input: SimplifiedTokenDataInput): SelectableCardsParams {
   return tokenData;
 }
 
-// TODO: I want to add a description field to the card props data
-// and also store the tokens in arrays and .map over them when I return them!
+const NFTData = {
+  isCustom: true,
+  imageLink: "/imgs/NFTLogo.png",
+  currency: "NFT",
+  erc20Address: "",
+};
 
 const tokenData: { [key in ChainIds]: SimplifiedTokenDataInput[] } = {
   [ChainIds.BTT_TESTNET_ID]: [
@@ -234,11 +238,17 @@ const tokenData: { [key in ChainIds]: SimplifiedTokenDataInput[] } = {
 export function getCardPropsData(
   cardType: "Bunny Note",
   netId: string,
+  bundle: boolean,
 ): Array<SelectableCardsParams> {
-  const propsData = tokenData[netId];
+  const propsData = [...tokenData[netId]];
   if (propsData === undefined) {
     return [];
   }
+  // TODO: add here the NFT, will do later
+  // if (bundle) {
+  //   propsData.unshift(NFTData);
+  // }
+
   return propsData.map((t) => getTokenData(t));
 }
 
@@ -276,18 +286,18 @@ export const networkButtons: NetworkSelectProps[] = [
     imageSrc: "/imgs/polygon-matic-logo.svg",
     cardTypography: "Polygon Network",
   },
-  // {
-  //   tooltipTitle: "Select Binance Smart Chain Testnet",
-  //   chainId: ChainIds.BSC_TESTNET_ID,
-  //   imageAlt: "Binance Smart Chain",
-  //   imageSrc: "/imgs/bnb-chain-binance-smart-chain-logo.svg",
-  //   cardTypography: "Binance Smart Chain Testnet",
-  // },
-  // {
-  //   tooltipTitle: "Select Bittorrent Chain Testnet",
-  //   chainId: ChainIds.BTT_TESTNET_ID,
-  //   imageAlt: "Bittorrent Testnet",
-  //   imageSrc: "/imgs/bttLogo.svg",
-  //   cardTypography: "BitTorrent Testnet",
-  // },
+  {
+    tooltipTitle: "Select Binance Smart Chain Testnet",
+    chainId: ChainIds.BSC_TESTNET_ID,
+    imageAlt: "Binance Smart Chain",
+    imageSrc: "/imgs/bnb-chain-binance-smart-chain-logo.svg",
+    cardTypography: "Binance Smart Chain Testnet",
+  },
+  {
+    tooltipTitle: "Select Bittorrent Chain Testnet",
+    chainId: ChainIds.BTT_TESTNET_ID,
+    imageAlt: "Bittorrent Testnet",
+    imageSrc: "/imgs/bttLogo.svg",
+    cardTypography: "BitTorrent Testnet",
+  },
 ];
