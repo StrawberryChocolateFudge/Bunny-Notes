@@ -16,20 +16,20 @@ import {
     Route,
 } from "react-router-dom";
 import { NotFoundPage } from './404page';
-import { BunnyNotesTab, onSelectedNetworkEmpty } from './BunnyNotesTab';
+import { BunnyNotesTab } from './BunnyNotesTab';
 import { getSelectedNFromSS } from '../storage/session';
 import { NoteDetails } from '../zkp/generateProof';
 import { TermsPage } from './TermsPage';
 import { TokenSalePage } from './TokenSalePage';
-import { Roadmap } from './Roadmap';
+import { BunnyBundlesTab } from './BunnyBundlesTab';
+import { onSelectedNetworkEmpty } from './utils/NetworkSelectorDropdown';
 
-export interface Base {
+
+export interface BaseProps {
     displayError: any,
     selectedNetwork: string,
     setSelectedNetwork: (n: string) => void;
     navigateToVerifyPage: (note: NoteDetails) => void;
-    depositButtonDisabled: boolean;
-    setDepositButtonDisabled: (to: boolean) => void;
 }
 
 export function Copyright() {
@@ -63,8 +63,9 @@ export default function Base() {
 
     const [paymentRequest, setPaymentRequest] = React.useState({ price: "", payTo: "" })
 
-    // Track if the deposit button is disabled with state stored here
-    const [depositButtonDisabled, setDepositButtonDisabled] = React.useState(false);
+
+
+    // Track if the download button was pressed for the bundle download
 
     // Initialize the terms accepted from local storage
 
@@ -84,7 +85,6 @@ export default function Base() {
 
     const onTabToggle = (event: React.SyntheticEvent, newValue: number) => {
         setSelectedTab(newValue);
-        setDepositButtonDisabled(false);
     };
 
     function navigateToVerifyPage(note: NoteDetails) {
@@ -99,13 +99,11 @@ export default function Base() {
         setTimeout(clickButton, 1000);
     }
 
-    const genericProps = {
+    const baseprops = {
         displayError: openSnackbar,
         selectedNetwork,
         setSelectedNetwork,
         navigateToVerifyPage,
-        depositButtonDisabled,
-        setDepositButtonDisabled,
     }
 
     const noteStringProps = {
@@ -117,13 +115,13 @@ export default function Base() {
     const getTabContent = () => {
         switch (selectedTab) {
             case 0:
-                return <BunnyNotesTab {...genericProps} />
+                return <BunnyNotesTab {...baseprops} />
             case 1:
-                return <VerifyNoteTab {...genericProps} {...noteStringProps} />
+                return <BunnyBundlesTab {...baseprops}></BunnyBundlesTab>
             case 2:
-                return <CashOutGiftCardTab {...genericProps} {...noteStringProps}></CashOutGiftCardTab>
+                return <CashOutGiftCardTab {...baseprops} {...noteStringProps}></CashOutGiftCardTab>
             case 3:
-                return <Roadmap></Roadmap>
+                return <VerifyNoteTab {...baseprops} {...noteStringProps} />
             default:
                 break;
         }
