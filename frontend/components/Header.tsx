@@ -18,9 +18,10 @@ export default function Header(props: HeaderProps) {
             {props.withTabs ? <AppBar component="div" position="static" elevation={0} sx={{ zIndex: 0 }}>
                 <Tabs value={props.selectedTab} onChange={props.onTabToggle} textColor="inherit" variant='scrollable' scrollButtons allowScrollButtonsMobile aria-label="Bunny Notes Options">
                     <Tab sx={{ fontFamily: `"Finger Paint",cursive` }} label="Bunny Notes" />
-                    <Tab sx={{ fontFamily: `"Finger Paint",cursive` }} label="Verify a Note" />
+                    <Tab sx={{ fontFamily: `"Finger Paint",cursive` }} label="Bundles" />
                     <Tab sx={{ fontFamily: `"Finger Paint",cursive` }} label="Withdraw" />
-                    <Tab sx={{ fontFamily: `"Finger Paint",cursive` }} label="Roadmap" />
+                    <Tab sx={{ fontFamily: `"Finger Paint",cursive` }} label="Verify a Note" />
+
                 </Tabs>
             </AppBar> : <React.Fragment></React.Fragment>}
 
