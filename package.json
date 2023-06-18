@@ -79,7 +79,6 @@
     "react-qr-reader": "git+https://github.com/StrawberryChocolateFudge/react-qr-reader.git",
     "react-router-dom": "^6.8.1",
     "snarkjs": "^0.6.1",
-    "styled-components": "^5.3.6",
-    "tronweb": "^4.4.0"
+    "styled-components": "^5.3.6"
   }
 }
