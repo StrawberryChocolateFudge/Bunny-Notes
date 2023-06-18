@@ -151,3 +151,5 @@ export default function getTheme() {
     };
     return theme;
 }
+
+export const paperBackgroundGradient = "linear-gradient(white 50%, #F2F8F4)";
