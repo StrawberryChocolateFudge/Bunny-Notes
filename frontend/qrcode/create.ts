@@ -13,6 +13,10 @@ export function getCommitmentQRString(amount: string, currency: string, netId: s
     return `commitment-${currency}-${amount}-${parseInt(netId)}-${commitment}-${nullifierHash}`;
 }
 
+export function getBundleRootNullifierQRString(amount: string, currency: string, netId: string, root: string, nullifierHash: string) {
+    return `bundlecommitment-${currency}-${amount}-${parseInt(netId)}-${root}-${nullifierHash}`;
+}
+
 export async function commitmentQR(
     {
         amount,
