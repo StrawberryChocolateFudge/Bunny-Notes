@@ -5,7 +5,7 @@ import { downloadA4PDF } from "../pdf";
 import { NoteDetails } from "../zkp/generateProof";
 import { CardType } from "./CardGrid";
 import { ethers } from "ethers";
-import { bunnyNotesCommitments, calculateFee, depositETH, depositToken, ERC20Approve, getChainId, getContract, getNetworkNameFromId, handleNetworkSelect, onboardOrSwitchNetwork, ZEROADDRESS } from "../web3/web3";
+import { bunnyNotesCommitments, calculateFee, depositETH, depositToken, ERC20Approve, getContract, getNetworkNameFromId, handleNetworkSelect, ZEROADDRESS } from "../web3/web3";
 import { parseEther } from "ethers/lib/utils";
 import { commitmentQR } from "../qrcode/create";
 
@@ -119,7 +119,6 @@ export function downloadNote(props: DownloadNoteProps) {
                 const tx = await depositETH(notesContract, toNoteHex(deposit.commitment), parseEther(amount)).catch(err => {
                     props.displayError("Unable to deposit  Note");
                     props.setDepositButtonDisabled(false);
-
                 }).catch(err => {
                     {
                         if (err.message.includes("underlying network changed")) {
@@ -169,11 +168,12 @@ export function downloadNote(props: DownloadNoteProps) {
             tokenAddress: isNativeToken ? "Native Token" : erc20Address
         })
         props.setDownloadClicked(true);
+        props.setDepositButtonDisabled(false);
     }
 
     const backButtonClicked = () => {
         props.setRenderDownloadPage(false);
-        props.setDepositButtonDisabled(false);
+        props.setDepositButtonDisabled(true);
     }
 
 
@@ -193,7 +193,7 @@ export function downloadNote(props: DownloadNoteProps) {
                     </Grid>
                     <Grid item>
                         <Tooltip arrow title="Download the Note">
-                            <Button onClick={downloadClick} variant="contained" sx={{ mr: 1,fontWeight: 800 }}>Download</Button>
+                            <Button onClick={downloadClick} variant="contained" sx={{ mr: 1, fontWeight: 800 }}>Download</Button>
                         </Tooltip>
                     </Grid>
 
