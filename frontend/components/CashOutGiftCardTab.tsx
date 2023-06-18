@@ -7,14 +7,14 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Box from "@mui/material/Box"
-import { Base } from './Base';
+import { BaseProps } from './Base';
 import ScanNoteButton from './QRScannerModal';
 import { parseNote, toNoteHex } from '../../lib/BunnyNote';
 import { generateZKProof, packSolidityProof } from '../zkp/generateProof';
 import { explorerURLWithTxPath, getContract, getNoteContractAddress, handleNetworkSelect, requestAccounts, withdraw } from '../web3/web3';
 import { Link, Typography } from '@mui/material';
 import { canRelayCheck, postWithdraw } from '../web3/relayer';
-interface CashOutGiftCardTabProps extends Base {
+interface CashOutGiftCardTabProps extends BaseProps {
     noteString: string
     setMyNoteString: (newValue: string) => void;
 }
