@@ -141,6 +141,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ISwapRouter__factory>;
     getContractFactory(
+      name: "BunnyBundles",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.BunnyBundles__factory>;
+    getContractFactory(
+      name: "IVerifier",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IVerifier__factory>;
+    getContractFactory(
       name: "BunnyDebit",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.BunnyDebit__factory>;
@@ -173,9 +181,21 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Verifier__factory>;
     getContractFactory(
+      name: "Verifier",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Verifier__factory>;
+    getContractFactory(
       name: "ZKBToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ZKBToken__factory>;
+    getContractFactory(
+      name: "IVerifier",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IVerifier__factory>;
+    getContractFactory(
+      name: "ZKNFT",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ZKNFT__factory>;
 
     getContractAt(
       name: "Initializable",
@@ -338,6 +358,16 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ISwapRouter>;
     getContractAt(
+      name: "BunnyBundles",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.BunnyBundles>;
+    getContractAt(
+      name: "IVerifier",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IVerifier>;
+    getContractAt(
       name: "BunnyDebit",
       address: string,
       signer?: ethers.Signer
@@ -378,10 +408,25 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Verifier>;
     getContractAt(
+      name: "Verifier",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Verifier>;
+    getContractAt(
       name: "ZKBToken",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.ZKBToken>;
+    getContractAt(
+      name: "IVerifier",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IVerifier>;
+    getContractAt(
+      name: "ZKNFT",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ZKNFT>;
 
     // default types
     getContractFactory(
