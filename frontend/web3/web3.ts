@@ -48,6 +48,17 @@ enum BunnyNotesContractAddress {
   ETH_MAINNET = "",
 }
 
+enum BunnyBundlesContractAddresses {
+  BTT_DONAU_TESTNET = "",
+  BSC_TESTNET = "",
+
+  //MAINNETS:
+  BTT_MAINNET = "",
+  BSC_MAINNET = "",
+  POLYGON_MAINNET = "",
+  ETH_MAINNET = "",
+}
+
 enum RPCURLS {
   BTT_TESTNET = "https://pre-rpc.bt.io/",
   BSC_TESTNET = "https://data-seed-prebsc-1-s3.binance.org:8545",
@@ -110,6 +121,18 @@ const noteContractAddresses: { [key in ChainIds]: BunnyNotesContractAddress } =
     [ChainIds.BSC_MAINNET]: BunnyNotesContractAddress.BSC_MAINNET,
     [ChainIds.POLYGON_MAINNET]: BunnyNotesContractAddress.POLYGON_MAINNET,
   };
+
+const bundleContractAddresses: {
+  [key in ChainIds]: BunnyBundlesContractAddresses;
+} = {
+  [ChainIds.BTT_TESTNET_ID]: BunnyBundlesContractAddresses.BTT_DONAU_TESTNET,
+  [ChainIds.BSC_TESTNET_ID]: BunnyBundlesContractAddresses.BSC_TESTNET,
+  // Mainnets
+  [ChainIds.BTT_MAINNET_ID]: BunnyBundlesContractAddresses.BTT_MAINNET,
+  [ChainIds.ETH_MAINNET]: BunnyBundlesContractAddresses.ETH_MAINNET,
+  [ChainIds.BSC_MAINNET]: BunnyBundlesContractAddresses.BSC_MAINNET,
+  [ChainIds.POLYGON_MAINNET]: BunnyBundlesContractAddresses.POLYGON_MAINNET,
+};
 
 const networkNameFromId: { [key in ChainIds]: NetworkNames } = {
   [ChainIds.BTT_TESTNET_ID]: NetworkNames.BTT_TESTNET,
@@ -202,8 +225,17 @@ export const ZEROADDRESS = "0x0000000000000000000000000000000000000000";
 export function getNoteContractAddress(netId: any) {
   const addr = noteContractAddresses[netId as ChainIds];
   if (!addr) {
-    // falling back to testnet if the netId is not found included!
+    // falling back to testnet if the netId is not found!
     return BunnyNotesContractAddress.BTT_DONAU_TESTNET;
+  }
+  return addr;
+}
+
+export function getBundlesContractAddress(netId: any) {
+  const addr = bundleContractAddresses[netId as ChainIds];
+  if (!addr) {
+    // Falling back to testnet if the netId is not found
+    return BunnyBundlesContractAddresses.BTT_DONAU_TESTNET;
   }
   return addr;
 }
@@ -566,4 +598,47 @@ export interface AvailableERC20Token {
   address: string;
   name: string;
   logo: string;
+}
+
+export async function bundle_depositEth(
+  contract: any,
+  root: string,
+  totalValue: BigNumber,
+  size: number,
+) {
+  const fee = await calculateFee(contract, totalValue);
+  return contract.depositEth(root, totalValue, size, {
+    value: totalValue.add(fee),
+  });
+}
+
+export async function bundle_depositToken(
+  contract: any,
+  root: string,
+  totalValue: BigNumber,
+  size: number,
+  token: string,
+) {
+  return contract.depositToken(root, totalValue, size, token);
+}
+
+export async function bundle_withdraw(
+  contract: any,
+  solidityProof: any,
+  nullifierHash: string,
+  commitment: string,
+  root: string,
+  recipient: string,
+) {
+  return await contract.withdraw(
+    solidityProof,
+    nullifierHash,
+    commitment,
+    root,
+    recipient,
+  );
+}
+
+export async function bunnyBundles(contract: any, root: any) {
+  return await contract.bundles(root);
 }
