@@ -149,14 +149,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVerifier__factory>;
     getContractFactory(
-      name: "BunnyDebit",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.BunnyDebit__factory>;
-    getContractFactory(
-      name: "IVerifier",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IVerifier__factory>;
-    getContractFactory(
       name: "BunnyNotes",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.BunnyNotes__factory>;
@@ -189,9 +181,9 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ZKBToken__factory>;
     getContractFactory(
-      name: "IVerifier",
+      name: "IBundleVerifier",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IVerifier__factory>;
+    ): Promise<Contracts.IBundleVerifier__factory>;
     getContractFactory(
       name: "ZKNFT",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -368,16 +360,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IVerifier>;
     getContractAt(
-      name: "BunnyDebit",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.BunnyDebit>;
-    getContractAt(
-      name: "IVerifier",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IVerifier>;
-    getContractAt(
       name: "BunnyNotes",
       address: string,
       signer?: ethers.Signer
@@ -418,10 +400,10 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ZKBToken>;
     getContractAt(
-      name: "IVerifier",
+      name: "IBundleVerifier",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IVerifier>;
+    ): Promise<Contracts.IBundleVerifier>;
     getContractAt(
       name: "ZKNFT",
       address: string,

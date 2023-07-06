@@ -46,6 +46,8 @@ contract BunnyBundles is ReentrancyGuard {
 
     mapping(bytes32 => BundleStore) public bundles; // The Bunny Bundles are stored in a struct, accessable with the bundle root hash!
 
+    mapping(bytes32 => address) public recipients; // Storing the recipients of the withdraw txs here nullifierHash ==> address
+
     event DepositETH(
         bytes32 indexed root,
         address depositFor,
@@ -213,10 +215,7 @@ contract BunnyBundles is ReentrancyGuard {
         bytes32 _root,
         address _recipient
     ) external nonReentrant {
-        require(
-            !nullifierHashes[_root][_nullifierHash],
-            "Invalid note"
-        );
+        require(!nullifierHashes[_root][_nullifierHash], "Invalid note");
         require(bundles[_root].creator != address(0), "Unused root!");
 
         require(bundles[_root].valueLeft > 0, "No value left");
@@ -254,7 +253,7 @@ contract BunnyBundles is ReentrancyGuard {
         } else {
             Address.sendValue(payable(_recipient), noteValue);
         }
-
+        recipients[_nullifierHash] = _recipient;
         emit WithdrawFromBundle(
             bundles[_root].creator,
             _recipient,

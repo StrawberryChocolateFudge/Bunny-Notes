@@ -24,6 +24,7 @@ interface ZKNFTInterface extends ethers.utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "bundleSize()": FunctionFragment;
+    "bundleVerifier()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "name()": FunctionFragment;
@@ -38,7 +39,6 @@ interface ZKNFTInterface extends ethers.utils.Interface {
     "symbol()": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
-    "verifier()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -48,6 +48,10 @@ interface ZKNFTInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(
     functionFragment: "bundleSize",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "bundleVerifier",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -109,11 +113,14 @@ interface ZKNFTInterface extends ethers.utils.Interface {
     functionFragment: "transferFrom",
     values: [string, string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "verifier", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bundleSize", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "bundleVerifier",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -152,7 +159,6 @@ interface ZKNFTInterface extends ethers.utils.Interface {
     functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "verifier", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
@@ -245,6 +251,8 @@ export class ZKNFT extends BaseContract {
 
     bundleSize(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    bundleVerifier(overrides?: CallOverrides): Promise<[string]>;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -329,8 +337,6 @@ export class ZKNFT extends BaseContract {
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    verifier(overrides?: CallOverrides): Promise<[string]>;
   };
 
   approve(
@@ -342,6 +348,8 @@ export class ZKNFT extends BaseContract {
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   bundleSize(overrides?: CallOverrides): Promise<BigNumber>;
+
+  bundleVerifier(overrides?: CallOverrides): Promise<string>;
 
   getApproved(
     tokenId: BigNumberish,
@@ -419,8 +427,6 @@ export class ZKNFT extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  verifier(overrides?: CallOverrides): Promise<string>;
-
   callStatic: {
     approve(
       to: string,
@@ -431,6 +437,8 @@ export class ZKNFT extends BaseContract {
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     bundleSize(overrides?: CallOverrides): Promise<BigNumber>;
+
+    bundleVerifier(overrides?: CallOverrides): Promise<string>;
 
     getApproved(
       tokenId: BigNumberish,
@@ -510,8 +518,6 @@ export class ZKNFT extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    verifier(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -597,6 +603,8 @@ export class ZKNFT extends BaseContract {
 
     bundleSize(overrides?: CallOverrides): Promise<BigNumber>;
 
+    bundleVerifier(overrides?: CallOverrides): Promise<BigNumber>;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -681,8 +689,6 @@ export class ZKNFT extends BaseContract {
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    verifier(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -698,6 +704,8 @@ export class ZKNFT extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     bundleSize(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    bundleVerifier(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getApproved(
       tokenId: BigNumberish,
@@ -783,7 +791,5 @@ export class ZKNFT extends BaseContract {
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    verifier(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

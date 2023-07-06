@@ -34,13 +34,13 @@ export type { IUniswapV3PoolState } from "./IUniswapV3PoolState";
 export type { ISwapRouter } from "./ISwapRouter";
 export type { BunnyBundles } from "./BunnyBundles";
 export type { IVerifier } from "./IVerifier";
-export type { BunnyDebit } from "./BunnyDebit";
 export type { BunnyNotes } from "./BunnyNotes";
 export type { MOCKERC20 } from "./MOCKERC20";
 export type { MOCKERC721 } from "./MOCKERC721";
 export type { TokenSale } from "./TokenSale";
 export type { Verifier } from "./Verifier";
 export type { ZKBToken } from "./ZKBToken";
+export type { IBundleVerifier } from "./IBundleVerifier";
 export type { ZKNFT } from "./ZKNFT";
 
 export { Initializable__factory } from "./factories/Initializable__factory";
@@ -76,11 +76,11 @@ export { IUniswapV3PoolState__factory } from "./factories/IUniswapV3PoolState__f
 export { ISwapRouter__factory } from "./factories/ISwapRouter__factory";
 export { BunnyBundles__factory } from "./factories/BunnyBundles__factory";
 export { IVerifier__factory } from "./factories/IVerifier__factory";
-export { BunnyDebit__factory } from "./factories/BunnyDebit__factory";
 export { BunnyNotes__factory } from "./factories/BunnyNotes__factory";
 export { MOCKERC20__factory } from "./factories/MOCKERC20__factory";
 export { MOCKERC721__factory } from "./factories/MOCKERC721__factory";
 export { TokenSale__factory } from "./factories/TokenSale__factory";
 export { Verifier__factory } from "./factories/Verifier__factory";
 export { ZKBToken__factory } from "./factories/ZKBToken__factory";
+export { IBundleVerifier__factory } from "./factories/IBundleVerifier__factory";
 export { ZKNFT__factory } from "./factories/ZKNFT__factory";

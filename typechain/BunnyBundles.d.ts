@@ -32,6 +32,7 @@ interface BunnyBundlesInterface extends ethers.utils.Interface {
     "getNoteValue(uint256,uint256)": FunctionFragment;
     "isSpent(bytes32,bytes32)": FunctionFragment;
     "nullifierHashes(bytes32,bytes32)": FunctionFragment;
+    "recipients(bytes32)": FunctionFragment;
     "setFeelessToken(address)": FunctionFragment;
     "verifier()": FunctionFragment;
     "withdraw(uint256[8],bytes32,bytes32,bytes32,address)": FunctionFragment;
@@ -70,6 +71,10 @@ interface BunnyBundlesInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "nullifierHashes",
     values: [BytesLike, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "recipients",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setFeelessToken",
@@ -124,6 +129,7 @@ interface BunnyBundlesInterface extends ethers.utils.Interface {
     functionFragment: "nullifierHashes",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "recipients", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setFeelessToken",
     data: BytesLike
@@ -287,6 +293,8 @@ export class BunnyBundles extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    recipients(arg0: BytesLike, overrides?: CallOverrides): Promise<[string]>;
+
     setFeelessToken(
       newFeelesstoken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -382,6 +390,8 @@ export class BunnyBundles extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  recipients(arg0: BytesLike, overrides?: CallOverrides): Promise<string>;
+
   setFeelessToken(
     newFeelesstoken: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -476,6 +486,8 @@ export class BunnyBundles extends BaseContract {
       arg1: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    recipients(arg0: BytesLike, overrides?: CallOverrides): Promise<string>;
 
     setFeelessToken(
       newFeelesstoken: string,
@@ -652,6 +664,8 @@ export class BunnyBundles extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    recipients(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
     setFeelessToken(
       newFeelesstoken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -725,6 +739,11 @@ export class BunnyBundles extends BaseContract {
     nullifierHashes(
       arg0: BytesLike,
       arg1: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    recipients(
+      arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
