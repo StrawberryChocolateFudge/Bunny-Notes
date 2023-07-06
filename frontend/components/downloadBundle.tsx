@@ -1,11 +1,12 @@
-import { AppBar, Button, Grid, Paper, Stack, Toolbar, Tooltip, Typography, CircularProgress } from "@mui/material";
+import { AppBar, Button, Grid, Paper, Stack, Toolbar, Tooltip, Typography, CircularProgress, Switch } from "@mui/material";
 import { ethers } from "ethers";
 import { formatEther, parseEther } from "ethers/lib/utils";
 import React from "react";
 import { serializeTree } from "../../lib/BunnyBundle";
 import { toNoteHex } from "../../lib/BunnyNote";
 import { downloadBunnyBundlePDF } from "../pdf";
-import { getNetworkNameFromId, ZEROADDRESS, handleNetworkSelect, getContract, bunnyBundles, calculateFee, ERC20Approve, bundle_depositToken, bundle_depositEth } from "../web3/web3";
+import { isRelayerOnline, uploadMerkleTree } from "../web3/relayer";
+import { getNetworkNameFromId, ZEROADDRESS, handleNetworkSelect, getContract, bunnyBundles, calculateFee, ERC20Approve, bundle_depositToken, bundle_depositEth, requestAccounts } from "../web3/web3";
 import { CardType } from "./CardGrid";
 
 interface DownloadBundleProps {
@@ -28,10 +29,11 @@ interface DownloadBundleProps {
     isFeeless: boolean;
     downloadBundlePressed: boolean;
     setDownloadBundlePressed: (to: boolean) => void;
-
-
+    downloadSwitchOn: boolean;
+    setDownloadSwitchOn: (setTo: boolean) => void;
 }
 
+// TODO: This is UNTESTED!! TEST THE BUNNY BUNDLES
 
 export function downloadBundle(props: DownloadBundleProps) {
     const denominationAndCurr = `${props.bundleValue}${props.bundleCurrency}`;
@@ -57,33 +59,52 @@ export function downloadBundle(props: DownloadBundleProps) {
 
     const downloadClick = async () => {
         props.setDownloadBundlePressed(true);
-        setTimeout(async () => {
-            await downloadBunnyBundlePDF({
-                bearerText,
-                bundleValue: denominationAndCurr,
-                bundleSize: props.bundleSize,
-                networkName,
-                cardType: props.cardType,
-                tokenAddress: isNativeToken ? "Native Token" : erc20Address,
-                bundle: props.bundleDetails
-            }).then(() => {
-                props.setDownloadBundlePressed(false)
-                downloadRecovery(props.bundleDetails)
-                props.setDownloadClicked(true);
-                props.setDepositButtonDisabled(false);
-            }).catch(err => {
-                props.setDownloadBundlePressed(false);
-            })
-        }, 1000);
+        if (!props.downloadSwitchOn) {
+            setTimeout(async () => {
+                await downloadBunnyBundlePDF({
+                    bearerText,
+                    bundleValue: denominationAndCurr,
+                    bundleSize: props.bundleSize,
+                    networkName,
+                    cardType: props.cardType,
+                    tokenAddress: isNativeToken ? "Native Token" : erc20Address,
+                    bundle: props.bundleDetails
+                }).then(() => {
+                    downloadRecovery(props.bundleDetails);
+                    props.setDownloadBundlePressed(false);
+                    props.setDownloadClicked(true);
+                    props.setDepositButtonDisabled(false);
+                }).catch(err => {
+                    props.setDownloadBundlePressed(false);
+                })
+            }, 1000);
+        } else {
+            downloadRecovery(props.bundleDetails)
+            downloadNoteBundleFile(props.bundleDetails);
+            props.setDownloadBundlePressed(false);
+            props.setDownloadClicked(true);
+            props.setDepositButtonDisabled(false);
+        }
+
     }
 
 
     const handleDepositTx = async (tx) => {
         if (tx !== undefined) {
-            await tx.wait().then((receipt) => {
+            await tx.wait().then(async (receipt) => {
                 if (receipt.status === 1) {
-                    // TODO: navigate to verify page and verify the bundle... Will be done after I deploy and implemetn verify!
-                    // props.navigateToVerifyPage(noteDetails)
+                    const uploadRes = await uploadMerkleTree(
+                        {
+                            root: props.bundleDetails.root,
+                            leaves: props.bundleDetails.leaves,
+                            network: networkName
+
+                        });
+                    if (!uploadRes) {
+                        props.displayError("Unable to cache public_merkletree. Try again on the verification page!");
+                        return;
+                    }
+                    //navigate to the verify page and verify using root!
                 } else {
                     // If the deposit transaction fails the deposit button will be reenabled
                     // This can happen if the deposit was dispatched too fast and the approval didn't succeed, yet
@@ -116,10 +137,11 @@ export function downloadBundle(props: DownloadBundleProps) {
     }
 
     const depositWithOwnerAddress = async (provider) => {
+        await requestAccounts(provider);
         const bundleContract = await getContract(provider, bundleContractAddress, "/BunnyBundles.json");
-        const commitments = await bunnyBundles(bundleContract, toNoteHex(props.bundleDetails.root));
-        if (commitments.used) {
-            props.displayError("Invalid commitment. Bundle already exists!");
+        const bundle = await bunnyBundles(bundleContract, toNoteHex(props.bundleDetails.root));
+        if (bundle.creator !== ZEROADDRESS) {
+            props.displayError("Invalid root. Bundle already exists!");
             return;
         }
 
@@ -176,11 +198,21 @@ export function downloadBundle(props: DownloadBundleProps) {
             return;
         }
 
+        const isOnline = await isRelayerOnline();
+        if (!isOnline) {
+            props.displayError("Relayer is offline. We can't cache the public_merkletree for you!")
+        }
+
         //When it's done upload the file to the server!
         const provider = await handleNetworkSelect(props.selectedNetwork, props.displayError)
         await depositWithOwnerAddress(provider);
 
     }
+
+    const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        props.setDownloadSwitchOn(event.target.checked);
+    };
+
 
     return <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
         <AppBar
@@ -190,7 +222,6 @@ export function downloadBundle(props: DownloadBundleProps) {
             sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
         >
             <Toolbar>
-
                 <Grid container spacing={2} alignItems="center" sx={{ paddingTop: "20px" }}>
                     <Grid item>
                         <Tooltip arrow title="Go back">
@@ -198,9 +229,17 @@ export function downloadBundle(props: DownloadBundleProps) {
                         </Tooltip>
                     </Grid>
                     <Grid item>
+
                         <Tooltip arrow title="Download the Bundle">
                             <Button onClick={downloadClick} variant="contained" sx={{ mr: 1, fontWeight: 800 }}> {props.downloadBundlePressed ? <CircularProgress sx={{ color: "white" }} /> : `Download ${props.bundleSize} X ${formattedBundleUnitPrice} ${props.bundleCurrency} Bunny Notes`}</Button>
                         </Tooltip>
+                    </Grid>
+                    <Grid item>
+                        <Stack direction="row" sx={{ marginLeft: "10px" }}>
+                            <Typography sx={{ alignSelf: "center" }} variant="subtitle2" component="div">PDF</Typography>
+                            <Switch checked={props.downloadSwitchOn} onChange={handleSwitchChange} />
+                            <Typography sx={{ alignSelf: "center" }} variant="subtitle2" component="div">JSON</Typography>
+                        </Stack>
                     </Grid>
 
                     <Grid item sx={{ margin: "0 auto" }}>
@@ -218,8 +257,12 @@ export function downloadBundle(props: DownloadBundleProps) {
                             {props.showApproval && !isNativeToken ? <Tooltip arrow title={"Approve spending " + denominationAndCurr + ` (plus ${displayedFee} fee)`}>
                                 <span><Button onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Approve Spend<img width="35px" src="/imgs/metamaskFox.svg" /></Button></span></Tooltip> : <Tooltip arrow title={"Deposit " + denominationAndCurr + ` (plus ${displayedFee} fee)`}>
                                 <span><Button disabled={props.depositButtonDisabled} onClick={depositClick} sx={{ marginBottom: "10px" }} variant="contained">Deposit<img width="35px" src="/imgs/metamaskFox.svg" /></Button></span></Tooltip>}
+                        </Grid>
+                        <Grid item sx={{ textAlign: "left", paddingBottom: "20px", marginTop: "20px" }}>
                             <Typography variant="subtitle1" component="div">
-                                Make sure to download the bundle before making the deposit! If you loose the bundle the deposit will be lost! The merkleTree.json file is needed for the withdraw transaciton. We cache it, but keep a backup safe!
+                                Make sure to download the bundle before making the deposit! If you loose the bundle the deposit will be lost!<br /> You can download multiple files. The <strong>public_merkletree file is public</strong> and needed for withdrawals. The relayer will cache it! The other files are either pdfs or json. Those are your bunny notes and only you have access to them! Keep them safe!
+                                <br />
+                                <strong>If you loose your Bunny Notes we are not able to recover them for you!</strong>
                             </Typography>
                         </Grid>
                     </Grid>
@@ -230,7 +273,11 @@ export function downloadBundle(props: DownloadBundleProps) {
 }
 
 function downloadRecovery(bundle) {
-    downloadTextFile(serializeTree(bundle.root, bundle.leaves), `${bundle.root}-merkletree.json`);
+    downloadTextFile(serializeTree(bundle.root, bundle.leaves), `public_merkletree-${bundle.root}.json`);
+}
+
+function downloadNoteBundleFile(bundle) {
+    downloadTextFile(JSON.stringify(bundle.bunnyBundle), `bunnyBundle-${bundle.root}.json`)
 }
 
 function downloadTextFile(text, name) {
