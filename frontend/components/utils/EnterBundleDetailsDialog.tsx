@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogContent, DialogContentText, Divider, Stack, TextField } from "@mui/material"
-import { isAddress } from "ethers/lib/utils";
+import { formatEther, isAddress, parseEther } from "ethers/lib/utils";
 import React from "react"
 
 interface EnterBundleDetailsDialogProps {
@@ -13,6 +13,8 @@ interface EnterBundleDetailsDialogProps {
     isNFT: boolean
 }
 
+export const MAXBUNDLE = 250;
+
 export function EnterBundleDetailsDialog(props: EnterBundleDetailsDialogProps) {
     const [bundleValue, setBundleValue] = React.useState("");
     const [bundleSize, setBundleSize] = React.useState("");
@@ -20,13 +22,14 @@ export function EnterBundleDetailsDialog(props: EnterBundleDetailsDialogProps) {
     const [tokenTicker, setTokenTicker] = React.useState("");
     const [tokenName, setTokenName] = React.useState("");
     const [NFTBaseURI, setNFTBaseURI] = React.useState("");
-    const [valuePerNote, setValuePerNote] = React.useState("");
+    const [valuePerNote, setValuePerNote] = React.useState("Enter the values");
 
     React.useEffect(() => {
-
-        if (isNaN(parseFloat(bundleValue)) && isNaN(parseFloat(bundleSize))) {
-
-            // setValuePerNote(bundleValue / bundleSize)
+        if (!isNaN(parseFloat(bundleValue)) && !isNaN(parseInt(bundleSize))) {
+            const perNote = parseEther(bundleValue).div(parseInt(bundleSize))
+            setValuePerNote(formatEther(perNote) + " tokens per note");
+        } else {
+            setValuePerNote("Enter the values")
         }
     }, [bundleValue, bundleSize]);
 
@@ -37,7 +40,6 @@ export function EnterBundleDetailsDialog(props: EnterBundleDetailsDialogProps) {
         props.handleClose();
     }
 
-    const calculateValuePerNote = () => { }
 
     const proceed = () => {
         if (props.isCustom) {
@@ -60,8 +62,8 @@ export function EnterBundleDetailsDialog(props: EnterBundleDetailsDialogProps) {
             return;
         }
 
-        if (parseFloat(bundleSize) > 1000) {
-            props.displayError("Bundle too large for webapp. Contact us if you want bigger bundles!");
+        if (parseFloat(bundleSize) > MAXBUNDLE) {
+            props.displayError("Bundle too large for web app. Contact us if you want bigger bundles!");
             return;
         }
 
@@ -117,8 +119,8 @@ export function EnterBundleDetailsDialog(props: EnterBundleDetailsDialogProps) {
         }
 
         return props.isFeeless
-            ? "The entered denomination is the bundle's total value There is no deposit fee!"
-            : "The entered denomination is the bundle's total value. A 1% fee is charged on deposit."
+            ? "The deposit amount is the bundle's total value There is no deposit fee!"
+            : "The deposit amountis the bundle's total value. A extra 1% fee is charged on deposit."
 
     }
 
@@ -143,12 +145,10 @@ export function EnterBundleDetailsDialog(props: EnterBundleDetailsDialogProps) {
                         setBundleValue(event.target.value);
                     }}></TextField>}
 
-
-
                 <TextField sx={{ marginBottom: "10px" }}
                     autoComplete="off"
-                    placeholder="Bundle Size (1000 max)"
-                    label="Amount of Notes"
+                    placeholder={`Bundle Size (${MAXBUNDLE} max)`}
+                    label={`Amount of Notes (${MAXBUNDLE} max)`}
                     type={"number"}
                     value={bundleSize}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,6 +160,7 @@ export function EnterBundleDetailsDialog(props: EnterBundleDetailsDialogProps) {
                 </DialogContentText>
             </Stack>
             <Divider sx={{ marginBottom: "10px" }} light />
+            <Stack direction="row" justifyContent="space-evenly">{valuePerNote}</Stack>
             <Stack direction="row" justifyContent={"space-evenly"}>
                 <Button onClick={() => props.handleClose()} variant="outlined">Cancel</Button>
                 <Button onClick={() => proceed()} variant="contained">Proceed</Button>
