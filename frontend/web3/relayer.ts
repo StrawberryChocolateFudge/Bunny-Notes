@@ -1,12 +1,7 @@
 import { SolidityProof } from "../../lib/types";
 import { BigNumber, ethers } from "ethers";
 import { BunnyNotes } from "../../typechain";
-import {
-  bunnyNotesCommitments,
-  calculateFeeLocally,
-  estimateWithdraw,
-  FEEDIVIDER,
-} from "./web3";
+import { bunnyNotesCommitments, estimateWithdraw, FEEDIVIDER } from "./web3";
 
 export let RELAYERURL = "https://relayer.bunnynotes.finance";
 
@@ -162,4 +157,72 @@ export async function postWithdraw(
   } catch (err) {
     return [false, "Relaying failed"];
   }
+}
+
+export type MerkleTreeUpload = {
+  root: string;
+  leaves: string;
+  network: string;
+};
+
+export async function uploadMerkleTree(body: MerkleTreeUpload) {
+  try {
+    const res = await fetch(RELAYERURL + "/bundle", {
+      method: "POST",
+      cache: "no-cache",
+
+      body: JSON.stringify(body),
+    });
+    const json = await res.json();
+    if (res.status === 200 && json.message === "ok") {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    return false;
+  }
+}
+
+export type MerkleTreeDownload = {
+  root: string;
+};
+
+export async function downloadMerkleTree(body: MerkleTreeDownload) {
+  try {
+    const res = await fetch(RELAYERURL + "/bundle", {
+      method: "GET",
+      cache: "no-cache",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    const json = await res.json();
+
+    if (res.status === 200) {
+      return { root: json.root, leaves: json.leaves, network: json.network };
+    } else {
+      return false;
+    }
+  } catch (err) {
+    return false;
+  }
+}
+
+export async function saveMerkleTreeString(merkleTree: string) {
+  // const helia = await createNode();
+  // const str = strings(helia);
+
+  // const cid = await str.add(merkleTree);
+  // return cid.toString();
+  return "";
+}
+
+export async function fetchMerkleTreeString(root: string) {
+  // const helia = await createNode();
+  // const str = strings(helia);
+  // const merkleTree = await str.get(CID.parse(cid));
+  // return merkleTree;
+  return "";
 }
