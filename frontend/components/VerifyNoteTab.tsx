@@ -7,16 +7,17 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Box from "@mui/material/Box"
-import { Base, Spacer } from './Base';
+import { BaseProps, Spacer } from './Base';
 import ScanNoteButton from './QRScannerModal';
-import { parseNote, toNoteHex } from '../../lib/BunnyNote';
+import { toNoteHex } from '../../lib/BunnyNote';
 import { styled, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
-import { bunnyNoteIsSpent, bunnyNotesCommitments, ChainIds, getJsonRpcProvider, getNetworkNameFromId, getNoteContractAddress, getRpcContract } from '../web3/web3';
+import { bundleIsSpent, bunnyBundles, bunnyNoteIsSpent, bunnyNotesCommitments, ChainIds, getBundlesContractAddress, getJsonRpcProvider, getNetworkNameFromId, getNoteContractAddress, getNoteValue, getRpcContract, recipients, ZEROADDRESS } from '../web3/web3';
 import { getLoading } from './LoadingIndicator';
-import { commitmentQRStringParser } from '../qrcode/create';
 import { ParsedNote } from '../zkp/generateProof';
+import { checkIsBundle, evalQRCodeType } from '../qrcode/create';
+import { formatEther } from 'ethers/lib/utils';
 
-interface VerifyNoteTabProps extends Base {
+interface VerifyNoteTabProps extends BaseProps {
       noteString: string
       setMyNoteString: (newValue: string) => void;
 
@@ -30,7 +31,11 @@ export type Commitment = {
       erc20Address: string,
       noteAddress: string,
       usesToken: boolean,
-      network: string
+      network: string,
+      isBundle: boolean,
+      bundleRoot: string,
+      bundleSize: string,
+      bundleTotalValue: string
 }
 
 const IMG = styled("img")({
@@ -40,39 +45,8 @@ const IMG = styled("img")({
 
 export const shortenAddress = (address: string) => <Tooltip title={address}><div>{address.substring(0, 6)}...{address.substring(address.length - 6)}</div></Tooltip>
 
-export const evalQRCodeType = async (qrString) => {
-      //TODO: ADD BUNNY BUNDLE HERE!
-      // COMMITMENT FOR BUNNY BUNDLE ALSO!
-      let cryptoNoteParseError = false;
-      let commitmentParseError = false;
-      let errorMessage = "";
-      let parsedQrCode = {};
-      try {
-            parsedQrCode = await parseNote(qrString);
-      } catch (err) {
-            cryptoNoteParseError = true;
-            errorMessage = err.message;
-      }
 
-      try {
-            parsedQrCode = commitmentQRStringParser(qrString);
-      } catch (err) {
-            commitmentParseError = true;
-            errorMessage = err.message;
-      }
-
-      if (!cryptoNoteParseError) {
-            return { type: "cryptoNote", code: parsedQrCode, err: errorMessage };
-      }
-
-      if (!commitmentParseError) {
-            return { type: "commitmentQR", code: parsedQrCode, err: errorMessage }
-      }
-
-      return { type: "invalid", code: parsedQrCode, err: errorMessage };
-}
-
-const getDetails = ({ type, code, err }: { type: string, code: any, err: string }) => {
+const getBunnyNoteDetails = ({ type, code, err }: { type: string, code: any, err: string }) => {
       if (type === "cryptoNote") {
             const note = code as ParsedNote;
             const nullifierHash = toNoteHex(note.deposit.nullifierHash);
@@ -86,10 +60,24 @@ const getDetails = ({ type, code, err }: { type: string, code: any, err: string 
       return null;
 }
 
+const getBunnyBundleDetails = ({ type, code, err }: { type: string, code: any, err: string }) => {
+      if (type === "bundleroot") {
+            return { root: code.root, netId: code.netId, nullifierHash: "", totalValue: code.totalValue, size: code.size, currency: code.currency }
+      } else if (type === "bunnybundle") {
+            const nullifierHash = toNoteHex(code.deposit.nullifierHash);
+            return { root: code.root, netId: code.netId, nullifierHash, currency: code.currency, amount: code.amount }
+      } else if (type === "bundlecommitment") {
+            return { root: code.root, nullifierHash: code.nullifierHash, netId: code.netId, currency: code.currency, amount: code.amount }
+      }
+      return null;
+}
+
+
 export default function VerifyNoteTab(props: VerifyNoteTabProps) {
 
       const [commitmentDetails, setCommitmentDetails] = React.useState<null | Commitment>(null)
       const [loading, setLoading] = React.useState(false);
+
       const noteStringSetter = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
             props.setMyNoteString(event.target.value);
       }
@@ -107,49 +95,118 @@ export default function VerifyNoteTab(props: VerifyNoteTabProps) {
                   return;
             }
 
-            const details = getDetails(evalResult);
-            if (!details) {
-                  props.displayError("Unable to parse note!");
-                  return;
-            }
-            const { commitment, nullifierHash, amount, currency, netId } = details;
-            const chainId = "0x" + netId.toString(16) as ChainIds;
-            setLoading(true);
+            const isBundle = checkIsBundle(evalResult.type);
 
-            const contractAddress = getNoteContractAddress(chainId);
+            if (isBundle) {
+                  //TODO: implement fetching the bundle details here
+                  // Depending on what I have I need to fetch the bundle details
+                  // or I need to fetch the bundle note details
+                  const details = getBunnyBundleDetails(evalResult);
+                  if (!details) {
+                        props.displayError("Unable to parse note");
+                        return;
+                  }
 
-            const provider = getJsonRpcProvider(chainId);
+                  const { root, netId, nullifierHash,
+                        //TotalValue and size is onl defined when using an encoded root
+                        totalValue, size,
+                        currency,
+                        // Amount is only defined when using an individual note
+                        amount
+                  } = details;
+                  const chainId = "0x" + netId.toString(16) as ChainIds;
+                  setLoading(true);
+                  const contractAddress = getBundlesContractAddress(chainId);
+                  const provider = getJsonRpcProvider(chainId);
 
-            const contract = await getRpcContract(provider, contractAddress, "/BunnyNotes.json");
-            // get the commitment data
+                  const contract = await getRpcContract(provider, contractAddress, "/BunnyBundles.json");
 
-            const isSpent = await bunnyNoteIsSpent(contract, nullifierHash)
+                  const isSpent = await bundleIsSpent(contract, nullifierHash, root);
 
-            const commitments = await bunnyNotesCommitments(contract, commitment)
+                  const bundle = await bunnyBundles(contract, root);
 
-            if (!commitments.used) {
-                  props.displayError("Invalid note. Missing Deposit!");
+                  if (bundle.creator === ZEROADDRESS) {
+                        props.displayError("Invalid Bundle. Missing deposit");
+                        setLoading(false);
+                        return;
+                  }
+
+                  const recipient = !isSpent ? "Not Spent" : await recipients(contract, nullifierHash);
+
+                  let erc20Address = bundle.usesToken ? bundle.token : "Native Token";
+
+                  // Fetch the currency and the amount for the denomination
+                  let denomination = ""
+                  if (amount) {
+                        denomination = `${amount} ${currency}`
+                  } else {
+                        const noteValue = await getNoteValue(contract, totalValue, size);
+                        denomination = `${formatEther(noteValue)} ${currency}`
+                  }
+
+                  setCommitmentDetails({
+                        validText: !isSpent ? "Valid" : "The Note has been spent!",
+                        creator: bundle.creator,
+                        recipient,
+                        denomination,
+                        noteAddress: contractAddress,
+                        erc20Address,
+                        usesToken: bundle.usesToken,
+                        network: getNetworkNameFromId(chainId),
+                        isBundle: true,
+                        bundleRoot: root,
+                        bundleSize: bundle.size,
+                        bundleTotalValue: formatEther(bundle.totalValue)
+                  })
+
+            } else {
+                  const details = getBunnyNoteDetails(evalResult);
+                  if (!details) {
+                        props.displayError("Unable to parse note!");
+                        return;
+                  }
+                  const { commitment, nullifierHash, amount, currency, netId } = details;
+                  const chainId = "0x" + netId.toString(16) as ChainIds;
+                  setLoading(true);
+
+                  const contractAddress = getNoteContractAddress(chainId);
+
+                  const provider = getJsonRpcProvider(chainId);
+
+                  const contract = await getRpcContract(provider, contractAddress, "/BunnyNotes.json");
+                  // get the commitment data
+
+                  const isSpent = await bunnyNoteIsSpent(contract, nullifierHash)
+
+                  const commitments = await bunnyNotesCommitments(contract, commitment)
+
+                  if (!commitments.used) {
+                        props.displayError("Invalid note. Missing Deposit!");
+                        setLoading(false);
+                        return;
+                  }
+
+                  const recipient = !isSpent ? "Not Spent" : commitments.recipient;
+
+                  //Try to get the token, if it throws then it must be an ETH note
+                  let erc20Address = commitments.usesToken ? commitments.token : "Native Token";
+
+                  setCommitmentDetails({
+                        validText: !isSpent ? "Valid!" : "The Note has been spent!",
+                        creator: commitments.creator,
+                        recipient: recipient,
+                        denomination: `${amount} ${currency}`,
+                        noteAddress: contractAddress,
+                        erc20Address,
+                        usesToken: commitments.usesToken,
+                        network: getNetworkNameFromId(chainId),
+                        isBundle: false,
+                        bundleRoot: "",
+                        bundleSize: "",
+                        bundleTotalValue: ""
+                  })
                   setLoading(false);
-                  return;
             }
-
-            const recipient = !isSpent ? "Not Spent" : commitments.recipient;
-
-            //Try to get the token, if it throws then it must be an ETH note
-            let erc20Address = commitments.usesToken ? commitments.token : "Native Token";
-
-            setCommitmentDetails({
-
-                  validText: !isSpent ? "Valid!" : "The Note has been spent!",
-                  creator: commitments.creator,
-                  recipient: recipient,
-                  denomination: `${amount} ${currency}`,
-                  noteAddress: contractAddress,
-                  erc20Address,
-                  usesToken: commitments.usesToken,
-                  network: getNetworkNameFromId(chainId)
-            })
-            setLoading(false);
       }
 
       const resetVerifyPage = () => {
