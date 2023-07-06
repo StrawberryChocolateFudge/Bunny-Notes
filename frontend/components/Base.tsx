@@ -123,8 +123,6 @@ export default function Base() {
                 return <VerifyNoteTab {...genericProps} {...noteStringProps} />
             case 2:
                 return <CashOutGiftCardTab {...genericProps} {...noteStringProps}></CashOutGiftCardTab>
-            case 3:
-                return <Roadmap></Roadmap>
             default:
                 break;
         }

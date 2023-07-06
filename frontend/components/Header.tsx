@@ -20,7 +20,6 @@ export default function Header(props: HeaderProps) {
                     <Tab sx={{ fontFamily: `"Finger Paint",cursive` }} label="Bunny Notes" />
                     <Tab sx={{ fontFamily: `"Finger Paint",cursive` }} label="Verify a Note" />
                     <Tab sx={{ fontFamily: `"Finger Paint",cursive` }} label="Withdraw" />
-                    <Tab sx={{ fontFamily: `"Finger Paint",cursive` }} label="Roadmap" />
                 </Tabs>
             </AppBar> : <React.Fragment></React.Fragment>}
 
