@@ -2,6 +2,8 @@ import MetaMaskOnboarding from "@metamask/onboarding";
 import { BigNumber, ethers } from "ethers";
 import { formatEther, parseEther } from "ethers/lib/utils";
 
+import { deserializeTree, serializeTree } from "../../lib/BunnyBundle";
+
 export const FEEDIVIDER = 100;
 
 enum NetworkNames {
@@ -49,7 +51,7 @@ enum BunnyNotesContractAddress {
 }
 
 enum BunnyBundlesContractAddresses {
-  BTT_DONAU_TESTNET = "",
+  BTT_DONAU_TESTNET = "0xA4e589a0A02EEaE9876c1B776E9c8D0bA9EFdfd8",
   BSC_TESTNET = "",
 
   //MAINNETS:
@@ -641,4 +643,31 @@ export async function bundle_withdraw(
 
 export async function bunnyBundles(contract: any, root: any) {
   return await contract.bundles(root);
+}
+
+export async function recipients(
+  contract: any,
+  nullifierHash: string,
+): Promise<string> {
+  return await contract.recipients(nullifierHash);
+}
+
+export async function bundleIsSpent(
+  contract: any,
+  nullifierHash: string,
+  root: string,
+) {
+  if (nullifierHash === "") {
+    // If this is an encoded root I pass in an empty nullifierHash so I just return false
+    return false;
+  }
+  return contract.isSpent(nullifierHash, root);
+}
+
+export async function getNoteValue(
+  contract: any,
+  totalValue: string,
+  size: string,
+) {
+  return contract.getNoteValue(totalValue, size);
 }
