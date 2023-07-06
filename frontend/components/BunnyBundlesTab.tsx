@@ -1,4 +1,4 @@
-import { Button, Link, Paper, Stack, Tooltip, Typography } from "@mui/material";
+import { Button, Link, Paper, Stack, Typography } from "@mui/material";
 import React from "react";
 import { calculateFeeAndBundle } from "../web3/calculateFeeAndNote";
 import { getCardPropsData } from "../web3/cardPropsData";
@@ -13,11 +13,9 @@ import { NetworkSelectorDropdown, onSelectedNetworkEmpty } from "./utils/Network
 interface BunnyNotesPageProps extends BaseProps {
 }
 
+//TODO: THIS IS UNTESTED!! THE BUNNY BUNDLE CREATION NEEDS TO BE TESTED!
 
 export function BunnyBundlesTab(props: BunnyNotesPageProps) {
-
-
-
     const [selectedCard, setSelectedCard] = React.useState({ tokenAddress: "", cardType: "", currency: "", isCustom: false, isFeeless: false, description: "" });
     const [showparametersInput, setShowParametersInput] = React.useState(false);
     const [bundleFee, setBundleFee] = React.useState("");
@@ -33,6 +31,8 @@ export function BunnyBundlesTab(props: BunnyNotesPageProps) {
     const [downloadBundlePressed, setDownloadBundlePressed] = React.useState(false);
     // Track if the deposit button is disabled with state stored here
     const [depositButtonDisabled, setDepositButtonDisabled] = React.useState(true);
+
+    const [downloadSwitchOn, setDownloadSwitchOn] = React.useState(false);
 
     const [showApproval, setShowApproval] = React.useState(true);
 
@@ -95,7 +95,9 @@ export function BunnyBundlesTab(props: BunnyNotesPageProps) {
             setShowApproval,
             setRenderDownloadPage,
             downloadBundlePressed,
-            setDownloadBundlePressed
+            setDownloadBundlePressed,
+            downloadSwitchOn,
+            setDownloadSwitchOn
         })
     }
 
