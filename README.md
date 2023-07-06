@@ -1,3 +1,5 @@
+# NOTE BUNNY BUNDLE FEATURES ARE UNTESTED!!
+
 # Bunny Notes
 
 This is the full implementation of Bunny Notes, a zero-knowledge proof based crypto note protocol.
@@ -58,13 +60,15 @@ Export the verifier smart contract
 
 And finally the verifier was copied to the contracts library
 
+## Bunny Bundles
+
 Bunny bundles flowchart!
 
 ```flowchart LR
  subgraph Deposit
     A[Alice] -->|Creates Bunny Notes| B(Bulk Notes)
     B --> C{Computes a merkle tree}
-    C -->|Uploads tree to decentralized storage| UploadTree(Tree is upladed) 
+    C -->|Uploads tree to decentralized storage or Cache| UploadTree(Tree is upladed) 
     C --> |Merkle Root| G{SavesMerkle Root With deposit in smart contract}
     A --> |Value Deposit| G
    end 
@@ -74,3 +78,25 @@ Bunny bundles flowchart!
    E -->|Merkle proof and merkle root| F{Computes ZKP}
 
   end
+```
+
+### Bunny Bundles verify the latest zkey
+
+` snarkjs zkey verify ./circuits/withdraw_bunnyBundle/withdrawBundledNote.r1cs ./circuits/powersOfTau28_hez_final_15.ptau ./circuits/withdraw_bunnyBundle/withdrawBundledNote_0009.zkey `
+
+#### Bunny Bundles random beacon
+The random beacon selected is the transaction ID of a BTT transaction that was sent during deployment. Nobody was able to predict what the hash will be. The transactions contains a message: `Bunny Bundles Beacon Transaction`
+
+BEACON TX ID = 0xc53c71c8be3c960f363b9f1959c13961d77513ce183bbe99156e1f0fa16c6b9a
+
+#### Create the final zkey
+` snarkjs zkey beacon withdrawBundledNote_0009.zkey withdrawBundledNote_final.zkey c53c71c8be3c960f363b9f1959c13961d77513ce183bbe99156e1f0fa16c6b9a 10 -n="Final Beacon Phase 2 Bunny Bundles is Ready"`
+
+#### Verify the Final zkey
+` snarkjs zkey verify withdrawBundledNote.r1cs ../powersOfTau28_hez_final_15.ptau withdrawBundledNote_final.zkey `
+
+#### Export the verification key
+`snarkjs zkey export verificationkey withdrawBundledNote_final.zkey withdrawBundledNote_verificationKey.json`
+
+#### Export the solidity verifier
+`snarkjs zkey export solidityverifier withdrawBundledNote_final.zkey WithdrawBundledNotes.sol`
