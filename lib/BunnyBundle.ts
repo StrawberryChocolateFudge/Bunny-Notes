@@ -73,6 +73,19 @@ export function serializeTree(root: string, leaves: bigint[]) {
   return JSON.stringify({ root: stringroot, leaves: stringleaves });
 }
 
+// A helper function to deserialize the tree
+export function deserializeTree(
+  merkleTreeString: string,
+): { root: string; leaves: bigint[] } {
+  const parsedString = JSON.parse(merkleTreeString);
+  const root = parsedString.root;
+  const leaves = [];
+  for (let i = 0; i < parsedString.leaves.length; i++) {
+    leaves.push(BigInt(parsedString.leaves[i]));
+  }
+  return { root, leaves };
+}
+
 export function fromNoteHex(hex: string) {
   return BigInt(hex);
 }
@@ -91,13 +104,37 @@ export async function parseBundleNote(noteString: string) {
   const deposit = await createDeposit({ nullifier, secret });
   //@ts-ignore
   const netId = Number(match.groups.netId);
-  //@ts-ignore
   return {
+    //@ts-ignore
     currency: match.groups.currency,
+    //@ts-ignore
     amount: match.groups.amount,
     netId,
     deposit,
+    //@ts-ignore
     size: match.groups.bundleSize,
+    //@ts-ignore
     root: match.groups.root,
   };
+}
+
+export async function rootEncodingForVerification(
+  root: string,
+  network: string,
+) {
+  return `bundleroot-${root}-${Number(network)}`;
+}
+
+export async function verifyEncodedRoot(encodedRoot: string) {
+  const rootRegex = /bundleroot-(?<root>\d+)-(?<netId>\d+)/g;
+  const match = rootRegex.exec(encodedRoot);
+  if (!match) {
+    throw new Error("Invalid Root format");
+  }
+  //@ts-ignore
+  const root = match?.groups.root;
+  //@ts-ignore
+  const netId = Number(match?.groups.netId);
+
+  return { root, netId };
 }
