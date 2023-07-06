@@ -400,4 +400,5 @@ function createPage(
   doc.line(3, 225, 207, 225);
 
   doc.text("https://bunnynotes.finance", 3, 292);
+  doc.setTextColor(prevTextColor);
 }
