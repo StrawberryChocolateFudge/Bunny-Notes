@@ -112,7 +112,7 @@ export async function generateBundleWithdrawProof(
       wasmFilePath:
         "circuits/withdraw_bunnyBundle/withdrawBundledNote_js/withdrawBundledNote.wasm",
       zkeyFilePath:
-        "circuits/withdraw_bunnyBundle/withdrawBundledNote_0001.zkey",
+        "circuits/withdraw_bunnyBundle/withdrawBundledNote_final.zkey",
     };
   }
 
