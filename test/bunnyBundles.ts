@@ -11,7 +11,6 @@ import { setUpBunnyBundles } from "./setup";
 import { toNoteHex } from "../lib/BunnyNote";
 import { parseEther } from "ethers/lib/utils";
 import packToSolidityProof from "../lib/packToSolidityProof";
-import { blob } from "stream/consumers";
 import { ZEROADDRESS } from "../frontend/web3/web3";
 
 describe("Bunny bundles", function () {
