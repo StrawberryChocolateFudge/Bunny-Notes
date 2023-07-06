@@ -10,7 +10,7 @@ async function main() {
     const [signer] = await ethers.getSigners();
 
     console.log(signer.address);
-    const txMessage = "Bunny Notes Mainnet Beacon Transaction";
+    const txMessage = "Bunny Bundles Beacon Transaction";
     const data = ethers.utils.defaultAbiCoder.encode(["string"], [txMessage])
 
     const tx = await signer.sendTransaction({
